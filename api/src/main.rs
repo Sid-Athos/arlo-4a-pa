@@ -4,6 +4,8 @@
 //! cargo run -p example-tokio-postgres
 //! ```
 
+extern crate dotenv;
+
 use axum::{
     async_trait,
     extract::{FromRef, FromRequestParts, State},
@@ -17,7 +19,6 @@ use std::net::SocketAddr;
 use tokio_postgres::NoTls;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use dotenv::dotenv;
-extern crate dotenv;
 use std::env;
 
 
