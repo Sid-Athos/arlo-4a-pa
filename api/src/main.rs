@@ -1,46 +1,114 @@
-use std::env;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-use sqlx::postgres::PgPoolOptions;
-extern crate dotenv;
+//! Run with
+//!
+//! ```not_rust
+//! cargo run -p example-tokio-postgres
+//! ```
 
+use axum::{
+    async_trait,
+    extract::{FromRef, FromRequestParts, State},
+    http::{request::Parts, StatusCode},
+    routing::get,
+    Router,
+};
+use bb8::{Pool, PooledConnection};
+use bb8_postgres::PostgresConnectionManager;
+use std::net::SocketAddr;
+use tokio_postgres::NoTls;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use dotenv::dotenv;
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
+extern crate dotenv;
+use std::env;
 
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()>{
+#[tokio::main]
+async fn main() {
     dotenv().ok();
-    //let conn_string = env::var("DB_URL").unwrap();
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&env::var("DB_URL").unwrap()).await.expect("Database error");
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "api=debug".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
-    // Make a simple query to return the given parameter (use a question mark `?` instead of `$1` for MySQL)
-    let row: (i64,) = sqlx::query_as("SELECT $1")
-        .bind(150_i64)
-        .fetch_one(&pool).await.expect("Failed to do the query");
-    println!("{}", row.0);
+    // set up connection pool
+    let manager =
+        PostgresConnectionManager::new_from_stringlike(&env::var("DB_URL").unwrap(), NoTls)
+            .unwrap();
+    let pool = Pool::builder().build(manager).await.unwrap();
 
-    HttpServer::new(|| {
-        App::new()
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
-    })
-        .bind(("127.0.0.1", 8080))?
-        .run()
+    // build our application with some routes
+    let app = Router::new()
+        .route(
+            "/",
+            get(using_connection_pool_extractor).post(using_connection_extractor),
+        )
+        .with_state(pool);
+
+    // run it with hyper
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    tracing::info!("listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
         .await
+        .unwrap();
+}
+
+type ConnectionPool = Pool<PostgresConnectionManager<NoTls>>;
+
+async fn using_connection_pool_extractor(
+    State(pool): State<ConnectionPool>,
+) -> Result<String, (StatusCode, String)> {
+    let conn = pool.get().await.map_err(internal_error)?;
+
+    let row = conn
+        .query_one("select 1 + 1", &[])
+        .await
+        .map_err(internal_error)?;
+    let two: i32 = row.try_get(0).map_err(internal_error)?;
+
+    Ok(two.to_string())
+}
+
+// we can also write a custom extractor that grabs a connection from the pool
+// which setup is appropriate depends on your application
+struct DatabaseConnection(PooledConnection<'static, PostgresConnectionManager<NoTls>>);
+
+#[async_trait]
+impl<S> FromRequestParts<S> for DatabaseConnection
+    where
+        ConnectionPool: FromRef<S>,
+        S: Send + Sync,
+{
+    type Rejection = (StatusCode, String);
+
+    async fn from_request_parts(_parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let pool = ConnectionPool::from_ref(state);
+
+        let conn = pool.get_owned().await.map_err(internal_error)?;
+
+        Ok(Self(conn))
+    }
+}
+
+async fn using_connection_extractor(
+    DatabaseConnection(conn): DatabaseConnection,
+) -> Result<String, (StatusCode, String)> {
+    let row = conn
+        .query_one("select 1 + 1", &[])
+        .await
+        .map_err(internal_error)?;
+    let two: i32 = row.try_get(0).map_err(internal_error)?;
+
+    Ok(two.to_string())
+}
+
+/// Utility function for mapping any error into a `500 Internal Server Error`
+/// response.
+fn internal_error<E>(err: E) -> (StatusCode, String)
+    where
+        E: std::error::Error,
+{
+    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
 }
