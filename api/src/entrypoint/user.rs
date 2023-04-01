@@ -1,11 +1,11 @@
 use axum::extract::{Path, State};
-use axum::http::{HeaderMap, HeaderValue, Request, StatusCode};
-use axum::{Extension, Json, Router};
+use axum::http::{HeaderMap, StatusCode};
+use axum::{Json, Router};
 use axum::routing::{get, post};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
-use crate::database::init::{ConnectionPool, DatabaseConnection};
+use crate::database::init::ConnectionPool;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::internal_error;

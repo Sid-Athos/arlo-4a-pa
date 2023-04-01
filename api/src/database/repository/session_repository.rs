@@ -1,5 +1,5 @@
 use axum::http::StatusCode;
-use bb8::{Pool, PooledConnection};
+use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 use crate::database::entity::session_entity::SessionEntity;

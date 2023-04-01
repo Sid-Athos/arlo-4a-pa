@@ -5,17 +5,7 @@ pub struct UserEntityMapper;
 
 impl UserEntityMapper {
 
-    pub fn to_user_entity(user: User) -> UserEntity {
-        UserEntity {
-            id: user.id,
-            pseudo: user.pseudo,
-            email: user.email,
-            password: user.password,
-            admin: user.admin
-        }
-    }
-
-    pub fn to_user(user_entity: UserEntity) -> User {
+    pub fn entity_to_domain(user_entity: UserEntity) -> User {
         User {
             id: user_entity.id,
             pseudo: user_entity.pseudo,

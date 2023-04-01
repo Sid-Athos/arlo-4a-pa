@@ -1,7 +1,7 @@
 use axum::http::StatusCode;
-use bb8::{Pool, PooledConnection};
+use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
-use tokio_postgres::{NoTls, Row};
+use tokio_postgres::NoTls;
 use crate::database::entity::user_entity::UserEntity;
 use crate::database::mapper::user_entity_mapper::UserEntityMapper;
 use crate::domain::error::internal_error;
@@ -31,7 +31,7 @@ impl UserRepository {
 
         let result = UserEntity::new(row);
 
-        Ok(UserEntityMapper::to_user(result))
+        Ok(UserEntityMapper::entity_to_domain(result))
     }
 
     pub async fn get_user_by_email(&self, email: String) -> Result<User, (StatusCode, String)> {
@@ -45,7 +45,7 @@ impl UserRepository {
 
         let result = UserEntity::new(row);
 
-        Ok(UserEntityMapper::to_user(result))
+        Ok(UserEntityMapper::entity_to_domain(result))
     }
 
     pub async fn create_user(&self, user: CreateUserCommand) -> Result<User, (StatusCode, String)> {
@@ -59,6 +59,6 @@ impl UserRepository {
 
         let result = UserEntity::new(row);
 
-        Ok(UserEntityMapper::to_user(result))
+        Ok(UserEntityMapper::entity_to_domain(result))
     }
 }
