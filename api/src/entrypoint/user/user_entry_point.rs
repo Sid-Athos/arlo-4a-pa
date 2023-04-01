@@ -1,6 +1,6 @@
 use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
-use axum::{Json, middleware, Router};
+use axum::{Extension, Json, middleware, Router};
 use axum::routing::{get, post};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
@@ -68,15 +68,7 @@ impl UserEntryPoint {
         Ok(Json(session))
     }
 
-    async fn me(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<User>, (StatusCode, String)> {
-        let session_service = SessionService::new(
-            UserRepository::new(pool.clone()),
-            SessionRepository::new(pool.clone())
-        );
-
-        let token = headers["authorization"].to_str().map_err(internal_error)?.replace("Bearer ", "");
-        let user = session_service.get_user_by_token(token).await?;
-
+    async fn me(Extension(user): Extension<User>) -> Result<Json<User>, (StatusCode, String)> {
         Ok(Json(user))
     }
 
@@ -86,8 +78,8 @@ impl UserEntryPoint {
             .route("/create", post(Self::user_create))
             .route("/:user_id", get(Self::user_get))
             .route("/login", post(Self::user_login))
-            .route("/logout", post(Self::user_logout))
-            .route("/me", get(Self::me).route_layer(middleware::from_fn(is_logged)))
+            .route("/logout", post(Self::user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+            .route("/me", get(Self::me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
             .with_state(pool)
     }
 }
