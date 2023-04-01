@@ -22,7 +22,7 @@ impl UserRepository {
     pub async fn get_user_by_id(&self, user_id: i32) -> Result<User, (StatusCode, String)> {
 
         let row: Row = self.connection
-            .query_one("SELECT id, pseudo, email, password FROM coding_games.user WHERE id = $1", &[&user_id])
+            .query_one("SELECT * FROM coding_games.user WHERE id = $1", &[&user_id])
             .await
             .map_err(internal_error)?;
 

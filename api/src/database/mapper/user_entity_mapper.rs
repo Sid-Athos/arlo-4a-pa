@@ -10,7 +10,8 @@ impl UserEntityMapper {
             id: user.id,
             pseudo: user.pseudo,
             email: user.email,
-            password: user.password
+            password: user.password,
+            admin: user.admin
         }
     }
 
@@ -19,7 +20,8 @@ impl UserEntityMapper {
             id: user_entity.id,
             pseudo: user_entity.pseudo,
             email: user_entity.email,
-            password: user_entity.password
+            password: user_entity.password,
+            admin: user_entity.admin
         }
     }
 }

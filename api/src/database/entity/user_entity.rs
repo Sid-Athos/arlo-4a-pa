@@ -5,6 +5,7 @@ pub struct UserEntity {
     pub pseudo: String,
     pub email: String,
     pub password: String,
+    pub admin: bool,
 }
 
 impl UserEntity {
@@ -14,6 +15,7 @@ impl UserEntity {
             pseudo: row.get("pseudo"),
             email: row.get("email"),
             password: row.get("password"),
+            admin: row.get("admin"),
         }
     }
 }
