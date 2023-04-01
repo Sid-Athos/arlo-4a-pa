@@ -1,5 +1,7 @@
 use bcrypt::{hash, verify};
 use axum::http::StatusCode;
+use rand::distributions::Alphanumeric;
+use rand::{Rng, thread_rng};
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::internal_error;
 use crate::domain::model::user::User;
@@ -33,6 +35,15 @@ impl UserService {
         let user_bdd = self.user_repository.get_user_by_email(user.email).await?;
 
         if verify(user.password, &user_bdd.password).map_err(internal_error)? {
+
+            let token: String = thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(256)
+                .map(char::from)
+                .collect();
+
+            println!("token: {}", token);
+
             Ok(user_bdd)
         } else {
             Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()))
