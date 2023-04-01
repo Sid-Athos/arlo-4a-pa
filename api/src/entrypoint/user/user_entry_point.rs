@@ -23,7 +23,7 @@ pub struct UserEntryPoint {}
 
 impl UserEntryPoint {
 
-    pub async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<User>, (StatusCode, String)> {
+    async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<User>, (StatusCode, String)> {
         let user_service = UserService::new(
             UserRepository::new(pool.clone()),
             SessionRepository::new(pool.clone())
@@ -34,7 +34,7 @@ impl UserEntryPoint {
         Ok(Json(user))
     }
 
-    pub async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<User>, (StatusCode, String)> {
+    async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<User>, (StatusCode, String)> {
         let user_service = UserService::new(
             UserRepository::new(pool.clone()),
             SessionRepository::new(pool.clone())
@@ -45,7 +45,7 @@ impl UserEntryPoint {
         Ok(Json(user))
     }
 
-    pub async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<Session>, (StatusCode, String)> {
+    async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<Session>, (StatusCode, String)> {
         let user_service = UserService::new(
             UserRepository::new(pool.clone()),
             SessionRepository::new(pool.clone())
@@ -56,7 +56,7 @@ impl UserEntryPoint {
         Ok(Json(session))
     }
 
-    pub async fn user_logout(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<Session>, (StatusCode, String)> {
+    async fn user_logout(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<Session>, (StatusCode, String)> {
         let session_service = SessionService::new(
             UserRepository::new(pool.clone()),
             SessionRepository::new(pool.clone())
@@ -68,7 +68,7 @@ impl UserEntryPoint {
         Ok(Json(session))
     }
 
-    pub async fn me(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<User>, (StatusCode, String)> {
+    async fn me(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<User>, (StatusCode, String)> {
         let session_service = SessionService::new(
             UserRepository::new(pool.clone()),
             SessionRepository::new(pool.clone())
@@ -83,11 +83,11 @@ impl UserEntryPoint {
     pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
         Router::new()
-            .route("/create", post(UserEntryPoint::user_create))
-            .route("/:user_id", get(UserEntryPoint::user_get))
-            .route("/login", post(UserEntryPoint::user_login))
-            .route("/logout", post(UserEntryPoint::user_logout))
-            .route("/me", get(UserEntryPoint::me).route_layer(middleware::from_fn(is_logged)))
+            .route("/create", post(Self::user_create))
+            .route("/:user_id", get(Self::user_get))
+            .route("/login", post(Self::user_login))
+            .route("/logout", post(Self::user_logout))
+            .route("/me", get(Self::me).route_layer(middleware::from_fn(is_logged)))
             .with_state(pool)
     }
 }
