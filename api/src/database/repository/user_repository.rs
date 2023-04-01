@@ -6,7 +6,7 @@ use crate::database::entity::user_entity::UserEntity;
 use crate::database::mapper::user_entity_mapper::UserEntityMapper;
 use crate::domain::error::internal_error;
 use crate::domain::model::user::User;
-use crate::entrypoint::command::create_user_command::CreateUserCommand;
+use crate::service::command::create_user_command::CreateUserCommand;
 
 pub struct UserRepository {
     pub connection: Pool<PostgresConnectionManager<NoTls>>,

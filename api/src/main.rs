@@ -7,7 +7,7 @@ use axum::Router;
 use std::net::SocketAddr;
 use dotenv::dotenv;
 use crate::database::init::init_db;
-use crate::entrypoint::user::UserEntryPoint;
+use crate::entrypoint::user::user_entry_point::UserEntryPoint;
 
 
 #[tokio::main]

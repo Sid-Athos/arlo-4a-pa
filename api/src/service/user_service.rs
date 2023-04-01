@@ -7,8 +7,8 @@ use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::internal_error;
 use crate::domain::model::session::Session;
 use crate::domain::model::user::User;
-use crate::entrypoint::command::create_user_command::CreateUserCommand;
-use crate::entrypoint::command::login_command::LoginCommand;
+use crate::service::command::create_user_command::CreateUserCommand;
+use crate::service::command::login_command::LoginCommand;
 
 pub struct UserService {
     pub user_repository: UserRepository,
@@ -50,9 +50,5 @@ impl UserService {
         } else {
             Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()))
         }
-    }
-
-    pub async fn logout_user(&self, token: String) -> Result<Session, (StatusCode, String)> {
-        self.session_repository.delete_by_token(token).await
     }
 }

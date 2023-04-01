@@ -47,7 +47,7 @@ impl SessionRepository {
         Ok(SessionEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn delete_by_token(&self, token: String) -> Result<Session, (StatusCode, String)> {
+    pub async fn delete_token(&self, token: String) -> Result<Session, (StatusCode, String)> {
 
         let conn = self.connection.get().await.map_err(internal_error)?;
 
