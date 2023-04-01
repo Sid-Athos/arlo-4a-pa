@@ -7,7 +7,7 @@ use axum::Router;
 use std::net::SocketAddr;
 use dotenv::dotenv;
 use crate::database::init::init_db;
-use crate::entrypoint::user::user_routes;
+use crate::entrypoint::user::UserEntryPoint;
 
 
 #[tokio::main]
@@ -18,7 +18,7 @@ async fn main() {
     let pool = init_db().await.unwrap();
 
     let app = Router::new()
-        .nest("/user", user_routes(pool));
+        .nest("/user", UserEntryPoint::get_routes(pool));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
