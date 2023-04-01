@@ -1,7 +1,6 @@
 use axum::extract::{Path, State};
-use axum::http::{HeaderMap, Request, StatusCode};
+use axum::http::{HeaderMap, StatusCode};
 use axum::{Json, middleware, Router};
-use axum::body::Body;
 use axum::routing::{get, post};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;

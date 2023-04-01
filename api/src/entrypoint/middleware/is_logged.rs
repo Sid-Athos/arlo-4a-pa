@@ -1,9 +1,7 @@
-use axum::{Router, routing::get, middleware::{self, Next}, response::Response, extract::State, http::Request, http};
-use tower::{Layer, Service};
-use std::task::{Context, Poll};
+use axum::{middleware:: Next, response::Response, http::Request, http};
 use axum::http::StatusCode;
 
-pub async fn is_logged<B>(mut req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
+pub async fn is_logged<B>(req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
     let auth_header = req.headers()
         .get(http::header::AUTHORIZATION)
         .and_then(|header| header.to_str().ok());
