@@ -8,7 +8,7 @@ use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 use crate::domain::error::internal_error;
 
-type ConnectionPool = Pool<PostgresConnectionManager<NoTls>>;
+pub type ConnectionPool = Pool<PostgresConnectionManager<NoTls>>;
 
 pub struct DatabaseConnection(pub PooledConnection<'static, PostgresConnectionManager<NoTls>>);
 
