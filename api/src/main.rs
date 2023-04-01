@@ -1,12 +1,13 @@
 mod database;
 mod service;
 mod domain;
+mod entrypoint;
 
 use axum::Router;
 use std::net::SocketAddr;
 use dotenv::dotenv;
 use crate::database::init::init_db;
-use crate::service::user::user_routes;
+use crate::entrypoint::user::user_routes;
 
 
 #[tokio::main]
