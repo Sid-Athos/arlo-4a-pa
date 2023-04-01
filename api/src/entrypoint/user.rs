@@ -1,6 +1,6 @@
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
-use axum::{Json, Router};
+use axum::http::{HeaderMap, HeaderValue, Request, StatusCode};
+use axum::{Extension, Json, Router};
 use axum::routing::{get, post};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
@@ -22,7 +22,10 @@ pub struct UserEntryPoint {}
 impl UserEntryPoint {
 
     pub async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<User>, (StatusCode, String)> {
-        let user_service = UserService::new(UserRepository::new(pool.clone()), SessionRepository::new(pool.clone()));
+        let user_service = UserService::new(
+            UserRepository::new(pool.clone()),
+            SessionRepository::new(pool.clone())
+        );
 
         let user = user_service.get_user_by_id(user_id).await?;
 
@@ -30,7 +33,10 @@ impl UserEntryPoint {
     }
 
     pub async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<User>, (StatusCode, String)> {
-        let user_service = UserService::new(UserRepository::new(pool.clone()), SessionRepository::new(pool.clone()));
+        let user_service = UserService::new(
+            UserRepository::new(pool.clone()),
+            SessionRepository::new(pool.clone())
+        );
 
         let user = user_service.create_user(CreateUserCommand::new(user)).await?;
 
@@ -38,9 +44,23 @@ impl UserEntryPoint {
     }
 
     pub async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<Session>, (StatusCode, String)> {
-        let user_service = UserService::new(UserRepository::new(pool.clone()), SessionRepository::new(pool.clone()));
+        let user_service = UserService::new(
+            UserRepository::new(pool.clone()),
+            SessionRepository::new(pool.clone())
+        );
 
         let session = user_service.login_user(LoginCommand::new(user)).await?;
+
+        Ok(Json(session))
+    }
+
+    pub async fn user_logout(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<Session>, (StatusCode, String)> {
+        let user_service = UserService::new(
+            UserRepository::new(pool.clone()),
+            SessionRepository::new(pool.clone())
+        );
+
+        let session = user_service.logout_user(headers["authorization"].to_str().map_err(internal_error)?.replace("Bearer ", "")).await?;
 
         Ok(Json(session))
     }
@@ -50,6 +70,7 @@ impl UserEntryPoint {
             .route("/create", post(UserEntryPoint::user_create))
             .route("/:user_id", get(UserEntryPoint::user_get))
             .route("/login", post(UserEntryPoint::user_login))
+            .route("/logout", post(UserEntryPoint::user_logout))
             .with_state(pool)
     }
 }

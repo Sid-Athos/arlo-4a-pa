@@ -46,4 +46,17 @@ impl SessionRepository {
 
         Ok(SessionEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn delete_by_token(&self, token: String) -> Result<Session, (StatusCode, String)> {
+
+        let conn = self.connection.get().await.map_err(internal_error)?;
+
+        let row = conn.query_one("DELETE FROM coding_games.session WHERE token = $1 RETURNING *", &[&token])
+            .await
+            .map_err(internal_error)?;
+
+        let result = SessionEntity::new(row);
+
+        Ok(SessionEntityMapper::entity_to_domain(result))
+    }
 }

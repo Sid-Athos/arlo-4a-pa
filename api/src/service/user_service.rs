@@ -46,11 +46,13 @@ impl UserService {
                 .map(char::from)
                 .collect();
 
-            println!("id: {}", user_bdd.id);
-
             self.session_repository.create_session(user_bdd.id, token).await
         } else {
             Err((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()))
         }
+    }
+
+    pub async fn logout_user(&self, token: String) -> Result<Session, (StatusCode, String)> {
+        self.session_repository.delete_by_token(token).await
     }
 }
