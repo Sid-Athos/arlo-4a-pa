@@ -19,6 +19,7 @@ use crate::entrypoint::user::request::login_request::LoginRequest;
 use crate::entrypoint::user::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::response::session_response::SessionResponse;
 use crate::entrypoint::user::response::user_response::UserResponse;
+use crate::service::command::change_password_command::ChangePasswordCommand;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
 use crate::service::command::update_user_command::UpdateUserCommand;
@@ -150,7 +151,9 @@ async fn change_password(State(pool): State<ConnectionPool>, Extension(user): Ex
         SessionRepository::new(pool.clone())
     );
 
-    let user = user_service.change_password(user.id, password.new_password, password.old_password).await?;
+    let command= ChangePasswordCommand::new(user.id, password);
+
+    let user = user_service.change_password(command).await?;
 
     Ok(Json(UserResponse::from_domain(user)))
 }

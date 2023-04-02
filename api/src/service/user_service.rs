@@ -8,6 +8,7 @@ use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::{database_error_to_status_code, internal_error};
 use crate::domain::model::session::Session;
 use crate::domain::model::user::User;
+use crate::service::command::change_password_command::ChangePasswordCommand;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
 use crate::service::command::update_user_command::UpdateUserCommand;
@@ -63,12 +64,12 @@ impl UserService {
         self.user_repository.delete_account(user_id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn change_password(&self, user_id: i32, new_password: String, old_password: String) -> Result<User, StatusCode> {
-        let user_bdd = self.user_repository.get_user_by_id(user_id).await.map_err(database_error_to_status_code)?;
+    pub async fn change_password(&self, change_password_command: ChangePasswordCommand) -> Result<User, StatusCode> {
+        let user_bdd = self.user_repository.get_user_by_id(change_password_command.user_id).await.map_err(database_error_to_status_code)?;
 
-        if verify(old_password, &user_bdd.password).map_err(internal_error)? {
-            let new_password = hash(new_password, 4).map_err(internal_error)?;
-            self.user_repository.change_password(user_id, new_password).await.map_err(database_error_to_status_code)
+        if verify(change_password_command.old_password, &user_bdd.password).map_err(internal_error)? {
+            let new_password = hash(change_password_command.new_password, 4).map_err(internal_error)?;
+            self.user_repository.change_password(change_password_command.user_id, new_password).await.map_err(database_error_to_status_code)
         } else {
             Err(StatusCode::UNAUTHORIZED)
         }
