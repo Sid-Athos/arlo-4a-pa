@@ -27,9 +27,10 @@ use crate::service::user_service::UserService;
     ),
     responses(
         (status = 200, description = "User found", body = User,),
+        (status = 404, description = "User not found",),
     )
 )]
-async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<User>, (StatusCode, String)> {
+async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<User>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -46,10 +47,10 @@ async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) 
     request_body = CreateUserRequest,
     responses(
         (status = 200, description = "User created", body = User,),
-        (status = 401, body = String,),
+        (status = 409, description = "User email already exist",),
     )
 )]
-async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<User>, (StatusCode, String)> {
+async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<User>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -66,10 +67,11 @@ async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<Create
     request_body = LoginRequest,
     responses(
         (status = 200, description = "User connected", body = Session,),
-        (status = 401, body = String,),
+        (status = 401, description = "Invalid password",),
+        (status = 404, description = "User not found",),
     )
 )]
-async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<Session>, (StatusCode, String)> {
+async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<Session>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -85,13 +87,13 @@ async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRe
     path = "/user/logout",
     responses(
         (status = 200, description = "User disconnected", body = Session),
-        (status = 401, body = String),
+        (status = 401, description = "Invalid token",),
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
     )
 )]
-async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<Session>, (StatusCode, String)> {
+async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<Session>, StatusCode> {
     let session_service = SessionService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -107,13 +109,13 @@ async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Ext
     path = "/user/me",
     responses(
         (status = 200, description = "User found", body = User),
-        (status = 401, body = String),
+        (status = 401, description = "Invalid token",),
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
     )
 )]
-async fn me(Extension(user): Extension<User>) -> Result<Json<User>, (StatusCode, String)> {
+async fn me(Extension(user): Extension<User>) -> Result<Json<User>, StatusCode> {
     Ok(Json(user))
 }
 

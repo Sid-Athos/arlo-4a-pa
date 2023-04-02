@@ -1,6 +1,15 @@
 use axum::http::StatusCode;
+use crate::database::database_error::DatabaseError;
 
-/// Utility function for mapping any error into a `500 Internal Server Error` response.
-pub fn internal_error<E>(err: E) -> (StatusCode, String) where E: std::error::Error {
-    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+pub fn internal_error<E>(_: E) -> StatusCode where E: std::error::Error {
+    StatusCode::INTERNAL_SERVER_ERROR
+}
+
+pub fn database_error_to_status_code(err: DatabaseError) -> StatusCode {
+    match err {
+        DatabaseError::NotFound => StatusCode::NOT_FOUND,
+        DatabaseError::DuplicateKey => StatusCode::CONFLICT,
+        DatabaseError::InvalidInput => StatusCode::BAD_REQUEST,
+        DatabaseError::CannotGetConnectionToDatabase => StatusCode::INTERNAL_SERVER_ERROR,
+    }
 }

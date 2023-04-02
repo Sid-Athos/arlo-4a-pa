@@ -14,7 +14,7 @@ pub struct DatabaseConnection(pub PooledConnection<'static, PostgresConnectionMa
 
 #[async_trait]
 impl<S> FromRequestParts<S> for DatabaseConnection where ConnectionPool: FromRef<S>, S: Send + Sync {
-    type Rejection = (StatusCode, String);
+    type Rejection = StatusCode;
 
     async fn from_request_parts(_parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let pool = ConnectionPool::from_ref(state);
@@ -25,7 +25,7 @@ impl<S> FromRequestParts<S> for DatabaseConnection where ConnectionPool: FromRef
     }
 }
 
-pub async fn init_db() -> Result<ConnectionPool, (StatusCode, String)> {
+pub async fn init_db() -> Result<ConnectionPool, StatusCode> {
     let manager = PostgresConnectionManager::new_from_stringlike(&env::var("DB_URL").unwrap(), NoTls).map_err(internal_error)?;
     let pool = Pool::builder().build(manager).await.map_err(internal_error)?;
 

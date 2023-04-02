@@ -1,10 +1,9 @@
-use axum::http::StatusCode;
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
+use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_duplicate_key, database_error_not_found, DatabaseError};
 use crate::database::entity::session_entity::SessionEntity;
 use crate::database::mapper::session_entity_mapper::SessionEntityMapper;
-use crate::domain::error::internal_error;
 use crate::domain::model::session::Session;
 
 pub struct SessionRepository {
@@ -19,41 +18,41 @@ impl SessionRepository {
         }
     }
 
-    pub async fn get_by_token(&self, token: String) -> Result<Session, (StatusCode, String)> {
+    pub async fn get_by_token(&self, token: String) -> Result<Session, DatabaseError> {
 
-        let conn = self.connection.get().await.map_err(internal_error)?;
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
             .query_one("SELECT * FROM coding_games.session WHERE token = $1", &[&token])
             .await
-            .map_err(internal_error)?;
+            .map_err(database_error_not_found)?;
 
         let result = SessionEntity::new(row);
 
         Ok(SessionEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn create_session(&self, user_id: i32, token: String) -> Result<Session, (StatusCode, String)> {
+    pub async fn create_session(&self, user_id: i32, token: String) -> Result<Session, DatabaseError> {
 
-        let conn = self.connection.get().await.map_err(internal_error)?;
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
             .query_one("INSERT INTO coding_games.session (user_id, token) VALUES ($1, $2) RETURNING *", &[&user_id, &token])
             .await
-            .map_err(internal_error)?;
+            .map_err(database_error_duplicate_key)?;
 
         let result = SessionEntity::new(row);
 
         Ok(SessionEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn delete_token(&self, token: String) -> Result<Session, (StatusCode, String)> {
+    pub async fn delete_token(&self, token: String) -> Result<Session, DatabaseError> {
 
-        let conn = self.connection.get().await.map_err(internal_error)?;
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn.query_one("DELETE FROM coding_games.session WHERE token = $1 RETURNING *", &[&token])
             .await
-            .map_err(internal_error)?;
+            .map_err(database_error_not_found)?;
 
         let result = SessionEntity::new(row);
 

@@ -7,7 +7,7 @@ use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::session::Session;
 use crate::service::session_service::SessionService;
 
-pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B>, next: Next<B>) -> Result<Response, (StatusCode, String)> {
+pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
     let auth_header = req.headers()
         .get(http::header::AUTHORIZATION)
         .and_then(|header| header.to_str().ok());
@@ -15,7 +15,7 @@ pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B
     let auth_header = if let Some(auth_header) = auth_header {
         auth_header
     } else {
-        return Err((StatusCode::UNAUTHORIZED, "No authorization header".to_string()));
+        return Err(StatusCode::UNAUTHORIZED);
     };
     let auth_header = auth_header.trim_start_matches("Bearer ");
 
@@ -24,7 +24,15 @@ pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B
         SessionRepository::new(pool.clone())
     );
 
-    let user = session_service.get_user_by_token(auth_header.to_string()).await?;
+    let user = match session_service.get_user_by_token(auth_header.to_string()).await {
+        Ok(user) => user,
+        Err(e) => {
+            if e == StatusCode::NOT_FOUND {
+                return Err(StatusCode::UNAUTHORIZED);
+            }
+            return Err(e);
+        },
+    };
 
     let session = Session {
         token: auth_header.to_string(),
