@@ -43,6 +43,7 @@ async fn main() {
         entrypoint::user::user_entry_point::user_logout,
         entrypoint::user::user_entry_point::me,
         entrypoint::user::user_entry_point::search,
+        entrypoint::user::user_entry_point::delete_user,
     ),
     components(
         schemas(UserResponse),

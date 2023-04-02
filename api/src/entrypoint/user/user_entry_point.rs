@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::{Extension, Json, middleware, Router};
-use axum::routing::{get, post};
+use axum::routing::{get, post, delete};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
@@ -108,6 +108,28 @@ async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Ext
 }
 
 #[utoipa::path(
+    delete,
+    path = "/user/delete",
+    responses(
+        (status = 200, description = "User deleted", body = UserResponse),
+        (status = 401, description = "Invalid token",),
+    ),
+    security(
+        ("BearerAuth" = ["read:items", "edit:items"])
+    )
+)]
+async fn delete_user(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {
+    let user_service = UserService::new(
+        UserRepository::new(pool.clone()),
+        SessionRepository::new(pool.clone())
+    );
+
+    let user = user_service.delete_account(user.id).await?;
+
+    Ok(Json(UserResponse::from_domain(user)))
+}
+
+#[utoipa::path(
     get,
     path = "/user/me",
     responses(
@@ -152,6 +174,7 @@ pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/create", post(user_create))
         .route("/login", post(user_login))
         .route("/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/delete", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/me", get(me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/search", get(search))
         .with_state(pool)

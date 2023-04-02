@@ -55,4 +55,9 @@ impl UserService {
     pub async fn search_user(&self, search: String) -> Result<Vec<User>, StatusCode> {
         self.user_repository.search_user(search).await.map_err(database_error_to_status_code)
     }
+
+    pub async fn delete_account(&self, user_id: i32) -> Result<User, StatusCode> {
+        self.session_repository.delete_all_for_user(user_id).await.map_err(database_error_to_status_code)?;
+        self.user_repository.delete_account(user_id).await.map_err(database_error_to_status_code)
+    }
 }

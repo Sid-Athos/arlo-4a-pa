@@ -78,4 +78,17 @@ impl UserRepository {
 
         Ok(result)
     }
+
+    pub async fn delete_account(&self, user_id: i32) -> Result<User, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("DELETE FROM coding_games.user WHERE id = $1 RETURNING *", &[&user_id])
+                            .await
+                            .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
 }

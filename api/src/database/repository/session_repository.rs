@@ -58,4 +58,21 @@ impl SessionRepository {
 
         Ok(SessionEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn delete_all_for_user(&self, user_id: i32) -> Result<Vec<Session>, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn.query("DELETE FROM coding_games.session WHERE user_id = $1 RETURNING *", &[&user_id])
+                            .await
+                            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(SessionEntityMapper::entity_to_domain(SessionEntity::new(row)));
+        }
+
+        Ok(result)
+    }
 }
