@@ -9,6 +9,7 @@ use crate::database::init::ConnectionPool;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::internal_error;
+use crate::domain::model;
 use crate::domain::model::session::Session;
 use crate::domain::model::user::User;
 use crate::entrypoint::middleware::is_logged::{is_logged};
@@ -56,14 +57,13 @@ impl UserEntryPoint {
         Ok(Json(session))
     }
 
-    async fn user_logout(State(pool): State<ConnectionPool>, headers: HeaderMap) -> Result<Json<Session>, (StatusCode, String)> {
+    async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<Session>, (StatusCode, String)> {
         let session_service = SessionService::new(
             UserRepository::new(pool.clone()),
             SessionRepository::new(pool.clone())
         );
 
-        let token = headers["authorization"].to_str().map_err(internal_error)?.replace("Bearer ", "");
-        let session = session_service.delete_token(token).await?;
+        let session = session_service.delete_token(session.token).await?;
 
         Ok(Json(session))
     }
