@@ -11,10 +11,10 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::database::init::init_db;
 use crate::entrypoint::user::user_entry_point::get_routes;
-use crate::domain::model::user::User;
-use crate::domain::model::session::Session;
 use crate::entrypoint::user::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::request::login_request::LoginRequest;
+use crate::entrypoint::user::response::user_response::UserResponse;
+use crate::entrypoint::user::response::session_response::SessionResponse;
 
 #[tokio::main]
 async fn main() {
@@ -45,8 +45,8 @@ async fn main() {
         entrypoint::user::user_entry_point::search,
     ),
     components(
-        schemas(User),
-        schemas(Session),
+        schemas(UserResponse),
+        schemas(SessionResponse),
         schemas(LoginRequest),
         schemas(CreateUserRequest),
     )

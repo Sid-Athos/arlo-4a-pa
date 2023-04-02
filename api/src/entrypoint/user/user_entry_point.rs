@@ -15,6 +15,8 @@ use crate::domain::model::user::User;
 use crate::entrypoint::middleware::is_logged::{is_logged};
 use crate::entrypoint::user::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::request::login_request::LoginRequest;
+use crate::entrypoint::user::response::session_response::SessionResponse;
+use crate::entrypoint::user::response::user_response::UserResponse;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
 use crate::service::session_service::SessionService;
@@ -27,11 +29,11 @@ use crate::service::user_service::UserService;
         ("user_id" = String,),
     ),
     responses(
-        (status = 200, description = "User found", body = User,),
+        (status = 200, description = "User found", body = UserResponse,),
         (status = 404, description = "User not found",),
     )
 )]
-async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<User>, StatusCode> {
+async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -39,7 +41,7 @@ async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) 
 
     let user = user_service.get_user_by_id(user_id).await?;
 
-    Ok(Json(user))
+    Ok(Json(UserResponse::from_domain(user)))
 }
 
 #[utoipa::path(
@@ -47,11 +49,11 @@ async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) 
     path = "/user/create",
     request_body = CreateUserRequest,
     responses(
-        (status = 200, description = "User created", body = User,),
+        (status = 200, description = "User created", body = UserResponse,),
         (status = 409, description = "User email already exist",),
     )
 )]
-async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<User>, StatusCode> {
+async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -59,7 +61,7 @@ async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<Create
 
     let user = user_service.create_user(CreateUserCommand::new(user)).await?;
 
-    Ok(Json(user))
+    Ok(Json(UserResponse::from_domain(user)))
 }
 
 #[utoipa::path(
@@ -67,12 +69,12 @@ async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<Create
     path = "/user/login",
     request_body = LoginRequest,
     responses(
-        (status = 200, description = "User connected", body = Session,),
+        (status = 200, description = "User connected", body = SessionResponse,),
         (status = 401, description = "Invalid password",),
         (status = 404, description = "User not found",),
     )
 )]
-async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<Session>, StatusCode> {
+async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<SessionResponse>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -80,21 +82,21 @@ async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRe
 
     let session = user_service.login_user(LoginCommand::new(user)).await?;
 
-    Ok(Json(session))
+    Ok(Json(SessionResponse::from_domain(session)))
 }
 
 #[utoipa::path(
     post,
     path = "/user/logout",
     responses(
-        (status = 200, description = "User disconnected", body = Session),
+        (status = 200, description = "User disconnected", body = SessionResponse),
         (status = 401, description = "Invalid token",),
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
     )
 )]
-async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<Session>, StatusCode> {
+async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<SessionResponse>, StatusCode> {
     let session_service = SessionService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -102,35 +104,35 @@ async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Ext
 
     let session = session_service.delete_token(session.token).await?;
 
-    Ok(Json(session))
+    Ok(Json(SessionResponse::from_domain(session)))
 }
 
 #[utoipa::path(
     get,
     path = "/user/me",
     responses(
-        (status = 200, description = "User found", body = User),
+        (status = 200, description = "User found", body = UserResponse),
         (status = 401, description = "Invalid token",),
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
     )
 )]
-async fn me(Extension(user): Extension<User>) -> Result<Json<User>, StatusCode> {
-    Ok(Json(user))
+async fn me(Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {
+    Ok(Json(UserResponse::from_domain(user)))
 }
 
 #[utoipa::path(
     get,
     path = "/user/search?pseudo={pseudo}",
     responses(
-        (status = 200, description = "Users found", body = Vec<User>),
+        (status = 200, description = "Users found", body = Vec<UserResponse>),
     ),
     params(
         ("pseudo" = String,),
     )
 )]
-async fn search(State(pool): State<ConnectionPool>, Query(params): Query<HashMap<String, String>>) -> Result<Json<Vec<User>>, StatusCode> {
+async fn search(State(pool): State<ConnectionPool>, Query(params): Query<HashMap<String, String>>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -140,7 +142,7 @@ async fn search(State(pool): State<ConnectionPool>, Query(params): Query<HashMap
 
     let users = user_service.search_user(pseudo).await?;
 
-    Ok(Json(users))
+    Ok(Json(UserResponse::from_vec_domain(users)))
 }
 
 pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
