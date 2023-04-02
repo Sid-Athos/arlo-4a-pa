@@ -1,4 +1,5 @@
-use axum::extract::{Path, State};
+use std::collections::HashMap;
+use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::{Extension, Json, middleware, Router};
 use axum::routing::{get, post};
@@ -119,6 +120,29 @@ async fn me(Extension(user): Extension<User>) -> Result<Json<User>, StatusCode> 
     Ok(Json(user))
 }
 
+#[utoipa::path(
+    get,
+    path = "/user/search?pseudo={pseudo}",
+    responses(
+        (status = 200, description = "Users found", body = Vec<User>),
+    ),
+    params(
+        ("pseudo" = String,),
+    )
+)]
+async fn search(State(pool): State<ConnectionPool>, Query(params): Query<HashMap<String, String>>) -> Result<Json<Vec<User>>, StatusCode> {
+    let user_service = UserService::new(
+        UserRepository::new(pool.clone()),
+        SessionRepository::new(pool.clone())
+    );
+
+    let pseudo = params.get("pseudo").ok_or_else(|| StatusCode::BAD_REQUEST)?.to_string();
+
+    let users = user_service.search_user(pseudo).await?;
+
+    Ok(Json(users))
+}
+
 pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
@@ -127,6 +151,7 @@ pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/login", post(user_login))
         .route("/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/me", get(me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/search", get(search))
         .with_state(pool)
 
 }

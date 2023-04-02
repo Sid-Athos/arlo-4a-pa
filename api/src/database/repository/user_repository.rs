@@ -60,4 +60,22 @@ impl UserRepository {
 
         Ok(UserEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn search_user(&self, search: String) -> Result<Vec<User>, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn
+            .query("SELECT * FROM coding_games.user WHERE pseudo LIKE $1", &[&format!("%{}%", search)])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(UserEntityMapper::entity_to_domain(UserEntity::new(row)));
+        }
+
+        Ok(result)
+    }
 }

@@ -51,4 +51,8 @@ impl UserService {
             Err(StatusCode::UNAUTHORIZED)
         }
     }
+
+    pub async fn search_user(&self, search: String) -> Result<Vec<User>, StatusCode> {
+        self.user_repository.search_user(search).await.map_err(database_error_to_status_code)
+    }
 }
