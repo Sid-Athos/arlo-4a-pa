@@ -91,4 +91,17 @@ impl UserRepository {
 
         Ok(UserEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn change_password(&self, user_id: i32, password: String) -> Result<User, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("UPDATE coding_games.user SET password = $1 WHERE id = $2 RETURNING *", &[&password, &user_id])
+                            .await
+                            .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
 }

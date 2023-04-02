@@ -12,6 +12,7 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::database::init::init_db;
 use crate::entrypoint::user::user_entry_point::get_routes;
 use crate::entrypoint::user::request::create_user_request::CreateUserRequest;
+use crate::entrypoint::user::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::request::login_request::LoginRequest;
 use crate::entrypoint::user::response::user_response::UserResponse;
 use crate::entrypoint::user::response::session_response::SessionResponse;
@@ -50,6 +51,7 @@ async fn main() {
         schemas(SessionResponse),
         schemas(LoginRequest),
         schemas(CreateUserRequest),
+        schemas(ChangePasswordRequest),
     )
 )]
 struct ApiDoc;

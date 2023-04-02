@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::{Extension, Json, middleware, Router};
-use axum::routing::{get, post, delete};
+use axum::routing::{get, post, delete, put};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
@@ -13,6 +13,7 @@ use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::session::Session;
 use crate::domain::model::user::User;
 use crate::entrypoint::middleware::is_logged::{is_logged};
+use crate::entrypoint::user::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::request::login_request::LoginRequest;
 use crate::entrypoint::user::response::session_response::SessionResponse;
@@ -130,6 +131,29 @@ async fn delete_user(State(pool): State<ConnectionPool>, Extension(user): Extens
 }
 
 #[utoipa::path(
+    put,
+    path = "/user/change_password",
+    responses(
+        (status = 200, description = "User found", body = UserResponse),
+        (status = 401, description = "Invalid token or password",),
+    ),
+    request_body = ChangePasswordRequest,
+    security(
+        ("BearerAuth" = ["read:items", "edit:items"])
+    )
+)]
+async fn change_password(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(password): Json<ChangePasswordRequest>) -> Result<Json<UserResponse>, StatusCode> {
+    let user_service = UserService::new(
+        UserRepository::new(pool.clone()),
+        SessionRepository::new(pool.clone())
+    );
+
+    let user = user_service.change_password(user.id, password.new_password, password.old_password).await?;
+
+    Ok(Json(UserResponse::from_domain(user)))
+}
+
+#[utoipa::path(
     get,
     path = "/user/me",
     responses(
@@ -176,6 +200,7 @@ pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/delete", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/me", get(me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/change_password", put(change_password).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/search", get(search))
         .with_state(pool)
 
