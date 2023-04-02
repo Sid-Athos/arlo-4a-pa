@@ -16,10 +16,12 @@ use crate::entrypoint::middleware::is_logged::{is_logged};
 use crate::entrypoint::user::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::request::login_request::LoginRequest;
+use crate::entrypoint::user::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::response::session_response::SessionResponse;
 use crate::entrypoint::user::response::user_response::UserResponse;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
+use crate::service::command::update_user_command::UpdateUserCommand;
 use crate::service::session_service::SessionService;
 use crate::service::user_service::UserService;
 
@@ -154,6 +156,32 @@ async fn change_password(State(pool): State<ConnectionPool>, Extension(user): Ex
 }
 
 #[utoipa::path(
+    put,
+    path = "/user/update",
+    responses(
+        (status = 200, description = "User found", body = UserResponse),
+        (status = 401, description = "Invalid token",),
+        (status = 409, description = "Pseudo already used",),
+    ),
+    request_body = UpdateUserRequest,
+    security(
+        ("BearerAuth" = ["read:items", "edit:items"])
+    )
+)]
+async fn update_user(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(update_request): Json<UpdateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {
+    let user_service = UserService::new(
+        UserRepository::new(pool.clone()),
+        SessionRepository::new(pool.clone())
+    );
+
+    let command = UpdateUserCommand::new(user.id, update_request);
+
+    let user = user_service.update_user(command).await?;
+
+    Ok(Json(UserResponse::from_domain(user)))
+}
+
+#[utoipa::path(
     get,
     path = "/user/me",
     responses(
@@ -201,6 +229,7 @@ pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/delete", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/me", get(me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/change_password", put(change_password).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/update", put(update_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/search", get(search))
         .with_state(pool)
 

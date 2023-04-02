@@ -2,6 +2,7 @@ use bcrypt::{hash, verify};
 use axum::http::StatusCode;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, thread_rng};
+use crate::database::database_error::DatabaseError;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::{database_error_to_status_code, internal_error};
@@ -9,6 +10,7 @@ use crate::domain::model::session::Session;
 use crate::domain::model::user::User;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
+use crate::service::command::update_user_command::UpdateUserCommand;
 
 pub struct UserService {
     pub user_repository: UserRepository,
@@ -70,5 +72,26 @@ impl UserService {
         } else {
             Err(StatusCode::UNAUTHORIZED)
         }
+    }
+
+    pub async fn update_user(&self, update_user_command: UpdateUserCommand) -> Result<User, StatusCode> {
+
+        let user = self.user_repository.get_user_by_pseudo(update_user_command.pseudo.clone()).await;
+
+        match user {
+            Ok(_) => {
+                return Err(StatusCode::CONFLICT);
+            }
+            Err(e) => {
+                match e {
+                    DatabaseError::NotFound => {}
+                    _ => {
+                        return Err(database_error_to_status_code(e));
+                    }
+                }
+            }
+        }
+
+        self.user_repository.update_user(update_user_command).await.map_err(database_error_to_status_code)
     }
 }

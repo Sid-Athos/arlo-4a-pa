@@ -6,6 +6,7 @@ use crate::database::entity::user_entity::UserEntity;
 use crate::database::mapper::user_entity_mapper::UserEntityMapper;
 use crate::domain::model::user::User;
 use crate::service::command::create_user_command::CreateUserCommand;
+use crate::service::command::update_user_command::UpdateUserCommand;
 
 pub struct UserRepository {
     pub connection: Pool<PostgresConnectionManager<NoTls>>,
@@ -41,6 +42,19 @@ impl UserRepository {
             .query_one("SELECT * FROM coding_games.user WHERE email = $1", &[&email])
             .await
             .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn get_user_by_pseudo(&self, pseudo: String) -> Result<User, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("SELECT * FROM coding_games.user WHERE pseudo = $1", &[&pseudo])
+                .await
+                .map_err(database_error_not_found)?;
 
         let result = UserEntity::new(row);
 
@@ -97,6 +111,19 @@ impl UserRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn.query_one("UPDATE coding_games.user SET password = $1 WHERE id = $2 RETURNING *", &[&password, &user_id])
+                            .await
+                            .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn update_user(&self, update_user_command: UpdateUserCommand) -> Result<User, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("UPDATE coding_games.user SET pseudo = $1 WHERE id = $2 RETURNING *", &[&update_user_command.pseudo, &update_user_command.id])
                             .await
                             .map_err(database_error_not_found)?;
 
