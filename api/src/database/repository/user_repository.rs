@@ -131,4 +131,21 @@ impl UserRepository {
 
         Ok(UserEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn get_all_users(&self) -> Result<Vec<User>, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn.query("SELECT * FROM coding_games.user", &[])
+                                .await
+                                .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(UserEntityMapper::entity_to_domain(UserEntity::new(row)));
+        }
+
+        Ok(result)
+    }
 }

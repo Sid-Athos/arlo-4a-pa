@@ -95,4 +95,8 @@ impl UserService {
 
         self.user_repository.update_user(update_user_command).await.map_err(database_error_to_status_code)
     }
+
+    pub async fn get_all_users(&self) -> Result<Vec<User>, StatusCode> {
+        self.user_repository.get_all_users().await.map_err(database_error_to_status_code)
+    }
 }

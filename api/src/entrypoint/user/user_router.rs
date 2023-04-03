@@ -15,7 +15,7 @@ use crate::entrypoint::user::route::me::me;
 use crate::entrypoint::user::route::search::search;
 use crate::entrypoint::user::route::update::update_user;
 
-pub fn get_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
+pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
         .route("/:user_id", get(user_get))

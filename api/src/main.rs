@@ -10,7 +10,8 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::database::init::init_db;
-use crate::entrypoint::user::user_router::get_routes;
+use crate::entrypoint::admin::admin_router::admin_routes;
+use crate::entrypoint::user::user_router::user_routes;
 use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
@@ -27,7 +28,8 @@ async fn main() {
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .nest("/user", get_routes(pool));
+        .nest("/user", user_routes(pool.clone()))
+        .nest("/admin", admin_routes(pool.clone()));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
@@ -48,6 +50,7 @@ async fn main() {
         entrypoint::user::route::delete::delete_user,
         entrypoint::user::route::update::update_user,
         entrypoint::user::route::change_password::change_password,
+        entrypoint::admin::route::get_all::get_all,
     ),
     components(
         schemas(UserResponse),
