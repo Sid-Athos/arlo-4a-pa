@@ -1,4 +1,4 @@
-use crate::entrypoint::user::request::create_user_request::CreateUserRequest;
+use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 
 pub struct CreateUserCommand {
     pub pseudo: String,

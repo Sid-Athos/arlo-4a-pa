@@ -1,4 +1,4 @@
-use crate::entrypoint::user::request::login_request::LoginRequest;
+use crate::entrypoint::user::route::request::login_request::LoginRequest;
 
 pub struct LoginCommand {
     pub email: String,

@@ -1,4 +1,4 @@
-use crate::entrypoint::user::request::change_password_request::ChangePasswordRequest;
+use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 
 pub struct ChangePasswordCommand {
     pub user_id: i32,

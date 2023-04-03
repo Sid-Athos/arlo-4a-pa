@@ -1,4 +1,4 @@
-use crate::entrypoint::user::request::update_user_request::UpdateUserRequest;
+use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 
 pub struct UpdateUserCommand {
     pub id: i32,
