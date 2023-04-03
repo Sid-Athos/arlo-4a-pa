@@ -99,4 +99,12 @@ impl UserService {
     pub async fn get_all_users(&self) -> Result<Vec<User>, StatusCode> {
         self.user_repository.get_all_users().await.map_err(database_error_to_status_code)
     }
+
+    pub async fn give_admin_role(&self, user_id: i32) -> Result<User, StatusCode> {
+        self.user_repository.give_admin_role(user_id).await.map_err(database_error_to_status_code)
+    }
+
+    pub async fn remove_admin_role(&self, user_id: i32) -> Result<User, StatusCode> {
+        self.user_repository.remove_admin_role(user_id).await.map_err(database_error_to_status_code)
+    }
 }

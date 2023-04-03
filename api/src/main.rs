@@ -52,6 +52,8 @@ async fn main() {
         entrypoint::user::route::change_password::change_password,
         entrypoint::admin::route::get_all::get_all,
         entrypoint::admin::route::delete::delete_user,
+        entrypoint::admin::route::give_admin_role::give_admin_role,
+        entrypoint::admin::route::remove_admin_role::remove_admin_role,
     ),
     components(
         schemas(UserResponse),
