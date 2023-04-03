@@ -51,6 +51,7 @@ async fn main() {
         entrypoint::user::route::update::update_user,
         entrypoint::user::route::change_password::change_password,
         entrypoint::admin::route::get_all::get_all,
+        entrypoint::admin::route::delete::delete_user,
     ),
     components(
         schemas(UserResponse),
