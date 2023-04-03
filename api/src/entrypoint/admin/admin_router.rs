@@ -7,6 +7,7 @@ use crate::entrypoint::admin::route::delete::delete_user;
 use crate::entrypoint::admin::route::get_all::get_all;
 use crate::entrypoint::admin::route::give_admin_role::give_admin_role;
 use crate::entrypoint::admin::route::remove_admin_role::remove_admin_role;
+use crate::entrypoint::admin::route::update_user::update_user;
 use crate::entrypoint::middleware::is_logged_admin::is_logged_admin;
 
 pub fn admin_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
@@ -16,6 +17,7 @@ pub fn admin_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/delete/:user_id", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .route("/give_admin_role/:user_id", put(give_admin_role).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .route("/remove_admin_role/:user_id", put(remove_admin_role).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
+        .route("/update/:user_id", put(update_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .with_state(pool)
 
 }

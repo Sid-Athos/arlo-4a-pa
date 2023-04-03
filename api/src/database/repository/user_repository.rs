@@ -6,7 +6,7 @@ use crate::database::entity::user_entity::UserEntity;
 use crate::database::mapper::user_entity_mapper::UserEntityMapper;
 use crate::domain::model::user::User;
 use crate::service::command::create_user_command::CreateUserCommand;
-use crate::service::command::update_user_command::UpdateUserCommand;
+use crate::service::command::update_pseudo_command::UpdatePseudoCommand;
 
 pub struct UserRepository {
     pub connection: Pool<PostgresConnectionManager<NoTls>>,
@@ -119,11 +119,24 @@ impl UserRepository {
         Ok(UserEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn update_user(&self, update_user_command: UpdateUserCommand) -> Result<User, DatabaseError> {
+    pub async fn change_pseudo(&self, pseudo: String, id: i32) -> Result<User, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
-        let row = conn.query_one("UPDATE coding_games.user SET pseudo = $1 WHERE id = $2 RETURNING *", &[&update_user_command.pseudo, &update_user_command.id])
+        let row = conn.query_one("UPDATE coding_games.user SET pseudo = $1 WHERE id = $2 RETURNING *", &[&pseudo, &id])
+                            .await
+                            .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn change_email(&self, email: String, id: i32) -> Result<User, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("UPDATE coding_games.user SET email = $1 WHERE id = $2 RETURNING *", &[&email, &id])
                             .await
                             .map_err(database_error_not_found)?;
 

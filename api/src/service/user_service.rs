@@ -11,7 +11,8 @@ use crate::domain::model::user::User;
 use crate::service::command::change_password_command::ChangePasswordCommand;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
-use crate::service::command::update_user_command::UpdateUserCommand;
+use crate::service::command::updata_user_command::UpdateUserCommand;
+use crate::service::command::update_pseudo_command::UpdatePseudoCommand;
 
 pub struct UserService {
     pub user_repository: UserRepository,
@@ -75,7 +76,7 @@ impl UserService {
         }
     }
 
-    pub async fn update_user(&self, update_user_command: UpdateUserCommand) -> Result<User, StatusCode> {
+    pub async fn change_pseudo(&self, update_user_command: UpdatePseudoCommand) -> Result<User, StatusCode> {
 
         let user = self.user_repository.get_user_by_pseudo(update_user_command.pseudo.clone()).await;
 
@@ -93,7 +94,7 @@ impl UserService {
             }
         }
 
-        self.user_repository.update_user(update_user_command).await.map_err(database_error_to_status_code)
+        self.user_repository.change_pseudo(update_user_command.pseudo, update_user_command.id).await.map_err(database_error_to_status_code)
     }
 
     pub async fn get_all_users(&self) -> Result<Vec<User>, StatusCode> {
@@ -106,5 +107,24 @@ impl UserService {
 
     pub async fn remove_admin_role(&self, user_id: i32) -> Result<User, StatusCode> {
         self.user_repository.remove_admin_role(user_id).await.map_err(database_error_to_status_code)
+    }
+
+    pub async fn update_user(&self, update_user_command: UpdateUserCommand) -> Result<User, StatusCode> {
+        let mut user = self.user_repository.get_user_by_id(update_user_command.id).await.map_err(database_error_to_status_code)?;
+
+        if update_user_command.pseudo.is_some() {
+            user = self.user_repository.change_pseudo(update_user_command.pseudo.unwrap_or_default(), update_user_command.id).await.map_err(database_error_to_status_code)?;
+        }
+
+        if update_user_command.email.is_some() {
+            user = self.user_repository.change_email(update_user_command.email.unwrap_or_default(), update_user_command.id).await.map_err(database_error_to_status_code)?;
+        }
+
+        if update_user_command.password.is_some() {
+            let new_password = hash(update_user_command.password.unwrap_or_default(), 4).map_err(internal_error)?;
+            user = self.user_repository.change_password(update_user_command.id, new_password).await.map_err(database_error_to_status_code)?;
+        }
+
+        Ok(user)
     }
 }

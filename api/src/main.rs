@@ -54,6 +54,7 @@ async fn main() {
         entrypoint::admin::route::delete::delete_user,
         entrypoint::admin::route::give_admin_role::give_admin_role,
         entrypoint::admin::route::remove_admin_role::remove_admin_role,
+        entrypoint::admin::route::update_user::update_user,
     ),
     components(
         schemas(UserResponse),
@@ -62,6 +63,7 @@ async fn main() {
         schemas(CreateUserRequest),
         schemas(ChangePasswordRequest),
         schemas(UpdateUserRequest),
+
     )
 )]
 struct ApiDoc;
