@@ -1,0 +1,14 @@
+version: "3"
+services:
+  api:
+    container_name: "api"
+    image: dixennaxos/pa-4al2-gr5:api-${ENV}-latest
+    restart: "always"
+    tty: true
+    volumes:
+      - "./api/.env:/.env"
+  front:
+    container_name: "front"
+    image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest
+    restart: "always"
+    tty: true
