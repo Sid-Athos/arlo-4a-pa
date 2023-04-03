@@ -1,2 +1,2 @@
-pub mod user_entry_point;
+pub mod user_router;
 pub mod route;

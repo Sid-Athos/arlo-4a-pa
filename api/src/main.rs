@@ -10,7 +10,7 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::database::init::init_db;
-use crate::entrypoint::user::user_entry_point::get_routes;
+use crate::entrypoint::user::user_router::get_routes;
 use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
