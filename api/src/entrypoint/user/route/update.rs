@@ -7,7 +7,7 @@ use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::user::User;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
-use crate::service::command::update_pseudo_command::UpdatePseudoCommand;
+use crate::service::command::updata_user_command::UpdateUserCommand;
 use crate::service::user_service::UserService;
 
 #[utoipa::path(
@@ -29,9 +29,9 @@ pub async fn update_user(State(pool): State<ConnectionPool>, Extension(user): Ex
         SessionRepository::new(pool.clone())
     );
 
-    let command = UpdatePseudoCommand::new(user.id, update_request);
+    let command = UpdateUserCommand::new(user.id, Some(update_request.pseudo), None, None);
 
-    let user = user_service.change_pseudo(command).await?;
+    let user = user_service.update_user(command).await?;
 
     Ok(Json(UserResponse::from_domain(user)))
 }

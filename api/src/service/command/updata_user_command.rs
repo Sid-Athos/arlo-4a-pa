@@ -9,12 +9,12 @@ pub struct UpdateUserCommand {
 
 impl UpdateUserCommand {
 
-    pub fn new(user_id: i32, update_user_request: UpdateUserRequest) -> Self {
+    pub fn new(user_id: i32, pseudo: Option<String>, email: Option<String>, password: Option<String>) -> Self {
         UpdateUserCommand {
             id: user_id,
-            pseudo: update_user_request.pseudo,
-            email: update_user_request.email,
-            password: update_user_request.password,
+            pseudo,
+            email,
+            password,
         }
     }
 }

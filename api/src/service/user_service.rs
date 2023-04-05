@@ -12,7 +12,6 @@ use crate::service::command::change_password_command::ChangePasswordCommand;
 use crate::service::command::create_user_command::CreateUserCommand;
 use crate::service::command::login_command::LoginCommand;
 use crate::service::command::updata_user_command::UpdateUserCommand;
-use crate::service::command::update_pseudo_command::UpdatePseudoCommand;
 
 pub struct UserService {
     pub user_repository: UserRepository,
@@ -74,27 +73,6 @@ impl UserService {
         } else {
             Err(StatusCode::UNAUTHORIZED)
         }
-    }
-
-    pub async fn change_pseudo(&self, update_user_command: UpdatePseudoCommand) -> Result<User, StatusCode> {
-
-        let user = self.user_repository.get_user_by_pseudo(update_user_command.pseudo.clone()).await;
-
-        match user {
-            Ok(_) => {
-                return Err(StatusCode::CONFLICT);
-            }
-            Err(e) => {
-                match e {
-                    DatabaseError::NotFound => {}
-                    _ => {
-                        return Err(database_error_to_status_code(e));
-                    }
-                }
-            }
-        }
-
-        self.user_repository.change_pseudo(update_user_command.pseudo, update_user_command.id).await.map_err(database_error_to_status_code)
     }
 
     pub async fn get_all_users(&self) -> Result<Vec<User>, StatusCode> {
