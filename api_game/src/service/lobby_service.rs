@@ -18,4 +18,8 @@ impl LobbyService {
     pub async fn get_public(&self) -> Result<Vec<Lobby>, StatusCode> {
         self.lobby_repository.get_public().await.map_err(database_error_to_status_code)
     }
+
+    pub async fn get_public_by_game_id(&self, game_id: i32) -> Result<Vec<Lobby>, StatusCode> {
+        self.lobby_repository.get_public_by_game_id(game_id).await.map_err(database_error_to_status_code)
+    }
 }

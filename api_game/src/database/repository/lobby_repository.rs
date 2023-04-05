@@ -34,4 +34,21 @@ impl LobbyRepository {
 
         Ok(result)
     }
+
+    pub async fn get_public_by_game_id(&self, game_id: i32) -> Result<Vec<Lobby>, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn
+            .query("SELECT * FROM coding_games.lobby WHERE private = false AND game_id = $1", &[&game_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(LobbyEntityMapper::entity_to_domain(LobbyEntity::new(row)));
+        }
+
+        Ok(result)
+    }
 }
