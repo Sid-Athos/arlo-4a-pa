@@ -2,7 +2,6 @@ use axum::http::StatusCode;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::database_error_to_status_code;
-use crate::domain::model::session::Session;
 use crate::domain::model::user::User;
 
 pub struct SessionService {

@@ -6,8 +6,6 @@ mod service;
 use axum::Router;
 use std::net::SocketAddr;
 use dotenv::dotenv;
-use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
 use crate::database::init::init_db;
 use crate::entrypoint::lobby::lobby_router::lobby_routes;
 

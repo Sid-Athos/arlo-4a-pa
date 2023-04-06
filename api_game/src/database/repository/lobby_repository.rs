@@ -18,6 +18,19 @@ impl LobbyRepository {
         }
     }
 
+    pub async fn get_by_id(&self, lobby_id: i32) -> Result<Lobby, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.lobby WHERE id = $1", &[&lobby_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyEntity::new(row);
+
+        Ok(LobbyEntityMapper::entity_to_domain(result))
+    }
+
     pub async fn get_public(&self) -> Result<Vec<Lobby>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
@@ -50,5 +63,33 @@ impl LobbyRepository {
         }
 
         Ok(result)
+    }
+
+    pub async fn create_lobby(&self, code: String, game_id: i32, private: bool) -> Result<Lobby, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("INSERT INTO coding_games.lobby (code, game_id, private) VALUES ($1, $2, $3) RETURNING *", &[&code, &game_id, &private])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyEntity::new(row);
+
+        Ok(LobbyEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn delete_lobby(&self, lobby_id: i32) -> Result<Lobby, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("DELETE FROM coding_games.lobby WHERE id = $1 RETURNING *", &[&lobby_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyEntity::new(row);
+
+        Ok(LobbyEntityMapper::entity_to_domain(result))
     }
 }
