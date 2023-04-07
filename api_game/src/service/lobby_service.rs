@@ -99,4 +99,13 @@ impl LobbyService {
 
         self.lobby_member_repository.create(user_id, lobby_id, false).await.map_err(database_error_to_status_code)
     }
+
+    pub async fn get_lobby_member_by_user_id(&self, user_id: i32) -> Result<LobbyMember, StatusCode> {
+        self.lobby_member_repository.get_by_user_id(user_id).await.map_err(database_error_to_status_code)
+    }
+
+    pub async fn give_host(&self, old_id: i32, next_host: i32) -> Result<LobbyMember, StatusCode> {
+        self.lobby_member_repository.update_host(old_id, false).await.map_err(database_error_to_status_code)?;
+        self.lobby_member_repository.update_host(next_host, true).await.map_err(database_error_to_status_code)
+    }
 }
