@@ -74,4 +74,8 @@ impl LobbyService {
 
         Ok(lobby)
     }
+
+    pub async fn get_lobby_by_code(&self, code: String) -> Result<Lobby, StatusCode> {
+        self.lobby_repository.get_by_code(code).await.map_err(database_error_to_status_code)
+    }
 }

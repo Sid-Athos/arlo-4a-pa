@@ -92,4 +92,17 @@ impl LobbyRepository {
 
         Ok(LobbyEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn get_by_code(&self, code: String) -> Result<Lobby, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.lobby WHERE code = $1", &[&code])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyEntity::new(row);
+
+        Ok(LobbyEntityMapper::entity_to_domain(result))
+    }
 }

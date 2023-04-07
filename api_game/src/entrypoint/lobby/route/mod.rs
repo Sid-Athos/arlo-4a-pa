@@ -6,3 +6,4 @@ pub mod create;
 pub mod me;
 pub mod get_member;
 pub mod exit;
+pub mod search;
