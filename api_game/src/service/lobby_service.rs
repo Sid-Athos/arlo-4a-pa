@@ -1,5 +1,6 @@
 use axum::http::StatusCode;
 use rand::{Rng, thread_rng};
+use crate::database::repository::game_repository::GameRepository;
 use crate::database::repository::lobby_member_repository::LobbyMemberRepository;
 use crate::database::repository::lobby_repository::LobbyRepository;
 use crate::domain::error::database_error_to_status_code;
@@ -8,14 +9,16 @@ use crate::domain::model::lobby_member::LobbyMember;
 use crate::service::command::create_lobby_command::CreateLobbyCommand;
 
 pub struct LobbyService {
+    pub game_repository: GameRepository,
     pub lobby_repository: LobbyRepository,
     pub lobby_member_repository: LobbyMemberRepository,
 }
 
 impl LobbyService {
 
-    pub fn new(lobby_repository: LobbyRepository, lobby_member_repository: LobbyMemberRepository) -> Self {
+    pub fn new(game_repository: GameRepository, lobby_repository: LobbyRepository, lobby_member_repository: LobbyMemberRepository) -> Self {
         LobbyService {
+            game_repository,
             lobby_repository,
             lobby_member_repository,
         }
@@ -77,5 +80,23 @@ impl LobbyService {
 
     pub async fn get_lobby_by_code(&self, code: String) -> Result<Lobby, StatusCode> {
         self.lobby_repository.get_by_code(code).await.map_err(database_error_to_status_code)
+    }
+
+    pub async fn join_lobby(&self, user_id: i32, lobby_id: i32) -> Result<LobbyMember, StatusCode> {
+        let _ = self.exit_lobby(user_id).await;
+
+        let lobby = self.lobby_repository.get_by_id(lobby_id).await.map_err(database_error_to_status_code)?;
+
+        if lobby.private {
+            return Err(StatusCode::FORBIDDEN);
+        }
+
+        let game = self.game_repository.get_by_id(lobby.game_id).await.map_err(database_error_to_status_code)?;
+
+        if game.nb_player <= self.lobby_member_repository.get_by_lobby_id(lobby_id).await.map_err(database_error_to_status_code)?.len() as i32 {
+            return Err(StatusCode::CONFLICT);
+        }
+
+        self.lobby_member_repository.create(user_id, lobby_id, false).await.map_err(database_error_to_status_code)
     }
 }

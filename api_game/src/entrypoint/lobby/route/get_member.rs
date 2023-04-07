@@ -2,6 +2,7 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::Json;
 use crate::database::init::ConnectionPool;
+use crate::database::repository::game_repository::GameRepository;
 use crate::database::repository::lobby_member_repository::LobbyMemberRepository;
 use crate::database::repository::lobby_repository::LobbyRepository;
 use crate::database::repository::session_repository::SessionRepository;
@@ -13,6 +14,7 @@ use crate::service::user_service::UserService;
 pub async fn get_lobby_member(State(pool): State<ConnectionPool>, Path(lobby_id): Path<i32>) -> Result<Json<Vec<LobbyMemberResponse>>, StatusCode> {
 
     let lobby_service = LobbyService::new(
+        GameRepository::new(pool.clone()),
         LobbyRepository::new(pool.clone()),
         LobbyMemberRepository::new(pool.clone()),
     );

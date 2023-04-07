@@ -1,15 +1,15 @@
-use std::collections::HashMap;
-use axum::extract::{Query, State};
+use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::Json;
+use axum::{Extension, Json};
 use crate::database::init::ConnectionPool;
 use crate::database::repository::game_repository::GameRepository;
 use crate::database::repository::lobby_member_repository::LobbyMemberRepository;
 use crate::database::repository::lobby_repository::LobbyRepository;
-use crate::entrypoint::lobby::route::response::lobby_response::LobbyResponse;
+use crate::domain::model::user::User;
+use crate::entrypoint::lobby::route::response::lobby_member_response::LobbyMemberResponse;
 use crate::service::lobby_service::LobbyService;
 
-pub async fn search(State(pool): State<ConnectionPool>, Query(params): Query<HashMap<String, String>>) -> Result<Json<LobbyResponse>, StatusCode> {
+pub async fn join_lobby(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Path(lobby_id): Path<i32>) -> Result<Json<LobbyMemberResponse>, StatusCode> {
 
     let lobby_service = LobbyService::new(
         GameRepository::new(pool.clone()),
@@ -17,9 +17,7 @@ pub async fn search(State(pool): State<ConnectionPool>, Query(params): Query<Has
         LobbyMemberRepository::new(pool.clone()),
     );
 
-    let code = params.get("code").ok_or_else(|| StatusCode::BAD_REQUEST)?.to_string();
+    let lobby_member = lobby_service.join_lobby(user.id, lobby_id).await?;
 
-    let lobby = lobby_service.get_lobby_by_code(code).await?;
-
-    Ok(Json(LobbyResponse::from_domain(lobby)))
+    Ok(Json(LobbyMemberResponse::from_domain(user, lobby_member)))
 }
