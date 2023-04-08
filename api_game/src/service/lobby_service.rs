@@ -108,4 +108,8 @@ impl LobbyService {
         self.lobby_member_repository.update_host(old_id, lobby_id, false).await.map_err(database_error_to_status_code)?;
         self.lobby_member_repository.update_host(next_host, lobby_id, true).await.map_err(database_error_to_status_code)
     }
+
+    pub async fn kick(&self, lobby_id: i32, user_id: i32) -> Result<LobbyMember, StatusCode> {
+        self.lobby_member_repository.delete_by_user_id_lobby_id(user_id, lobby_id).await.map_err(database_error_to_status_code)
+    }
 }

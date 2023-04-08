@@ -77,6 +77,19 @@ impl LobbyMemberRepository {
         Ok(LobbyMemberEntityMapper::entity_to_domain(result))
     }
 
+    pub async fn delete_by_user_id_lobby_id(&self, user_id: i32, lobby_id: i32) -> Result<LobbyMember, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("DELETE FROM coding_games.lobby_member WHERE user_id = $1 AND lobby_id = $2 RETURNING *", &[&user_id, &lobby_id])
+                            .await
+                            .map_err(database_error_not_found)?;
+
+        let result = LobbyMemberEntity::new(row);
+
+        Ok(LobbyMemberEntityMapper::entity_to_domain(result))
+    }
+
     pub async fn update_host(&self, user_id: i32, lobby_id: i32, is_host: bool) -> Result<LobbyMember, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;

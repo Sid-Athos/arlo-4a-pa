@@ -9,3 +9,4 @@ pub mod exit;
 pub mod search;
 pub mod join;
 pub mod give_host;
+pub mod kick;

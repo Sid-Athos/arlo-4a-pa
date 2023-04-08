@@ -10,6 +10,7 @@ use crate::entrypoint::lobby::route::get_public::get_public_lobby;
 use crate::entrypoint::lobby::route::get_public_for_game::get_public_lobby_for_game;
 use crate::entrypoint::lobby::route::give_host::give_host;
 use crate::entrypoint::lobby::route::join::join_lobby;
+use crate::entrypoint::lobby::route::kick::kick;
 use crate::entrypoint::lobby::route::me::me;
 use crate::entrypoint::lobby::route::search::search;
 use crate::entrypoint::middleware::is_host::is_host;
@@ -27,6 +28,7 @@ pub fn lobby_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/search", get(search))
         .route("/join/:lobby_id", put(join_lobby).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/give_host/:user_id", put(give_host).route_layer(middleware::from_fn_with_state(pool.clone(), is_host)))
+        .route("/kick/:user_id", delete(kick).route_layer(middleware::from_fn_with_state(pool.clone(), is_host)))
         .with_state(pool)
 
 }
