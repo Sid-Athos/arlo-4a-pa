@@ -46,7 +46,7 @@ impl LobbyService {
         }
         if lobby_member.is_host {
             let new_host = lobby_members.get(0).unwrap();
-            self.lobby_member_repository.update_host(new_host.user_id, true).await.map_err(database_error_to_status_code)?;
+            self.lobby_member_repository.update_host(new_host.user_id, lobby_member.lobby_id, true).await.map_err(database_error_to_status_code)?;
         }
 
         self.lobby_repository.get_by_id(lobby_member.lobby_id).await.map_err(database_error_to_status_code)
@@ -104,8 +104,8 @@ impl LobbyService {
         self.lobby_member_repository.get_by_user_id(user_id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn give_host(&self, old_id: i32, next_host: i32) -> Result<LobbyMember, StatusCode> {
-        self.lobby_member_repository.update_host(old_id, false).await.map_err(database_error_to_status_code)?;
-        self.lobby_member_repository.update_host(next_host, true).await.map_err(database_error_to_status_code)
+    pub async fn give_host(&self, old_id: i32, next_host: i32, lobby_id: i32) -> Result<LobbyMember, StatusCode> {
+        self.lobby_member_repository.update_host(old_id, lobby_id, false).await.map_err(database_error_to_status_code)?;
+        self.lobby_member_repository.update_host(next_host, lobby_id, true).await.map_err(database_error_to_status_code)
     }
 }

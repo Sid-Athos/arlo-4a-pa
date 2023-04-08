@@ -56,6 +56,7 @@ pub async fn is_host<B>(State(pool): State<ConnectionPool>, mut req: Request<B>,
         return Err(StatusCode::UNAUTHORIZED);
     }
 
+    req.extensions_mut().insert(lobby);
     req.extensions_mut().insert(session);
     req.extensions_mut().insert(user);
 
