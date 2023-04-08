@@ -16,7 +16,8 @@ use crate::service::user_service::UserService;
     responses(
         (status = 200, description = "User created", body = UserResponse,),
         (status = 409, description = "User email already exist",),
-    )
+    ),
+    tag = "user"
 )]
 pub async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

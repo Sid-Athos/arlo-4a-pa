@@ -21,7 +21,8 @@ use crate::service::user_service::UserService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag = "admin"
 )]
 pub async fn delete_user(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

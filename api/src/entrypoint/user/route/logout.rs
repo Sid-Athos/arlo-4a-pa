@@ -17,7 +17,8 @@ use crate::service::session_service::SessionService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag = "user"
 )]
 pub async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<SessionResponse>, StatusCode> {
     let session_service = SessionService::new(

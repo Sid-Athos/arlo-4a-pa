@@ -16,7 +16,8 @@ use crate::service::user_service::UserService;
     responses(
         (status = 200, description = "User found", body = UserResponse,),
         (status = 404, description = "User not found",),
-    )
+    ),
+    tag = "user"
 )]
 pub async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(
