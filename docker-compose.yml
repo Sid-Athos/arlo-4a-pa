@@ -3,12 +3,27 @@ services:
   api:
     container_name: "api"
     image: dixennaxos/pa-4al2-gr5:api-${ENV}-latest
+    ports:
+      - '7590:3000'
     restart: "always"
     tty: true
     volumes:
       - "./api/.env:/.env"
+  apigame:
+    container_name: "apigame"
+    image: dixennaxos/pa-4al2-gr5:api-game-${ENV}-latest
+    ports:
+      - '7589:3000'
+    restart: "always"
+    tty: true
+    volumes:
+      - "./api_game/.env:/.env"
   front:
     container_name: "front"
     image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest
+    ports:
+      - '3000:3000'
     restart: "always"
     tty: true
+    volumes:
+      - "./web/coding-games/.env:/.env"

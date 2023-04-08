@@ -3,7 +3,7 @@ name: API
 on:
   push:
     branches: [ "main", "test", "dev" ]
-    paths: 
+    paths:
       - 'api/Cargo.toml'
 
 env:
@@ -22,7 +22,7 @@ jobs:
     - name: Run tests
       run: |
         cargo test --verbose
-      
+
   build:
     needs: tests
     name: Build docker image
@@ -35,11 +35,11 @@ jobs:
           password: ${{secrets.DOCKERHUB_TOKEN}}
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
-        with: 
+        with:
           context: ./api
           push: true
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/${{DOCKERHUB_PROJECT_NAME}}:api-${{env.BRANCH_NAME}}-latest
-    
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_PROJECT_NAME}}:api-${{env.BRANCH_NAME}}-latest
+
   redeploy:
     needs: build
     name: Redeploy
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Connect and exec
         uses: appleboy/ssh-action@master
-        with: 
+        with:
           host: ${{ secrets[format('SERVER_HOSTNAME_{0}', env.BRANCH_NAME)] }}
           username: ${{ secrets[format('SERVER_USERNAME_{0}', env.BRANCH_NAME)] }}
           key: ${{ secrets[format('SERVER_KEY_{0}', env.BRANCH_NAME)] }}
