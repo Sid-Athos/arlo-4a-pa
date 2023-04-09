@@ -44,6 +44,7 @@ use axum::extract::ws::CloseFrame;
 //allows to split the websocket stream into separate TX and RX branches
 use futures::{sink::SinkExt, stream::StreamExt};
 
+use serde::{Deserialize};
 
 #[tokio::main]
 async fn main() {
@@ -208,7 +209,7 @@ async fn handle_socket(mut socket: WebSocket, who: SocketAddr) {
     // returning from the handler closes the websocket connection
     println!("Websocket context {} destroyed", who);
 }
-
+use std::str;
 /// helper to print contents of messages to stdout. Has special treatment for Close.
 fn process_message(msg: Message, who: SocketAddr) -> ControlFlow<(), ()> {
     match msg {
@@ -216,7 +217,14 @@ fn process_message(msg: Message, who: SocketAddr) -> ControlFlow<(), ()> {
             println!(">>> {} sent str: {:?}", who, t);
         }
         Message::Binary(d) => {
-            println!(">>> {} sent {} bytes: {:?}", who, d.len(), d);
+            let us: Meh = match serde_json::from_str(str::from_utf8(&d).unwrap())  {
+                Ok(x) => x,
+                Err(_) => todo!()
+            };
+
+            println!("working with version: {:?}", us.hello);
+            println!(">>> {} sent {} bytes: {:?}", who, d.len(), us.hello);
+            return ControlFlow::Break(());
         }
         Message::Close(c) => {
             if let Some(cf) = c {
@@ -241,4 +249,11 @@ fn process_message(msg: Message, who: SocketAddr) -> ControlFlow<(), ()> {
         }
     }
     ControlFlow::Continue(())
+}
+
+
+/** Todo define proper struct for communications */
+#[derive(Deserialize)]
+struct Meh {
+    pub hello: String
 }
