@@ -9,8 +9,8 @@ publish = false
 [dependencies]
 axum = "0.6.12"
 dotenv = "0.15.0"
-bb8 = "0.7.1"
-bb8-postgres = "0.7.0"
+bb8 = "0.8.0"
+bb8-postgres = "0.8.1"
 tokio = { version = "1.0", features = ["full"] }
 tokio-postgres = "0.7.2"
 tracing = "0.1"
