@@ -1,11 +1,6 @@
 [package]
-<<<<<<< HEAD:game-manager/Cargo.toml
 name = "game-manager"
 version = "0.1.0"
-=======
-name = "api"
-version = "0.1.6"
->>>>>>> 75b25abddd3b8082469467d2c61b437021d20b35:api/Cargo.toml
 edition = "2021"
 publish = false
 
