@@ -21,8 +21,6 @@ pub struct Client {
 #[tokio::main]
 async fn main() {
     let clients: Clients = Arc::new(RwLock::new(HashMap::new()));
-    tracing::info!("?");
-
     let health_route = warp::path!("health").and_then(handler::health_handler);
 
     let register = warp::path("register");
