@@ -10,7 +10,7 @@ socket.addEventListener('message', function (event) {
 
 
 setTimeout(() => {
-    const obj = { hello: "world" };
+    const obj = { message: "world", timestamp: new Date().getTime() };
     const blob = new Blob([JSON.stringify(obj, null, 2)], {
         type: "application/json",
     });
