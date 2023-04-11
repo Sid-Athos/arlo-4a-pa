@@ -28,10 +28,10 @@ async fn ws_handler(ws: WebSocketUpgrade, user_agent: Option<TypedHeader<headers
     ws.on_upgrade(move |socket| handle_socket(socket, addr, connections))
 }
 
-async fn handle_socket(mut socket: WebSocket, who: SocketAddr, connections: Extension<Connections>) {
-    let (mut sender, mut receiver) = socket.split();
+async fn handle_socket(socket: WebSocket, who: SocketAddr, connections: Extension<Connections>) {
+    let (sender, mut receiver) = socket.split();
 
-    connections.add_client(sender).await;
+    connections.add_client(who.to_string().replace("127.0.0.1:", "").parse().unwrap(), sender).await;
 
     connections.send_to_all(Message::Text(format!("{} joined", who.to_string()))).await;
 
