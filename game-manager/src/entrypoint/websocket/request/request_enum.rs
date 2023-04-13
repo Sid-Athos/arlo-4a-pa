@@ -2,6 +2,14 @@ use axum::Extension;
 use serde::Deserialize;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
+use crate::entrypoint::websocket::request::accepte_invite_lobby_request::AcceptInviteLobbyRequest;
+use crate::entrypoint::websocket::request::cancel_invite_user_lobby_request::CancelInviteUserLobbyRequest;
+use crate::entrypoint::websocket::request::create_lobby_request::CreateLobbyRequest;
+use crate::entrypoint::websocket::request::decline_invite_lobby_request::DeclineInviteLobbyRequest;
+use crate::entrypoint::websocket::request::give_lobby_host_request::GiveHostRequest;
+use crate::entrypoint::websocket::request::invite_user_lobby_request::InviteUserLobbyRequest;
+use crate::entrypoint::websocket::request::join_lobby_request::JoinLobbyRequest;
+use crate::entrypoint::websocket::request::kick_user_lobby_request::KickUserRequest;
 use crate::entrypoint::websocket::request::message_request::MessageRequest;
 use crate::entrypoint::websocket::response::message_response::MessageResponse;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
@@ -12,6 +20,15 @@ pub enum RequestEnum {
     Ping,
     Exit,
     Message(MessageRequest),
+    CreateLobbyRequest(CreateLobbyRequest),
+    JoinLobbyRequest(JoinLobbyRequest),
+    ExitLobbyRequest,
+    GiveHostRequest(GiveHostRequest),
+    KickUserRequest(KickUserRequest),
+    InviteUserLobbyRequest(InviteUserLobbyRequest),
+    CancelInviteUserLobbyRequest(CancelInviteUserLobbyRequest),
+    AcceptInviteLobbyRequest(AcceptInviteLobbyRequest),
+    DeclineInviteLobbyRequest(DeclineInviteLobbyRequest),
     BadMessage,
 }
 
@@ -43,6 +60,7 @@ impl RequestEnum {
                 connections.send_to_vec_user_id(ResponseEnum::BadMessage, vec![user.id]).await;
                 false
             }
+            _ => false,
         }
     }
 }
