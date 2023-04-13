@@ -20,4 +20,5 @@ pub enum ResponseEnum {
     HostGiven,
     StartedGame,
     BadMessage,
+    Error(String),
 }

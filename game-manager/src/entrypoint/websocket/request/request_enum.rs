@@ -1,5 +1,6 @@
 use axum::Extension;
 use serde::Deserialize;
+use crate::database::init::ConnectionPool;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::request::accepte_invite_lobby_request::AcceptInviteLobbyRequest;
@@ -20,21 +21,21 @@ pub enum RequestEnum {
     Ping,
     Exit,
     Message(MessageRequest),
-    CreateLobbyRequest(CreateLobbyRequest),
-    JoinLobbyRequest(JoinLobbyRequest),
-    ExitLobbyRequest,
-    GiveHostRequest(GiveHostRequest),
-    KickUserRequest(KickUserRequest),
-    InviteUserLobbyRequest(InviteUserLobbyRequest),
-    CancelInviteUserLobbyRequest(CancelInviteUserLobbyRequest),
-    AcceptInviteLobbyRequest(AcceptInviteLobbyRequest),
-    DeclineInviteLobbyRequest(DeclineInviteLobbyRequest),
+    CreateLobby(CreateLobbyRequest),
+    JoinLobby(JoinLobbyRequest),
+    ExitLobby,
+    GiveHost(GiveHostRequest),
+    KickUser(KickUserRequest),
+    InviteUserLobby(InviteUserLobbyRequest),
+    CancelInviteUserLobby(CancelInviteUserLobbyRequest),
+    AcceptInviteLobby(AcceptInviteLobbyRequest),
+    DeclineInviteLobby(DeclineInviteLobbyRequest),
     BadMessage,
 }
 
 impl RequestEnum {
 
-    pub async fn compute(&self, connections: Extension<Connections>, user: User) -> bool {
+    pub async fn compute(&self, pool: ConnectionPool, connections: Extension<Connections>, user: User) -> bool {
         match self {
             RequestEnum::Hello => {
                 connections.send_to_vec_user_id(ResponseEnum::Hello, vec![user.id]).await;
@@ -58,6 +59,10 @@ impl RequestEnum {
             }
             RequestEnum::BadMessage => {
                 connections.send_to_vec_user_id(ResponseEnum::BadMessage, vec![user.id]).await;
+                false
+            }
+            RequestEnum::CreateLobby(create_lobby_request) => {
+                create_lobby_request.compute(pool, connections, user).await;
                 false
             }
             _ => false,

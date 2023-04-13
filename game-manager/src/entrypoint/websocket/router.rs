@@ -1,6 +1,6 @@
 use std::net::SocketAddr;
 use axum::{Extension, middleware, Router, TypedHeader};
-use axum::extract::{ConnectInfo, WebSocketUpgrade};
+use axum::extract::{ConnectInfo, State, WebSocketUpgrade};
 use axum::extract::ws::{Message, WebSocket};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -10,6 +10,7 @@ use colored::Colorize;
 use futures_util::StreamExt;
 use tokio_postgres::NoTls;
 use tower_http::trace::{DefaultMakeSpan, TraceLayer};
+use crate::database::init::ConnectionPool;
 use crate::domain::model::user::User;
 use crate::entrypoint::middleware::is_logged::is_logged;
 use crate::entrypoint::websocket::connections::Connections;
@@ -20,14 +21,15 @@ pub fn ws_routes(connections: Connections, pool: Pool<PostgresConnectionManager<
     Router::new()
         .route("/", get(ws_handler).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .layer(Extension(connections.clone()))
+        .with_state(pool)
 
 }
 
-async fn ws_handler(ws: WebSocketUpgrade, ConnectInfo(addr): ConnectInfo<SocketAddr>, connections: Extension<Connections>, Extension(user): Extension<User>) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| handle_socket(socket, addr, connections, user))
+async fn ws_handler(ws: WebSocketUpgrade, ConnectInfo(addr): ConnectInfo<SocketAddr>, State(pool): State<ConnectionPool>, connections: Extension<Connections>, Extension(user): Extension<User>) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| handle_socket(pool, socket, addr, connections, user))
 }
 
-async fn handle_socket(socket: WebSocket, who: SocketAddr, connections: Extension<Connections>, user: User) {
+async fn handle_socket(pool: ConnectionPool, socket: WebSocket, who: SocketAddr, connections: Extension<Connections>, user: User) {
     let (sender, mut receiver) = socket.split();
 
     let user_id = user.id;
@@ -41,7 +43,7 @@ async fn handle_socket(socket: WebSocket, who: SocketAddr, connections: Extensio
             Ok(message) => message,
             Err(_) => RequestEnum::BadMessage,
         };
-        if message.compute(connections.clone(), user.clone()).await {
+        if message.compute(pool.clone(), connections.clone(), user.clone()).await {
             break
         }
     }
