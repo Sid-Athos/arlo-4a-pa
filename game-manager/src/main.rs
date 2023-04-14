@@ -4,7 +4,6 @@ mod database;
 mod service;
 
 use std::net::SocketAddr;
-use std::path::PathBuf;
 use axum::Router;
 use colored::Colorize;
 use dotenv::dotenv;

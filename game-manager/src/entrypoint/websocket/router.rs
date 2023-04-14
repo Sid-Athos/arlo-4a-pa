@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
-use axum::{Extension, middleware, Router, TypedHeader};
+use axum::{Extension, middleware, Router};
 use axum::extract::{ConnectInfo, State, WebSocketUpgrade};
-use axum::extract::ws::{Message, WebSocket};
+use axum::extract::ws::{WebSocket};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use bb8::Pool;
@@ -9,7 +9,6 @@ use bb8_postgres::PostgresConnectionManager;
 use colored::Colorize;
 use futures_util::StreamExt;
 use tokio_postgres::NoTls;
-use tower_http::trace::{DefaultMakeSpan, TraceLayer};
 use crate::database::init::ConnectionPool;
 use crate::domain::model::user::User;
 use crate::entrypoint::middleware::is_logged::is_logged;
@@ -22,21 +21,18 @@ pub fn ws_routes(connections: Connections, pool: Pool<PostgresConnectionManager<
         .route("/", get(ws_handler).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .layer(Extension(connections.clone()))
         .with_state(pool)
-
 }
 
 async fn ws_handler(ws: WebSocketUpgrade, ConnectInfo(addr): ConnectInfo<SocketAddr>, State(pool): State<ConnectionPool>, connections: Extension<Connections>, Extension(user): Extension<User>) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| handle_socket(pool, socket, addr, connections, user))
+    ws.on_upgrade(move |socket| handle_socket(pool, socket, connections, user))
 }
 
-async fn handle_socket(pool: ConnectionPool, socket: WebSocket, who: SocketAddr, connections: Extension<Connections>, user: User) {
+async fn handle_socket(pool: ConnectionPool, socket: WebSocket, connections: Extension<Connections>, user: User) {
     let (sender, mut receiver) = socket.split();
 
-    let user_id = user.id;
+    connections.add_client(user.id, sender).await;
 
-    connections.add_client(user_id, sender).await;
-
-    println!("{} : User {} connected", "INFO".blue(), user_id);
+    println!("{} : User {} connected", "INFO".blue(), user.id);
 
     while let Some(Ok(msg)) = receiver.next().await {
         let message: RequestEnum = match serde_json::from_str(msg.to_text().unwrap()) {
@@ -48,7 +44,13 @@ async fn handle_socket(pool: ConnectionPool, socket: WebSocket, who: SocketAddr,
         }
     }
 
-    connections.disconnect_client(user_id).await;
+    exit_socket(pool, connections, user.clone()).await;
 
-    println!("{} : User {} disconnected", "INFO".blue(), user_id);
+    println!("{} : User {} disconnected", "INFO".blue(), user.id);
+}
+
+async fn exit_socket(pool: ConnectionPool, connections: Extension<Connections>, user: User) {
+
+    RequestEnum::ExitLobby.compute(pool, connections.clone(), user.clone()).await;
+    connections.disconnect_client(user.id).await;
 }
