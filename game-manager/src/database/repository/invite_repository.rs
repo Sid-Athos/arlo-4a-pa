@@ -91,4 +91,22 @@ impl InviteRepository {
 
         Ok(result)
     }
+
+    pub async fn get_invites_from_by_user_id(&self, user_id: i32) -> Result<Vec<Invite>, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn
+            .query("SELECT * FROM coding_games.invite WHERE from_user_id = $1", &[&user_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(InviteEntityMapper::entity_to_domain(InviteEntity::new(row)));
+        }
+
+        Ok(result)
+    }
 }

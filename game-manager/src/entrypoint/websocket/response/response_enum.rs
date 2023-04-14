@@ -1,4 +1,5 @@
 use serde::Serialize;
+use crate::entrypoint::websocket::response::invite_response::InviteResponse;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::message_response::MessageResponse;
 
@@ -17,9 +18,10 @@ pub enum ResponseEnum {
     UserKicked,
     Kicked,
     UserInvited,
-    InviteLobbyCancelled,
-    InviteLobbyAccepted,
-    InviteLobbyDeclined,
+    InviteLobbyCancelled(InviteResponse),
+    InviteLobbyAccepted(InviteResponse),
+    InviteLobbyDeclined(InviteResponse),
+    InviteReceived(InviteResponse),
     StartedGame,
     BadMessage,
     Lobby(LobbyResponse),
