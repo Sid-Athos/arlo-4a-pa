@@ -90,6 +90,10 @@ impl RequestEnum {
                 let response = invite_user_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
+            RequestEnum::CancelInviteUserLobby(cancel_invite_user_lobby_request) => {
+                let response = cancel_invite_user_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
+            }
             _ => {},
         }
         return false;

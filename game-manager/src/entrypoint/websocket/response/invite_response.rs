@@ -1,7 +1,7 @@
 use serde::Serialize;
 use crate::domain::model::invite::Invite;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct InviteResponse {
     pub from_user_id: i32,
     pub to_user_id: i32,
