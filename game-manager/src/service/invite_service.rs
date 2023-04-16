@@ -34,6 +34,10 @@ impl InviteService {
         self.invite_repository.delete_by_id(invite.id).await.map_err(database_error_to_response_error)
     }
 
+    pub async fn cancel_all_from_user_id(&self, from_user_id: i32) -> Result<Vec<Invite>, String> {
+        self.invite_repository.delete_all_from_user_id(from_user_id).await.map_err(database_error_to_response_error)
+    }
+
     pub async fn get_invites_sent_by_user_id(&self, user_id: i32) -> Result<Vec<Invite>, String> {
         self.invite_repository.get_invites_from_by_user_id(user_id).await.map_err(database_error_to_response_error)
     }
