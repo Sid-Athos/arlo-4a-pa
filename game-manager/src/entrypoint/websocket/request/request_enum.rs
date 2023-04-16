@@ -86,12 +86,13 @@ impl RequestEnum {
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
                 LobbyResponse::send_lobby_to_members(pool, connections.clone(), user.clone()).await.log_error();
             }
+            RequestEnum::InviteUserLobby(invite_user_lobby_request) => {
+                let response = invite_user_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
+            }
             _ => {},
         }
         return false;
     }
-
-
-
 
 }

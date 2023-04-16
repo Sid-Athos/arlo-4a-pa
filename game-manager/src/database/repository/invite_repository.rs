@@ -1,7 +1,7 @@
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
-use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_not_found, DatabaseError};
+use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_duplicate_key, database_error_not_found, DatabaseError};
 use crate::database::entity::invite::InviteEntity;
 use crate::database::mapper::invite_entity_mapper::InviteEntityMapper;
 use crate::domain::model::invite::Invite;
@@ -25,7 +25,7 @@ impl InviteRepository {
         let row = conn
             .query_one("INSERT INTO coding_games.invite (lobby_id, from_user_id, to_user_id) VALUES ($1, $2, $3) RETURNING *", &[&lobby_id, &from_user_id, &to_user_id])
             .await
-            .map_err(database_error_not_found)?;
+            .map_err(database_error_duplicate_key)?;
 
         let result = InviteEntity::new(row);
 
