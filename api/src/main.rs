@@ -63,6 +63,7 @@ async fn main() {
         entrypoint::friend_list::route::delete_friend::delete_friend,
         entrypoint::friend_list::route::accept_friend_request::accept_friend_request,
         entrypoint::friend_list::route::show_friend_list::show_friend_list,
+        entrypoint::friend_list::route::show_friend_request::show_friend_request,
     ),
     components(
         schemas(UserResponse),

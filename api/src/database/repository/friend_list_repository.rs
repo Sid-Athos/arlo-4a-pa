@@ -17,30 +17,12 @@ impl FriendListRepository {
         }
     }
 
-    pub async fn get_friend_list_request(&self, applicant_id: i32) -> Result<Vec<FriendList>, DatabaseError> {
+    pub async fn get_friend_list_requests(&self, user_id: i32) -> Result<Vec<FriendList>, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let rows = conn
-            .query("SELECT * FROM coding_games.friend_list WHERE applicant_id = $1 AND accepted = false", &[&applicant_id])
-            .await
-            .map_err(database_error_not_found)?;
-
-        let mut result = Vec::new();
-
-        for row in rows {
-            result.push(FriendListEntityMapper::entity_to_domain(FriendListEntity::new(row)));
-        }
-
-        Ok(result)
-    }
-
-    pub async fn get_friend_list_received(&self, recipient_id: i32) -> Result<Vec<FriendList>, DatabaseError> {
-
-        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
-
-        let rows = conn
-            .query("SELECT * FROM coding_games.friend_list WHERE recipient_id = $1 AND accepted = false", &[&recipient_id])
+            .query("SELECT * FROM coding_games.friend_list WHERE ( recipient_id = $1 OR applicant_id = $1 ) AND accepted = false", &[&user_id])
             .await
             .map_err(database_error_not_found)?;
 
@@ -105,7 +87,6 @@ impl FriendListRepository {
             .map_err(database_error_not_found)?;
 
         let result = FriendListEntity::new(row);
-        println!("{} {} {:?}",recipient_id,applicant_id,result);
         Ok(FriendListEntityMapper::entity_to_domain(result))
     }
 

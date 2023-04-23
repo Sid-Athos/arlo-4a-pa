@@ -10,7 +10,7 @@ use crate::service::friend_list_service::FriendListService;
 
 #[utoipa::path(
     get,
-    path = "/friend_list/show_friend_list",
+    path = "/friend_list/",
     responses(
         (status = 200, description = "Friends found", body = Vec<UserResponse>),
         (status = 401, description = "Invalid token",),

@@ -1,4 +1,4 @@
-use axum::extract::{Path, State};
+use axum::extract::State;
 use axum::http::StatusCode;
 use axum::{Extension, Json};
 use crate::database::init::ConnectionPool;
@@ -9,22 +9,22 @@ use crate::entrypoint::friend_list::route::response::friend_list_response::Frien
 use crate::service::friend_list_service::FriendListService;
 
 #[utoipa::path(
-    delete,
-    path = "/friend_list/{friend_list_id}",
+    get,
+    path = "/friend_list/requests",
     responses(
-        (status = 200, description = "FriendList entry deleted", body = FriendListResponse,),
+        (status = 200, description = "Friends requests found", body = Vec<UserResponse>),
         (status = 401, description = "Invalid token",),
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
     )
 )]
-pub async fn delete_friend(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Path(friend_list_id): Path<i32>) -> Result<Json<FriendListResponse>, StatusCode> {
+pub async fn show_friend_request(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<Vec<FriendListResponse>>, StatusCode> {
     let friend_list_service = FriendListService::new(
         FriendListRepository::new(pool.clone()),
     );
 
-    let result = friend_list_service.delete_friend(friend_list_id,user.id).await?;
+    let result = friend_list_service.get_all_requests(user.id).await?;
 
-    Ok(Json(FriendListResponse::from_domain(result)))
+    Ok(Json(FriendListResponse::from_vec_domain(result)))
 }
