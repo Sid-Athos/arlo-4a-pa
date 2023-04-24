@@ -34,7 +34,6 @@ impl FriendListService {
     }
 
     pub async fn accept_friend_request(&self, request_id : i32, user_id : i32) -> Result<FriendList, StatusCode> {
-        println!("request : {} // user : {}",request_id,user_id);
         self.friend_list_repository.accept_friend_list_request(request_id, user_id).await.map_err(database_error_to_status_code)
     }
 

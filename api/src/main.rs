@@ -19,6 +19,7 @@ use crate::entrypoint::user::route::request::change_password_request::ChangePass
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
 use crate::entrypoint::friend_list::route::request::create_friend_list_request::CreateFriendListRequest;
 use crate::entrypoint::friend_list::route::response::friend_list_response::FriendListResponse;
+use crate::entrypoint::ranking::ranking_router::ranking_routes;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
 use crate::entrypoint::user::route::response::session_response::SessionResponse;
 
@@ -33,6 +34,7 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
         .nest("/admin", admin_routes(pool.clone()))
+        .nest("/ranking", ranking_routes(pool.clone()))
         .nest("/friend_list", friend_list_routes(pool.clone()));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
