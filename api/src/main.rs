@@ -47,6 +47,7 @@ async fn main() {
     paths(
         entrypoint::user::route::get_by_id::user_get,
         entrypoint::user::route::create::user_create,
+        entrypoint::user::route::add_experience::add_experience,
         entrypoint::user::route::login::user_login,
         entrypoint::user::route::logout::user_logout,
         entrypoint::user::route::me::me,

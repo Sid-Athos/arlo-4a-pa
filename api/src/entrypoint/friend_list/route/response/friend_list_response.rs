@@ -21,6 +21,6 @@ impl FriendListResponse {
     }
 
     pub fn from_vec_domain(friendLists: Vec<FriendList>) -> Vec<Self> {
-        friendLists.into_iter().map(|user| FriendListResponse::from_domain(user)).collect()
+        friendLists.into_iter().map(|friend| FriendListResponse::from_domain(friend)).collect()
     }
 }

@@ -105,4 +105,14 @@ impl UserService {
 
         Ok(user)
     }
+
+    pub async fn add_experience(&self, user_id : i32) -> Result<User, StatusCode> {
+        let mut user = self.user_repository.get_user_by_id(user_id).await.map_err(database_error_to_status_code)?;
+        user.experience = user.experience + 1;
+        if user.experience >= user.level*10 {
+            user.experience = 0;
+            user.level = user.level + 1;
+        }
+        self.user_repository.add_experience(user_id,user.experience,user.level).await.map_err(database_error_to_status_code)
+    }
 }

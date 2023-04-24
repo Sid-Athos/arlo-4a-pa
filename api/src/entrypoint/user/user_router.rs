@@ -5,6 +5,7 @@ use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 
 use crate::entrypoint::middleware::is_logged::{is_logged};
+use crate::entrypoint::user::route::add_experience::add_experience;
 use crate::entrypoint::user::route::change_password::change_password;
 use crate::entrypoint::user::route::create::user_create;
 use crate::entrypoint::user::route::delete::delete_user;
@@ -27,6 +28,7 @@ pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/change_password", put(change_password).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/update", put(update_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/search", get(search))
+        .route("/add_experience", put(add_experience).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .with_state(pool)
 
 }
