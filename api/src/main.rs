@@ -14,12 +14,22 @@ use axum::{
 use bb8::{Pool, PooledConnection};
 use bb8_postgres::PostgresConnectionManager;
 use std::net::SocketAddr;
-use tokio_postgres::NoTls;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use axum::http::Method;
 use dotenv::dotenv;
-extern crate dotenv;
-use std::env;
+use tower_http::cors::{Any, CorsLayer};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
+use crate::database::init::init_db;
+use crate::entrypoint::admin::admin_router::admin_routes;
+use crate::entrypoint::user::user_router::user_routes;
+use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
+use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
+use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
+use crate::entrypoint::user::route::request::login_request::LoginRequest;
+use crate::entrypoint::user::route::response::user_response::UserResponse;
+use crate::entrypoint::user::route::response::session_response::SessionResponse;
 
 #[tokio::main]
 async fn main() {
@@ -32,22 +42,31 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    // set up connection pool
-    let manager =
-        PostgresConnectionManager::new_from_stringlike(&env::var("DB_URL").unwrap(), NoTls)
-            .unwrap();
-    let pool = Pool::builder().build(manager).await.unwrap();
 
-    // build our application with some routes
-    let app = Router::new()
-        .route(
-            "/",
-            get(using_connection_pool_extractor).post(using_connection_extractor),
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "api=debug".into()),
         )
-        .with_state(pool);
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
-    // run it with hyper
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let pool = init_db().await.unwrap();
+
+    let cors = CorsLayer::new()
+        // allow `GET` and `POST` when accessing the resource
+        .allow_methods([Method::GET, Method::POST])
+        // allow requests from any origin
+        .allow_origin(Any);
+
+    let app = Router::new()
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .nest("/user", user_routes(pool.clone()))
+        .nest("/admin", admin_routes(pool.clone()))
+        .layer(cors);
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+
     tracing::info!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
