@@ -22,6 +22,9 @@ use crate::entrypoint::friend_list::route::response::friend_list_response::Frien
 use crate::entrypoint::ranking::ranking_router::ranking_routes;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
 use crate::entrypoint::user::route::response::session_response::SessionResponse;
+use crate::entrypoint::ranking::route::request::ranking_request::RankingRequest;
+use crate::entrypoint::ranking::route::request::update_ranking_request::UpdateRankingRequest;
+use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 
 #[tokio::main]
 async fn main() {
@@ -67,6 +70,8 @@ async fn main() {
         entrypoint::friend_list::route::accept_friend_request::accept_friend_request,
         entrypoint::friend_list::route::show_friend_list::show_friend_list,
         entrypoint::friend_list::route::show_friend_request::show_friend_request,
+        entrypoint::ranking::route::init_ranking::init_ranking,
+        entrypoint::ranking::route::update_ranking::update_ranking,
     ),
     components(
         schemas(UserResponse),
@@ -77,7 +82,9 @@ async fn main() {
         schemas(ChangePasswordRequest),
         schemas(UpdateUserRequest),
         schemas(FriendListResponse),
-
+        schemas(RankingRequest),
+        schemas(UpdateRankingRequest),
+        schemas(RankingResponse),
     )
 )]
 struct ApiDoc;

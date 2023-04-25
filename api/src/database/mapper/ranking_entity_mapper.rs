@@ -10,6 +10,8 @@ impl RankingEntityMapper {
             id: entity.id,
             user_id: entity.user_id,
             game_id: entity.game_id,
+            rank: entity.rank,
+            nb_games : entity.nb_games
         }
     }
 }
