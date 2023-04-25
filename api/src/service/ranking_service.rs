@@ -8,6 +8,8 @@ use crate::database::repository::ranking_repository::RankingRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::database_error_to_status_code;
 use crate::domain::model::ranking::Ranking;
+use serde::{Deserialize, Serialize};
+
 
 pub struct RankingService {
     pub ranking_repository: RankingRepository
