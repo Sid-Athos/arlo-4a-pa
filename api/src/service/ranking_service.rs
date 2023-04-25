@@ -36,11 +36,11 @@ impl RankingService {
         self.ranking_repository.get_ranking_by_game(game_id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn delete_ranking_by_user(&self, user_id: i32) -> Result<Ranking, StatusCode> {
+    pub async fn delete_ranking_by_user(&self, user_id: i32) -> Result<Vec<Ranking>, StatusCode> {
         self.ranking_repository.delete_rankings_by_user_id(user_id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn delete_ranking_by_game(&self, game_id: i32) -> Result<Ranking, StatusCode> {
+    pub async fn delete_ranking_by_game(&self, game_id: i32) -> Result<Vec<Ranking>, StatusCode> {
         self.ranking_repository.delete_rankings_by_game_id(game_id).await.map_err(database_error_to_status_code)
     }
 
