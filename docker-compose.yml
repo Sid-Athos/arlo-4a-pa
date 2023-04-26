@@ -8,7 +8,7 @@ services:
     restart: "always"
     tty: true
     volumes:
-      - "./api/.env:/.env"
+      - "./api/.env:.env"
   gamemanager:
     container_name: "gamemanager"
     image: dixennaxos/pa-4al2-gr5:game-manager-${ENV}-latest
@@ -17,7 +17,7 @@ services:
     restart: "always"
     tty: true
     volumes:
-      - "./game-manager/.env:/.env"
+      - "./game-manager/.env:.env"
   front:
     container_name: "front"
     image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest
@@ -26,4 +26,4 @@ services:
     restart: "always"
     tty: true
     volumes:
-      - "./web/coding-games/.env:/.env"
+      - "./web/coding-games/.env:.env"
