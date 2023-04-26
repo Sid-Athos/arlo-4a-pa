@@ -16,7 +16,7 @@ use crate::service::ranking_service::RankingService;
 
 #[utoipa::path(
     get,
-    path = "/ranking/game/{game_id}",
+    path = "/ranking/user/{user_id}",
     params(
         ("user_id" = String,),
     ),
@@ -25,12 +25,12 @@ use crate::service::ranking_service::RankingService;
         (status = 404, description = "Game not found",),
     )
 )]
-pub async fn get_ranking_by_game_id(State(pool): State<ConnectionPool>, Path(game_id): Path<i32>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {
+pub async fn get_ranking_by_user_id(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {
     let ranking_service = RankingService::new(
         RankingRepository::new(pool.clone()),
     );
 
-    let result = ranking_service.get_ranking_by_game(game_id).await?;
+    let result = ranking_service.get_ranking_by_user(user_id).await?;
 
     Ok(Json(RankingResponse::from_vec_domain(result)))
 }

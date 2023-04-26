@@ -72,6 +72,10 @@ async fn main() {
         entrypoint::friend_list::route::show_friend_request::show_friend_request,
         entrypoint::ranking::route::init_ranking::init_ranking,
         entrypoint::ranking::route::update_ranking::update_ranking,
+        entrypoint::ranking::route::get_ranking_by_friend::get_ranking_by_friend,
+        entrypoint::ranking::route::get_ranking_by_game::get_ranking_by_game_id,
+        entrypoint::ranking::route::get_ranking_by_user::get_ranking_by_user_id,
+
     ),
     components(
         schemas(UserResponse),
