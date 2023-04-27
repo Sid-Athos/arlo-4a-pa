@@ -59,9 +59,30 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/img/background.png
+    - assets/fonts/google_sans_bold.ttf
+    - assets/fonts/google_sans_bold_italic.ttf
+    - assets/fonts/google_sans_italic.ttf
+    - assets/fonts/google_sans_medium.ttf
+    - assets/fonts/google_sans_medium_italic.ttf
+    - assets/fonts/google_sans_regular.ttf
+    - assets/fonts/proxima_nova_font.otf
+
+  fonts:
+    - family: GoogleSans
+      fonts:
+        - asset: assets/fonts/google_sans_bold.ttf
+        - asset: assets/fonts/google_sans_bold_italic.ttf
+        - asset: assets/fonts/google_sans_italic.ttf
+        - asset: assets/fonts/google_sans_medium.ttf
+        - asset: assets/fonts/google_sans_medium_italic.ttf
+        - asset: assets/fonts/google_sans_regular.ttf
+          weight: 700
+    - family: Proxima
+      fonts:
+        - asset: assets/fonts/proxima_nova_font.otf
+          weight: 700
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

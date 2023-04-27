@@ -1,53 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:miku/api/user/api_user.dart';
 import 'dart:developer' as developer;
 
-import 'package:miku/api/user/request/login_request.dart';
-import 'package:miku/view/subscribe_view.dart';
+class SubscribeView extends StatefulWidget {
+  static String routeName = "Subscribe";
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const SubscribeView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
+  State<SubscribeView> createState() => _SubscribeState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class _SubscribeState extends State<SubscribeView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final pseudoController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final passwordConfirmController = TextEditingController();
 
-  void signUserIn() async {
+  void subscribe() async {
     if (_formKey.currentState!.validate()) {
-      developer.log("Sign In");
+      developer.log("Subscribe");
     }
-    // LoginRequest loginRequest = LoginRequest(email: emailController.text, password: passwordController.text);
-    // final session = await ApiUser().login(loginRequest);
   }
 
   String? _textEmptyValidator(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please, fill this input';
+    }
+    return null;
+  }
+
+  String? _passwordValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please, fill this input';
+    }
+    if (value.length < 8) {
+      return 'Password must contain at least 8 characters';
+    }
+    const pattern = r'^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    final regExp = RegExp(pattern);
+    if (!regExp.hasMatch(value)) {
+      return 'Rules : 1 capital letter, 1 digit, 1 special character';
+    }
+    return null;
+  }
+
+  String? _passwordConfirmValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please, fill this input';
+    }
+    if (passwordController.text != value) {
+      return 'Must be the same that the password';
     }
     return null;
   }
@@ -59,22 +62,20 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/img/background.png"),
-              fit: BoxFit.cover,
-            ),
+                image: AssetImage("assets/img/background.png"),
+                fit: BoxFit.cover),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 0),
                 child: Text(
-                  "Login",
+                  "Subscribe",
                   style: TextStyle(
-                    fontFamily: 'GoogleSans',
-                    fontSize: 40,
-                    color: Colors.white,
-                  ),
+                      fontFamily: 'GoogleSans',
+                      fontSize: 40,
+                      color: Colors.white),
                 ),
               ),
               Padding(
@@ -83,6 +84,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
+                      TextFormField(
+                        validator: _textEmptyValidator,
+                        controller: pseudoController,
+                        decoration: const InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          labelText: 'Enter your pseudo',
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       TextFormField(
                         validator: _textEmptyValidator,
                         controller: emailController,
@@ -96,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: const TextStyle(color: Colors.white),
                       ),
                       TextFormField(
-                        validator: _textEmptyValidator,
+                        validator: _passwordValidator,
                         controller: passwordController,
                         decoration: const InputDecoration(
                           enabledBorder: UnderlineInputBorder(
@@ -108,16 +121,29 @@ class _MyHomePageState extends State<MyHomePage> {
                         obscureText: true,
                         style: const TextStyle(color: Colors.white),
                       ),
+                      TextFormField(
+                        validator: _passwordConfirmValidator,
+                        controller: passwordConfirmController,
+                        decoration: const InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          labelText: 'Confirm your password',
+                          labelStyle: TextStyle(color: Colors.white),
+                        ),
+                        obscureText: true,
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(top: 40),
                         child: SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: signUserIn,
+                            onPressed: subscribe,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF626af7),
                             ),
-                            child: const Text("Log In"),
+                            child: const Text("Create Account"),
                           ),
                         ),
                       ),
@@ -125,26 +151,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SubscribeView()),
-                    );
-                  },
-                  child: const Text(
-                    "Create an account",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 50),
             ],
           ),
         ),
