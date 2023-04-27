@@ -31,7 +31,7 @@ async fn main() {
         .nest("/user", user_routes(pool.clone()))
         .nest("/admin", admin_routes(pool.clone()));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 7590));
 
     println!("{} : listening on {}", "START", addr);
 
