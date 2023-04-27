@@ -4,7 +4,7 @@ services:
     container_name: "api"
     image: dixennaxos/pa-4al2-gr5:api-${ENV}-latest
     ports:
-      - '7590:7590'
+      - '3001:3001'
     restart: "always"
     tty: true
     volumes:
