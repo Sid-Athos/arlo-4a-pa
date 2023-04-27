@@ -3,6 +3,7 @@ import 'package:miku/api/user/api_user.dart';
 import 'dart:developer' as developer;
 
 import 'package:miku/api/user/request/login_request.dart';
+import 'package:miku/view/home_view.dart';
 import 'package:miku/view/subscribe_view.dart';
 
 void main() {
@@ -39,10 +40,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void signUserIn() async {
     if (_formKey.currentState!.validate()) {
-      developer.log("Sign In");
+      LoginRequest loginRequest = LoginRequest(email: emailController.text, password: passwordController.text);
+      final session = await ApiUser().login(loginRequest);
+      if (session != null) {
+        developer.log("Sign In");
+        developer.log(session.token);
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const HomeView()
+          ),
+        );
+      } else {
+        wrongCredentials();
+      }
     }
-    // LoginRequest loginRequest = LoginRequest(email: emailController.text, password: passwordController.text);
-    // final session = await ApiUser().login(loginRequest);
+  }
+
+  void wrongCredentials() {
+
   }
 
   String? _textEmptyValidator(String? value) {
@@ -132,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SubscribeView()),
+                          builder: (context) => const SubscribeView()
+                      ),
                     );
                   },
                   child: const Text(

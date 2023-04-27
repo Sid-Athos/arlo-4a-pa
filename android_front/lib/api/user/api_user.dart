@@ -8,7 +8,7 @@ import '../../model/session_model.dart';
 import '../../model/user_model.dart';
 
 class ApiUser {
-  final String baseURL = "http://127.0.0.1:3000";
+  final String baseURL = "http://dev.mikusupremacy.fr:7590";
   final dio = Dio();
 
   Future<User?> getById(int id) async {
@@ -30,10 +30,10 @@ class ApiUser {
   }
 
   Future<Session?> login(LoginRequest loginRequest) async {
-    final response = await dio.post('$baseURL/user/login', data: loginRequest.toJson());
-    if(response.statusCode == 200) {
+    try {
+      final response = await dio.post('$baseURL/user/login', data: loginRequest.toJson());
       return SessionResponseMapper.fromJson(response.data);
-    } else {
+    } catch (e) {
       return null;
     }
   }

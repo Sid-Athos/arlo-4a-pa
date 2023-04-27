@@ -63,7 +63,8 @@ class _SubscribeState extends State<SubscribeView> {
           decoration: const BoxDecoration(
             image: DecorationImage(
                 image: AssetImage("assets/img/background.png"),
-                fit: BoxFit.cover),
+                fit: BoxFit.cover
+            ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
