@@ -33,7 +33,7 @@ async fn main() {
         .nest("/admin", admin_routes(pool.clone()))
         .route("/ping", get(ping_handler));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 7590));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
 
     println!("{} : listening on {}", "START", addr);
 
