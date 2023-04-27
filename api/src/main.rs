@@ -5,6 +5,7 @@ mod entrypoint;
 
 use axum::Router;
 use std::net::SocketAddr;
+use axum::routing::get;
 use dotenv::dotenv;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -29,13 +30,19 @@ async fn main() {
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
-        .nest("/admin", admin_routes(pool.clone()));
+        .nest("/admin", admin_routes(pool.clone()))
+        .route("/ping", get(ping_handler));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 7590));
 
     println!("{} : listening on {}", "START", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
+}
+
+async fn ping_handler() -> &'static str {
+    println!("Pong");
+    return "Pong";
 }
 
 #[derive(OpenApi)]
