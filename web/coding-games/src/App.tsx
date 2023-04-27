@@ -1,6 +1,8 @@
 import type {Component} from 'solid-js';
 
+// @ts-ignore
 import logo from './logo.svg';
+// @ts-ignore
 import styles from './App.module.css';
 import {
   AppBar,
@@ -36,7 +38,11 @@ const App: Component = () => {
   }
 
   // @ts-ignore
-  return (
+  // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    return (
       <Box>
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" sx={{backgroundColor:'#282c34'}}>
