@@ -16,6 +16,7 @@ use bb8_postgres::PostgresConnectionManager;
 use std::net::SocketAddr;
 use axum::http::Method;
 use dotenv::dotenv;
+use tokio_postgres::NoTls;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::OpenApi;
