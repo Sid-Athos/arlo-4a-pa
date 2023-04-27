@@ -40,7 +40,7 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
         .nest("/admin", admin_routes(pool.clone()))
-        .layer(cors);
+        .layer(init_cors_layer());
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 

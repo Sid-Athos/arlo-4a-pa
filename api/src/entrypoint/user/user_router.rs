@@ -14,6 +14,7 @@ use crate::entrypoint::user::route::logout::user_logout;
 use crate::entrypoint::user::route::me::me;
 use crate::entrypoint::user::route::search::search;
 use crate::entrypoint::user::route::update::update_user;
+use crate::middlewares::cors_layer::init_cors_layer;
 
 pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 

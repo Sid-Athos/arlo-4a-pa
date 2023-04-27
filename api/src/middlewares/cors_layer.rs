@@ -3,8 +3,8 @@ use axum::http::Method;
 
 pub fn init_cors_layer()-> CorsLayer {
     CorsLayer::new()
-        // allow `GET` and `POST` when accessing the resource
-        .allow_methods([Method::GET, Method::POST])
-        // allow requests from any origin
+        .allow_headers(Any)
+        .allow_methods(Any)
         .allow_origin(Any)
+        .expose_headers(Any)
 }

@@ -1,4 +1,3 @@
-import type {Component} from 'solid-js';
 
 // @ts-ignore
 import logo from './logo.svg';
@@ -10,38 +9,39 @@ import {
   Button,
   Card,
   CardActions,
-  CardContent, FormControl, FormHelperText,
-  IconButton, Input, InputLabel,
+  CardContent,
+  IconButton,
   Modal, TextField,
   Toolbar,
-  Typography, useTheme
+  Typography
 } from "@suid/material";
 import MenuIcon from "@suid/icons-material/Menu";
 import {createResource, createSignal} from "solid-js";
+import axios from 'axios';
 
-const fetchUser = async () => {
-    return (await fetch(`http://localhost:8080/user/1`));
-}
+const instance = axios.create({
+    baseURL: 'http://localhost:3000',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
-const App: Component = () => {
+const App = () => {
+
 
   const [open, setOpen] = createSignal(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [userLogin, setUserLogin] = createSignal({account : "", password: ""});
+  const [userLogin, setUserLogin] = createSignal({email : "", password: ""});
     // @ts-ignore
-    const [user] = createResource(userLogin, fetchUser);
 
-  function test(){
-      console.log("fetch")
-    JSON.stringify(user()?.body)
+  async function test() {
+      console.log(userLogin())
+      console.log(instance.getUri());
+      const user = await instance.post('/user/login', userLogin());
+      console.log(user);
   }
 
-  // @ts-ignore
-  // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
     return (
       <Box>
         <Box sx={{ flexGrow: 1 }}>
@@ -73,7 +73,6 @@ const App: Component = () => {
             Edit <code>src/App.tsx</code> and save to reload.
           </p>
         </header>
-
         <Modal
             open={open()}
             onClose={handleClose}
@@ -111,7 +110,7 @@ const App: Component = () => {
                     defaultValue="dsqdj"
                     onChange={(e) =>{
                       let user = userLogin();
-                      user.account = e.target.value;
+                      user.email = e.target.value;
                       setUserLogin(user)
                     } }
                     sx={{  color: '#ffffff'  }}
