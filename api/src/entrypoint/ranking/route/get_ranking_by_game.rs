@@ -3,7 +3,6 @@ use std::{time::Duration, convert::Infallible};
 use std::ops::Deref;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use tokio_stream::StreamExt as _ ;
 use futures_util::stream::{self, Stream};
 use serde::Serialize;
 use serde_json::json;
@@ -11,7 +10,7 @@ use tracing_subscriber::fmt::format;
 use crate::database::init::ConnectionPool;
 use crate::database::repository::ranking_repository::RankingRepository;
 use crate::domain::model::user::User;
-use crate::RankingResponse;
+use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::service::ranking_service::RankingService;
 
 #[utoipa::path(

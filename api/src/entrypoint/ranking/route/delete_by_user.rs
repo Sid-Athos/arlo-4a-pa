@@ -6,8 +6,8 @@ use crate::database::repository::ranking_repository::RankingRepository;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::user::User;
+use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
-use crate::RankingResponse;
 use crate::service::ranking_service::RankingService;
 use crate::service::user_service::UserService;
 
