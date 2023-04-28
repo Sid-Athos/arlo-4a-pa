@@ -20,7 +20,7 @@ use crate::service::user_service::UserService;
     tag = "user"
 )]
 pub async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {
-    tracing::debug!("Calling user_get for user_id {}", user_id);
+    tracing::info!("Calling user_get for user_id {}", user_id);
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
@@ -28,7 +28,7 @@ pub async fn user_get(State(pool): State<ConnectionPool>, Path(user_id): Path<i3
 
     let user = user_service.get_user_by_id(user_id).await?;
 
-    tracing::debug!("Found {:?}", user);
+    tracing::info!("Found {:?}", user);
 
     Ok(Json(UserResponse::from_domain(user)))
 }

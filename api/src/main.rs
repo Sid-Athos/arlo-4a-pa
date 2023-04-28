@@ -44,7 +44,7 @@ async fn main() {
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
-    tracing::debug!("listening on {}", addr);
+    tracing::info!("listening on {}", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }

@@ -15,6 +15,7 @@ pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B
     let auth_header = if let Some(auth_header) = auth_header {
         auth_header
     } else {
+        tracing::error!("Illegal connexion attempt");
         return Err(StatusCode::UNAUTHORIZED);
     };
     let auth_header = auth_header.trim_start_matches("Bearer ");
