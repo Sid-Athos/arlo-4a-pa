@@ -1,11 +1,17 @@
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_appender::rolling;
+use tracing_subscriber::fmt::writer::MakeWriterExt;
 
 pub fn init_tracer(){
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "api=debug".into()),
-        )
-        .with(tracing_subscriber::fmt::layer())
+    let debug_file = rolling::hourly("./logs", "debug");
+    // Log warnings and errors to a separate file. Since we expect these events
+    // to occur less frequently, roll that file on a daily basis instead.
+    let warn_file = rolling::daily("./logs", "warnings").with_max_level(tracing::Level::WARN);
+    let all_files = debug_file.and(warn_file);
+
+    tracing_subscriber::fmt()
+        .with_writer(all_files)
+        .with_ansi(false)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 }

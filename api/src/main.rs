@@ -40,11 +40,11 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
         .nest("/admin", admin_routes(pool.clone()))
-        .layer(init_cors_layer());
+        .layer(cors);
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
-    tracing::info!("listening on {}", addr);
+    tracing::debug!("listening on {}", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
