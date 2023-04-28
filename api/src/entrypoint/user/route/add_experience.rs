@@ -21,7 +21,7 @@ use crate::service::user_service::UserService;
     request_body = UpdateUserRequest,
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
     tag="user"
 )]
 pub async fn add_experience(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {

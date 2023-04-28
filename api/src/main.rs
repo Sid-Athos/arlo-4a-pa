@@ -5,13 +5,11 @@ mod entrypoint;
 mod middlewares;
 
 use std::env;
-use axum::{Json, Router};
+use axum::{ Router};
 use std::net::SocketAddr;
-use axum::http::{HeaderMap, HeaderValue, Method, Request, StatusCode};
+use axum::http::{HeaderMap, StatusCode};
 use dotenv::dotenv;
-use tokio_postgres::Socket;
-use tower_http::cors::{Any, CorsLayer};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{util::SubscriberInitExt};
 use utoipa::{Modify, OpenApi};
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
@@ -27,6 +25,7 @@ use crate::entrypoint::ranking::route::request::ranking_request::RankingRequest;
 use crate::entrypoint::ranking::route::request::update_ranking_request::UpdateRankingRequest;
 use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::entrypoint::admin::admin_router::admin_routes;
+use crate::entrypoint::friend_list::friend_list_router::friend_list_routes;
 use crate::entrypoint::user::user_router::user_routes;
 use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
@@ -47,6 +46,8 @@ async fn main() {
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
         .nest("/admin", admin_routes(pool.clone()))
+        .nest("/ranking", ranking_routes(pool.clone()))
+        .nest("/friend_list", friend_list_routes(pool.clone()))
         .layer(cors);
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
@@ -56,10 +57,6 @@ async fn main() {
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
 
-async fn ping_handler() -> &'static str {
-    println!("Pong");
-    return "Pong";
-}
 
 #[derive(OpenApi)]
 #[openapi(
