@@ -1,8 +1,10 @@
 use bcrypt::{hash, verify};
 use axum::http::StatusCode;
+use futures_util::future::err;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, thread_rng};
-use crate::database::database_error::DatabaseError;
+use regex::Regex;
+use crate::database::database_error::{database_error_invalid_input, DatabaseError};
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::{database_error_to_status_code, internal_error};
@@ -32,6 +34,26 @@ impl UserService {
     }
 
     pub async fn create_user(&self, mut user: CreateUserCommand) -> Result<User, StatusCode> {
+
+        let password_regex_upper = Regex::new(r"^[A-Z]$").unwrap();
+        let password_regex_lower = Regex::new(r"^[a-z]$").unwrap();
+        let password_regex_number = Regex::new(r"^\d$").unwrap();
+        let password_regex_special = Regex::new(r"^[^a-zA-Z0-9]$").unwrap();
+
+        let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+
+        if  !password_regex_upper.is_match(&*user.password) &&
+            !password_regex_lower.is_match(&*user.password) &&
+            !password_regex_number.is_match(&*user.password) &&
+            !password_regex_special.is_match(&*user.password) &&
+            user.password.len() < 8
+        {
+            return Err(StatusCode::BAD_REQUEST);
+        }
+
+        if(!email_regex.is_match(&*user.email)){
+            return Err(StatusCode::BAD_REQUEST);
+        }
 
         user.password = hash(user.password, 4).map_err(internal_error)?;
 
