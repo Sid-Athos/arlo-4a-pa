@@ -25,3 +25,4 @@ tracing-appender = "0.2"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 utoipa = { version = "3.2.1", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "3", features = ["axum"] }
+regex = "1.8.1"
