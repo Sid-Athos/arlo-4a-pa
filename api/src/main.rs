@@ -89,7 +89,7 @@ impl Modify for SecurityAddon {
         if let Some(components) = openapi.components.as_mut() {
             components.add_security_scheme(
                 "api_key",
-                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("todo_apikey"))),
+                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))),
             )
         }
     }
@@ -97,7 +97,7 @@ impl Modify for SecurityAddon {
 fn check_api_key(
     headers: &HeaderMap
 ) -> Result<(), (StatusCode, String)> {
-    match headers.get("todo_apikey") {
+    match headers.get("api-key") {
         Some(header) if header != &env::var("API_KEY").unwrap() => {
             tracing::error_span!("Invalid api key");
             Err((
