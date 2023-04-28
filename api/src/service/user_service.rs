@@ -1,10 +1,10 @@
 use bcrypt::{hash, verify};
 use axum::http::StatusCode;
-use futures_util::future::err;
+
 use rand::distributions::Alphanumeric;
 use rand::{Rng, thread_rng};
 use regex::Regex;
-use crate::database::database_error::{database_error_invalid_input, DatabaseError};
+
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::{database_error_to_status_code, internal_error};
@@ -51,7 +51,7 @@ impl UserService {
             return Err(StatusCode::BAD_REQUEST);
         }
 
-        if(!email_regex.is_match(&*user.email)){
+        if !email_regex.is_match(&*user.email) {
             return Err(StatusCode::BAD_REQUEST);
         }
 

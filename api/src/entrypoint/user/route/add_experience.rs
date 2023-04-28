@@ -5,9 +5,9 @@ use crate::database::init::ConnectionPool;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::user::User;
-use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
+
 use crate::entrypoint::user::route::response::user_response::UserResponse;
-use crate::service::command::updata_user_command::UpdateUserCommand;
+
 use crate::service::user_service::UserService;
 
 #[utoipa::path(

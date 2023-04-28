@@ -9,20 +9,19 @@ use axum::{ Router};
 use std::net::SocketAddr;
 use axum::http::{HeaderMap, StatusCode};
 use dotenv::dotenv;
-use tracing_subscriber::{util::SubscriberInitExt};
 use utoipa::{Modify, OpenApi};
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use crate::database::init::init_db;
-use crate::entrypoint::friend_list::route::request::create_friend_list_request::CreateFriendListRequest;
-use crate::entrypoint::friend_list::route::response::friend_list_response::FriendListResponse;
+
+
 use crate::entrypoint::ranking::ranking_router::ranking_routes;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
 use crate::entrypoint::user::route::response::session_response::SessionResponse;
-use crate::entrypoint::ranking::route::request::ranking_request::RankingRequest;
-use crate::entrypoint::ranking::route::request::update_ranking_request::UpdateRankingRequest;
+
+
 use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::entrypoint::admin::admin_router::admin_routes;
 use crate::entrypoint::friend_list::friend_list_router::friend_list_routes;

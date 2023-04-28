@@ -1,5 +1,5 @@
 use tower_http::cors::{AllowOrigin, Any, CorsLayer};
-use axum::http::Method;
+
 
 pub fn init_cors_layer()-> CorsLayer {
     CorsLayer::new()

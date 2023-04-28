@@ -1,12 +1,12 @@
-use axum::{Router, routing::get, response::sse::{Event, KeepAlive, Sse}, Json, Extension};
-use std::{time::Duration, convert::Infallible};
-use std::ops::Deref;
+use axum::{Json, Extension};
+
+
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use futures_util::stream::{self, Stream};
-use serde::Serialize;
-use serde_json::json;
-use tracing_subscriber::fmt::format;
+
+
+
+
 use crate::database::init::ConnectionPool;
 use crate::database::repository::ranking_repository::RankingRepository;
 use crate::domain::model::user::User;

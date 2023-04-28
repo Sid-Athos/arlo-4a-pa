@@ -1,11 +1,11 @@
-use std::ptr::null;
-use bcrypt::{hash, verify};
+
+
 use axum::http::StatusCode;
-use rand::distributions::Alphanumeric;
-use rand::{Rng, thread_rng};
-use crate::database::database_error::{database_error_invalid_input, DatabaseError};
+
+
+
 use crate::database::repository::friend_list_repository::FriendListRepository;
-use crate::domain::error::{database_error_to_status_code, internal_error};
+use crate::domain::error::{database_error_to_status_code};
 use crate::domain::model::friend_list::FriendList;
 
 pub struct FriendListService {
