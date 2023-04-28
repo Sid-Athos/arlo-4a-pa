@@ -17,7 +17,8 @@ use crate::service::friend_list_service::FriendListService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag="friend_list"
 )]
 pub async fn delete_friend(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Path(friend_list_id): Path<i32>) -> Result<Json<FriendListResponse>, StatusCode> {
     let friend_list_service = FriendListService::new(

@@ -17,7 +17,8 @@ use crate::service::friend_list_service::FriendListService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag="friend_list"
 )]
 pub async fn show_friend_request(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<Vec<FriendListResponse>>, StatusCode> {
     let friend_list_service = FriendListService::new(

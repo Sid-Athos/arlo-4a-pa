@@ -22,7 +22,8 @@ use crate::service::ranking_service::RankingService;
     responses(
         (status = 200, description = "Rankings found", body = RankingResponse,),
         (status = 404, description = "Game not found",),
-    )
+    ),
+    tag="ranking"
 )]
 pub async fn get_ranking_by_user_id(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {
     let ranking_service = RankingService::new(

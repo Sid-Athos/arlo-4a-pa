@@ -20,7 +20,8 @@ use crate::service::user_service::UserService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag="ranking"
 )]
 pub async fn delete_by_user(State(pool): State<ConnectionPool>, Path(user_id) : Path<i32>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {
     let ranking_service = RankingService::new(

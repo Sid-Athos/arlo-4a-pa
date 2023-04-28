@@ -21,7 +21,8 @@ use crate::service::user_service::UserService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag="ranking"
 )]
 pub async fn init_ranking(State(pool): State<ConnectionPool>, Json(ranking): Json<RankingRequest>) -> Result<Json<RankingResponse>, StatusCode> {
     let ranking_service = RankingService::new(
