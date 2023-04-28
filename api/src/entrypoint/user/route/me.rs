@@ -12,7 +12,8 @@ use crate::entrypoint::user::route::response::user_response::UserResponse;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag = "user"
 )]
 pub async fn me(Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {
     Ok(Json(UserResponse::from_domain(user)))

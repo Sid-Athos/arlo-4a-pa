@@ -20,7 +20,8 @@ use crate::service::user_service::UserService;
     request_body = ChangePasswordRequest,
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag="user"
 )]
 pub async fn change_password(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(password): Json<ChangePasswordRequest>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

@@ -19,7 +19,8 @@ use crate::service::user_service::UserService;
     ),
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
-    )
+    ),
+    tag = "admin"
 )]
 pub async fn get_all(State(pool): State<ConnectionPool>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
     let user_service = UserService::new(

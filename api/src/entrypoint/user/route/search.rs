@@ -16,7 +16,8 @@ use crate::service::user_service::UserService;
     ),
     params(
         ("pseudo" = String,),
-    )
+    ),
+    tag = "user"
 )]
 pub async fn search(State(pool): State<ConnectionPool>, Query(params): Query<HashMap<String, String>>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
     let user_service = UserService::new(

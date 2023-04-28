@@ -2,13 +2,21 @@ mod database;
 mod service;
 mod domain;
 mod entrypoint;
+mod middlewares;
 
-use axum::Router;
+use std::env;
+use axum::{Json, Router};
 use std::net::SocketAddr;
+use axum::http::{HeaderMap, HeaderValue, Method, Request, StatusCode};
 use dotenv::dotenv;
-use utoipa::OpenApi;
+use tokio_postgres::Socket;
+use tower_http::cors::{Any, CorsLayer};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use utoipa::{Modify, OpenApi};
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
 
+use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use crate::database::init::init_db;
 use crate::entrypoint::admin::admin_router::admin_routes;
 use crate::entrypoint::user::user_router::user_routes;
@@ -23,15 +31,20 @@ use crate::entrypoint::user::route::response::session_response::SessionResponse;
 async fn main() {
 
     dotenv().ok();
+    init_tracer();
 
     let pool = init_db().await.unwrap();
+
+    let cors = init_cors_layer();
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
-        .nest("/admin", admin_routes(pool.clone()));
+        .nest("/admin", admin_routes(pool.clone()))
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+        .layer(cors);
+
+    let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
     tracing::info!("listening on {}", addr);
 
@@ -56,6 +69,7 @@ async fn main() {
         entrypoint::admin::route::remove_admin_role::remove_admin_role,
         entrypoint::admin::route::update_user::update_user,
     ),
+    modifiers(&SecurityAddon),
     components(
         schemas(UserResponse),
         schemas(SessionResponse),
@@ -64,6 +78,40 @@ async fn main() {
         schemas(ChangePasswordRequest),
         schemas(UpdateUserRequest),
 
-    )
+    ),
 )]
 struct ApiDoc;
+
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        if let Some(components) = openapi.components.as_mut() {
+            components.add_security_scheme(
+                "api_key",
+                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))),
+            )
+        }
+    }
+}
+fn check_api_key(
+    headers: &HeaderMap
+) -> Result<(), (StatusCode, String)> {
+    match headers.get("api-key") {
+        Some(header) if header != &env::var("API_KEY").unwrap() => {
+            tracing::error_span!("Invalid api key");
+            Err((
+                StatusCode::UNAUTHORIZED,
+                "Incorrect or missing Api Key".to_string(),
+            ))
+        },
+        None => {
+            tracing::error_span!("Missing api key");
+            Err((
+                StatusCode::UNAUTHORIZED,
+                "Incorrect or missing Api Key".to_string(),
+            ))
+        },
+        _ => Ok(()),
+    }
+}

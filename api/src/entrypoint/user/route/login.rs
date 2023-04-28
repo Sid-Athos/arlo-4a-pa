@@ -17,7 +17,8 @@ use crate::service::user_service::UserService;
         (status = 200, description = "User connected", body = SessionResponse,),
         (status = 401, description = "Invalid password",),
         (status = 404, description = "User not found",),
-    )
+    ),
+    tag = "user"
 )]
 pub async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<SessionResponse>, StatusCode> {
     let user_service = UserService::new(
