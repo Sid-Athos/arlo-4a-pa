@@ -10,10 +10,10 @@ RUN cargo build --release
 RUN rm src/*.rs
 COPY ./src ./src
 
-RUN rm ./target/release/deps/game-manager*
+RUN rm ./target/release/deps/game_manager*
 RUN cargo build --release
 
 FROM debian:buster-slim
-COPY --from=build /api/target/release/game-manager .
+COPY --from=build /game-manager/target/release/game-manager .
 
 CMD ["./game-manager"]

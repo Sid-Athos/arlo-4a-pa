@@ -15,6 +15,9 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       - name: Build
         run: |
           cd game-manager
@@ -43,7 +46,7 @@ jobs:
           context: ./game-manager
           platforms: linux/arm64
           push: true
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_PROJECT_NAME}}:api-game-${{env.BRANCH_NAME}}-latest
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_PROJECT_NAME}}:game-manager-${{env.BRANCH_NAME}}-latest
 
   redeploy:
     needs: build

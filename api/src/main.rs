@@ -51,9 +51,14 @@ async fn main() {
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
-    tracing::info!("listening on {}", addr);
+    println!("{} : listening on {}", "START", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
+}
+
+async fn ping_handler() -> &'static str {
+    println!("Pong");
+    return "Pong";
 }
 
 #[derive(OpenApi)]
