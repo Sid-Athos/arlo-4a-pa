@@ -3,6 +3,7 @@ use axum::routing::{get, post, delete, put};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
+use crate::check_api_key;
 
 use crate::entrypoint::middleware::is_logged::{is_logged};
 use crate::entrypoint::user::route::change_password::change_password;
