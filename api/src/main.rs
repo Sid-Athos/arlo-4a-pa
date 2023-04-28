@@ -10,7 +10,7 @@ use std::net::SocketAddr;
 use axum::http::{HeaderMap, StatusCode};
 use dotenv::dotenv;
 use utoipa::{Modify, OpenApi};
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, Http, HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
@@ -107,6 +107,10 @@ impl Modify for SecurityAddon {
             components.add_security_scheme(
                 "api_key",
                 SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))),
+            );
+            components.add_security_scheme(
+                "bearer",
+                SecurityScheme::Http(HttpBuilder::new().scheme(HttpAuthScheme::Bearer).build())
             )
         }
     }
@@ -114,6 +118,7 @@ impl Modify for SecurityAddon {
 fn check_api_key(
     headers: &HeaderMap
 ) -> Result<(), (StatusCode, String)> {
+    println!("Headers {:?}", headers);
     match headers.get("api-key") {
         Some(header) if header != &env::var("API_KEY").unwrap() => {
             tracing::error_span!("Invalid api key");
@@ -129,6 +134,9 @@ fn check_api_key(
                 "Incorrect or missing Api Key".to_string(),
             ))
         },
-        _ => Ok(()),
+        _ => {
+            tracing::info!("Valid api-key provided");
+            Ok(())
+        },
     }
 }

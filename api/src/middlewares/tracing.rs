@@ -1,5 +1,4 @@
 
-use tracing_subscriber::{util::SubscriberInitExt};
 use tracing_appender::rolling;
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 
