@@ -9,6 +9,7 @@ use crate::domain::model::session::Session;
 use crate::service::session_service::SessionService;
 
 pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
+    println!("lol");
     check_api_key(req.headers()).expect_err("Invalid or missing Api Key");
     let auth_header = req.headers()
         .get(http::header::AUTHORIZATION)

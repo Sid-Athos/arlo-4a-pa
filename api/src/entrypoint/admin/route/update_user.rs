@@ -11,7 +11,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     put,
-    path = "/user/update/{user_id}",
+    path = "/admin/update/{user_id}",
     params(
         ("user_id" = String,),
     ),
@@ -24,7 +24,7 @@ use crate::service::user_service::UserService;
     security(
         ("BearerAuth" = ["read:items", "edit:items"])
     ),
-    tag="user"
+    tag="admin"
 )]
 pub async fn update_user(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>, Json(update_request): Json<UpdateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(
