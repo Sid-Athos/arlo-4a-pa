@@ -186,4 +186,16 @@ impl UserRepository {
 
         Ok(UserEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn add_experience(&self, user_id : i32, experience : i32, level : i32) -> Result<User, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("UPDATE coding_games.user SET experience = $1, level = $2 WHERE id = $3 RETURNING *", &[&experience, &level, &user_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
 }

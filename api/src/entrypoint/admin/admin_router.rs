@@ -9,7 +9,6 @@ use crate::entrypoint::admin::route::give_admin_role::give_admin_role;
 use crate::entrypoint::admin::route::remove_admin_role::remove_admin_role;
 use crate::entrypoint::admin::route::update_user::update_user;
 use crate::entrypoint::middleware::is_logged_admin::is_logged_admin;
-use crate::middlewares::cors_layer::init_cors_layer;
 
 pub fn admin_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
