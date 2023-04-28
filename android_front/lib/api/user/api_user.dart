@@ -20,11 +20,11 @@ class ApiUser {
     }
   }
 
-  Future<User?> create(CreateUserRequest createUserRequest) async {
-    final response = await dio.post('$baseURL/user/create', data: createUserRequest.toJson());
-    if(response.statusCode == 200) {
+  Future<User?> createUser(CreateUserRequest createUserRequest) async {
+    try {
+      final response = await dio.post('$baseURL/user/create', data: createUserRequest.toJson());
       return UserResponseMapper.fromJson(response.data);
-    } else {
+    } catch (e) {
       return null;
     }
   }

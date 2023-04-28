@@ -1,57 +1,41 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
-
 import 'package:flutter/services.dart';
-import 'package:miku/api/user/request/create_user_request.dart';
+import 'package:miku/view/subscribe_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 
 import '../api/user/api_user.dart';
 import '../api/user/request/login_request.dart';
-import '../model/user_model.dart';
 import 'home_view.dart';
 
-class SubscribeView extends StatefulWidget {
-  static String routeName = "Subscribe";
-
-  const SubscribeView({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<SubscribeView> createState() => _SubscribeState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _SubscribeState extends State<SubscribeView> {
+class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final pseudoController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final passwordConfirmController = TextEditingController();
   String error = "";
 
-  void subscribe() async {
+  void signUserIn() async {
     if (_formKey.currentState!.validate()) {
-      CreateUserRequest createUserRequest = CreateUserRequest(
-          pseudo: pseudoController.text,
+      LoginRequest loginRequest = LoginRequest(
           email: emailController.text,
           password: passwordController.text
       );
-      User? user = await ApiUser().createUser(createUserRequest);
-
-      if (user != null) {
-        LoginRequest loginRequest = LoginRequest(
-            email: emailController.text,
-            password: passwordController.text
+      final session = await ApiUser().login(loginRequest);
+      if (session != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeView()),
         );
-        final session = await ApiUser().login(loginRequest);
-        if (session != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
-          );
-        } else {
-          wrongCredentials();
-        }
       } else {
         wrongCredentials();
       }
@@ -60,38 +44,13 @@ class _SubscribeState extends State<SubscribeView> {
 
   void wrongCredentials() {
     setState(() {
-      error = "Email already exist";
+      error = "Wrong credentials";
     });
   }
 
   String? _textEmptyValidator(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please, fill this input';
-    }
-    return null;
-  }
-
-  String? _passwordValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please, fill this input';
-    }
-    if (value.length < 8) {
-      return 'Password must contain at least 8 characters';
-    }
-    const pattern = r'^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-    final regExp = RegExp(pattern);
-    if (!regExp.hasMatch(value)) {
-      return 'Rules : 1 capital letter, 1 digit, 1 special character';
-    }
-    return null;
-  }
-
-  String? _passwordConfirmValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please, fill this input';
-    }
-    if (passwordController.text != value) {
-      return 'Must be the same that the password';
     }
     return null;
   }
@@ -110,20 +69,22 @@ class _SubscribeState extends State<SubscribeView> {
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("assets/img/background.png"),
-                  fit: BoxFit.cover),
+                image: AssetImage("assets/img/background.png"),
+                fit: BoxFit.cover,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                   child: Text(
-                    "Subscribe",
+                    "Login",
                     style: TextStyle(
-                        fontFamily: 'GoogleSans',
-                        fontSize: 40,
-                        color: Colors.white),
+                      fontFamily: 'GoogleSans',
+                      fontSize: 40,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 Padding(
@@ -132,18 +93,6 @@ class _SubscribeState extends State<SubscribeView> {
                     key: _formKey,
                     child: Column(
                       children: <Widget>[
-                        TextFormField(
-                          validator: _textEmptyValidator,
-                          controller: pseudoController,
-                          decoration: const InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            labelText: 'Enter your pseudo',
-                            labelStyle: TextStyle(color: Colors.white),
-                          ),
-                          style: const TextStyle(color: Colors.white),
-                        ),
                         TextFormField(
                           validator: _textEmptyValidator,
                           controller: emailController,
@@ -157,26 +106,13 @@ class _SubscribeState extends State<SubscribeView> {
                           style: const TextStyle(color: Colors.white),
                         ),
                         TextFormField(
-                          validator: _passwordValidator,
+                          validator: _textEmptyValidator,
                           controller: passwordController,
                           decoration: const InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
                             ),
                             labelText: 'Enter your password',
-                            labelStyle: TextStyle(color: Colors.white),
-                          ),
-                          obscureText: true,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        TextFormField(
-                          validator: _passwordConfirmValidator,
-                          controller: passwordConfirmController,
-                          decoration: const InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            labelText: 'Confirm your password',
                             labelStyle: TextStyle(color: Colors.white),
                           ),
                           obscureText: true,
@@ -193,11 +129,11 @@ class _SubscribeState extends State<SubscribeView> {
                           child: SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: subscribe,
+                              onPressed: signUserIn,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF626af7),
                               ),
-                              child: const Text("Create Account"),
+                              child: const Text("Log In"),
                             ),
                           ),
                         ),
@@ -205,6 +141,26 @@ class _SubscribeState extends State<SubscribeView> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SubscribeView()),
+                      );
+                    },
+                    child: const Text(
+                      "Create an account",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
               ],
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:miku/view/friends_view.dart';
 import 'dart:developer' as developer;
 
@@ -32,6 +33,10 @@ class _HomeState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return Scaffold(
       body: Center(
         child: Container(
