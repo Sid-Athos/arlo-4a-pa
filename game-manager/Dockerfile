@@ -13,7 +13,7 @@ COPY ./src ./src
 RUN rm ./target/release/deps/game_manager*
 RUN cargo build --release
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 COPY --from=build /game-manager/target/release/game-manager .
 
 CMD ["./game-manager"]
