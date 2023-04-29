@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
           email: emailController.text,
           password: passwordController.text
       );
-      final session = await ApiUser().login(loginRequest);
+      final session = await ApiUser.login(loginRequest);
       if (session != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         Navigator.pop(context);

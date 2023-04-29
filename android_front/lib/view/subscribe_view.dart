@@ -34,14 +34,14 @@ class _SubscribeState extends State<SubscribeView> {
           email: emailController.text,
           password: passwordController.text
       );
-      User? user = await ApiUser().createUser(createUserRequest);
+      User? user = await ApiUser.createUser(createUserRequest);
 
       if (user != null) {
         LoginRequest loginRequest = LoginRequest(
             email: emailController.text,
             password: passwordController.text
         );
-        final session = await ApiUser().login(loginRequest);
+        final session = await ApiUser.login(loginRequest);
         if (session != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           Navigator.pop(context);
