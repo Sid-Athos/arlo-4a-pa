@@ -49,18 +49,6 @@ async fn main() {
 
     println!(env!("CARGO_MANIFEST_DIR"));
 
-    let config = RustlsConfig::from_pem_file(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("certificates")
-            .join("cert.pem"),
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("certificates")
-            .join("key.pem"),
-    )
-        .await
-        .unwrap();
-
-
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .nest("/user", user_routes(pool.clone()))
@@ -73,7 +61,7 @@ async fn main() {
 
     tracing::info!("listening on {:?}", addr);
 
-    axum_server::bind_rustls(addr, config).serve(app.into_make_service()).await.unwrap();
+    axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
 
 

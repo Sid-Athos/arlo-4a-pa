@@ -20,14 +20,17 @@ export default function LoginComponent ({open, setOpen})  {
     const [userSignUpErrorMessage, setUserSignUpErrorMessage] = createSignal("");
     const [userSignUp, setUserSignUp] = createSignal({email : "", password: "", nickname:""});
     const [userSignUpError, setUserSignUpError] = createSignal(false);
+    const [userIsSignedIn, setUserIsSignedIn] = createSignal(false);
 
     // @ts-ignore
     async function signIn() {
         if(userSignIn().email.length > 0 && userSignIn().password.length >= 3){
             try {
-                const userLogged = await UserService.signIn(userSignIn());
-                if(userLogged.status === 200){
-                    setClientData(userLogged)
+                let res = await UserService.signIn(userSignIn());
+                if(res.status === 200){
+                    setClientData(res);
+                    setUserSignInError(false)
+                    setUserIsSignedIn(true)
                 }
             } catch (error) {
                 setUserSignInError(true)
@@ -49,12 +52,14 @@ export default function LoginComponent ({open, setOpen})  {
     async function signUp() {
         if(userSignUp().email.length > 0 && userSignUp().password.length >= 3 && userSignUp().nickname.length >= 5){
             try {
-                const userCreated = await instance.post('/user/create', userSignUp());
+                const userCreated = await UserService.signUp(userSignUp());
                 if(userCreated.status === 200){
-                    console.log(userCreated.data)
+                    setClientData(userCreated);
+                    setUserSignInError(false)
+                    setUserIsSignedIn(true)
                 }
             } catch (error) {
-                setUserSignUpError(!userSignInError())
+                setUserSignUpError(!userSignUpError())
                 setUserSignUpErrorMessage("An error occured while creating your account")
             }
         }
@@ -77,16 +82,16 @@ export default function LoginComponent ({open, setOpen})  {
 
     return (
         <Box>
-            <header class={styles.header}>
+            <header className={styles.header}>
                 <p>
                     Coding Games
                 </p>
-                <img src={logo} class={styles.logo} alt="logo" />
+                <img src={logo} className={styles.logo} alt="logo" />
             </header>
             <UnloggedScreen open={open} handleClose={handleClose} userSignIn={userSignIn} userSignUp={userSignUp} userSignInError={userSignInError} userSignUpError={userSignUpError} signIn={signIn}
             userSignUpErrorMessage={userSignUpErrorMessage} submitSignInFormOnPressEnter={submitSignInFormOnPressEnter} submitSignUpFormOnPressEnter={submitSignUpFormOnPressEnter}
             userSignInErrorMessage={userSignInErrorMessage} setUserSignInError={setUserSignInError} setUserSignIn={setUserSignIn} setUserSignUp={setUserSignUp}
-            setUserSignUpError={setUserSignUpError}/>
+            setUserSignUpError={setUserSignUpError} signUp={signUp} userIsSignedIn={userIsSignedIn} setUserIsSignedIn={setUserIsSignedIn}></UnloggedScreen>
         </Box>
     );
 };

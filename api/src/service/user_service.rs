@@ -48,10 +48,12 @@ impl UserService {
             !password_regex_special.is_match(&*user.password) &&
             user.password.len() < 8
         {
+            tracing::error!("Password criterion not fulfilled");
             return Err(StatusCode::BAD_REQUEST);
         }
 
         if !email_regex.is_match(&*user.email) {
+            tracing::error!("Email criterion not fulfilled");
             return Err(StatusCode::BAD_REQUEST);
         }
 

@@ -1,6 +1,6 @@
 import {
     Alert,
-    Box, Button,
+    Box, Button, ButtonGroup,
     Card,
     CardActions,
     CardContent,
@@ -29,14 +29,14 @@ const UnloggedScreen = (
         submitSignInFormOnPressEnter,
         open,
         handleClose,
-        signIn}) => {
+        signIn,
+        signUp,
+        userIsSignedIn,
+        setUserIsSignedIn}) => {
     const [screen, setScreen] = createSignal('signIn');
-    function swapScreen(){
-        if(screen() === "signIn"){
-            setScreen('signUp');
-        } else {
-            setScreen('signIn');
-        }
+    function swapScreen(newScreen){
+        setScreen(newScreen);
+        setScreen(newScreen);
         setUserSignUpError(false);
         setUserSignInError(false);
     }
@@ -53,7 +53,8 @@ const UnloggedScreen = (
             <Card
                 sx={{
                     position: "absolute",
-                    top: "30%",
+                    justifyContent: "center",
+                    top: "40%",
                     left: "53%",
                     transform: "translate(-50%, -50%)",
                     width: 300,
@@ -78,6 +79,17 @@ const UnloggedScreen = (
 
                             </Fade>
                         </Show>
+                        <Show when={userIsSignedIn()} fallback={<></>}>
+                            <Fade timeout={{ enter: 300, exit: 5000 }} in={userIsSignedIn()} addEndListener={() => {
+                                setTimeout(() => {
+                                    setUserIsSignedIn(false);
+                                }, 5000);
+                            }}
+                            >
+                                <Alert sx={{backgroundColor:"rgb(12.899999999999997, 19.899999999999995, 13.199999999999998)", color:"rgb(204.6, 232.6, 205.8)"}} severity="success">Connexion successful</Alert>
+
+                            </Fade>
+                        </Show>
                         <Show when={userSignUpError()} fallback={<></>}>
                             <Fade timeout={{ enter: 300, exit: 5000 }} in={userSignInError()} addEndListener={() => {
                                 setTimeout(() => {
@@ -90,10 +102,17 @@ const UnloggedScreen = (
                         </Show>
                         <Switch>
                             <Match when={screen() === 'signIn'}>
+                                <Stack component={"form"}
+                                       sx={{
+                                           width: '27ch',
+                                       }}
+                                       spacing={2}
+                                       noValidate
+                                       autoComplete="off"
+                                >
                                 <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
                                     {cardInfo().signInButton}
                                 </Typography>
-                                <Box component={"form"}>
                                     <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
                                         Email / Username
                                     </Typography>
@@ -107,8 +126,8 @@ const UnloggedScreen = (
                                             await submitSignInFormOnPressEnter(k.key)
                                         }
                                         }
-                                        inputProps={{ style: { color: "white" } }}
-                                        onChange={(e) =>{
+                                        inputProps={{ style: { color: "white", justifyContent:"center" } }}
+                                        onchange={(e) =>{
                                             let user = userSignIn();
                                             user.email = e.target.value;
                                             setUserSignIn(user)
@@ -135,13 +154,35 @@ const UnloggedScreen = (
                                         setUserSignIn(user)
                                     } }
                                     />
-                                </Box>
+                                    <Button size="large" onclick={signIn}>Login</Button>
+                                </Stack>
                             </Match>
                             <Match when={screen() === 'signUp'}>
                                 <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
-                                    {cardInfo().signInButton}
+                                    {cardInfo().signUpButton}
                                 </Typography>
-                                <Box component={"form"}>
+                                <Box component={"form"} autocomplete={"off"}>
+                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
+                                        Nickname
+                                    </Typography>
+                                    <TextField
+                                        required
+                                        id="username"
+                                        label="Required"
+                                        type="text"
+                                        variant="standard"
+                                        inputProps={{ style: { color: "white" } }}
+                                        onkeypress={async (k) => {
+                                            await submitSignUpFormOnPressEnter(k.key)
+                                        }
+                                        }
+                                        onChange={(e) =>{
+                                            let user = userSignUp();
+                                            user.nickname = e.target.value;
+                                            setUserSignUp(user)
+                                        } }
+                                        sx={{  color: '#ffffff'  }}
+                                    />
                                     <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
                                         Email
                                     </Typography>
@@ -160,27 +201,6 @@ const UnloggedScreen = (
                                         onChange={(e) =>{
                                             let user = userSignUp();
                                             user.email = e.target.value;
-                                            setUserSignUp(user)
-                                        } }
-                                        sx={{  color: '#ffffff'  }}
-                                    />
-                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
-                                        Email
-                                    </Typography>
-                                    <TextField
-                                        required
-                                        id="username"
-                                        label="Required"
-                                        type="text"
-                                        variant="standard"
-                                        inputProps={{ style: { color: "white" } }}
-                                        onkeypress={async (k) => {
-                                            await submitSignUpFormOnPressEnter(k.key)
-                                        }
-                                        }
-                                        onChange={(e) =>{
-                                            let user = userSignUp();
-                                            user.nickname = e.target.value;
                                             setUserSignUp(user)
                                         } }
                                         sx={{  color: '#ffffff'  }}
@@ -205,22 +225,25 @@ const UnloggedScreen = (
                                         setUserSignUp(user)
                                     } }
                                     />
+                                    <Button size="large" onclick={signUp}>
+                                        Register
+                                    </Button>
                                 </Box>
                             </Match>
                         </Switch>
                     </Stack>
                 </CardContent>
-                <CardActions>
-                    <Container>
-                        <Button size="small" onClick={signIn} sx={{left:'40px'}}>
+                <CardActions >
+                    <Box sx={{paddingLeft: '20px'}}>
+                    <ButtonGroup >
+                        <Button size="large" onClick={() => swapScreen('signIn')}>
                             {cardInfo().signInButton}
                         </Button>
-                    </Container>
-                    <Container>
-                        <Button size="small" onClick={swapScreen} >
+                        <Button size="large" onClick={() => swapScreen('signUp')} >
                             {cardInfo().signUpButton}
                         </Button>
-                    </Container>
+                    </ButtonGroup>
+                    </Box>
                 </CardActions>
             </Card>
         </Modal>
