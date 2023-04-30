@@ -10,7 +10,7 @@ impl CreateUserCommand {
 
     pub fn new(request: CreateUserRequest) -> Self {
         CreateUserCommand {
-            pseudo: request.pseudo,
+            pseudo: request.nickname,
             email: request.email,
             password: request.password,
         }
