@@ -1,0 +1,29 @@
+version: "3"
+services:
+  api:
+    container_name: "api"
+    image: dixennaxos/pa-4al2-gr5:api-${ENV}-latest
+    ports:
+      - '7590:7590'
+    restart: "always"
+    tty: true
+    volumes:
+      - "./api/.env:/.env"
+  gamemanager:
+    container_name: "gamemanager"
+    image: dixennaxos/pa-4al2-gr5:game-manager-${ENV}-latest
+    ports:
+      - '7589:7589'
+    restart: "always"
+    tty: true
+    volumes:
+      - "./game-manager/.env:/.env"
+  front:
+    container_name: "front"
+    image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest
+    ports:
+      - '3000:3000'
+    restart: "always"
+    tty: true
+    volumes:
+      - "./web/coding-games/.env:/.env"
