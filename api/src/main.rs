@@ -7,8 +7,7 @@ mod middlewares;
 use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
-
-
+use std::path::PathBuf;
 
 
 use dotenv::dotenv;
@@ -37,7 +36,7 @@ use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequ
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
 use crate::middlewares::swagger_security;
-
+use axum_server::tls_rustls::RustlsConfig;
 
 #[tokio::main]
 async fn main() {
@@ -48,6 +47,18 @@ async fn main() {
 
     let cors = init_cors_layer();
 
+    println!(env!("CARGO_MANIFEST_DIR"));
+
+    let config = RustlsConfig::from_pem_file(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("certificates")
+            .join("cert.pem"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("certificates")
+            .join("key.pem"),
+    )
+        .await
+        .unwrap();
 
 
     let app = Router::new()
@@ -62,7 +73,7 @@ async fn main() {
 
     tracing::info!("listening on {:?}", addr);
 
-    axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
+    axum_server::bind_rustls(addr, config).serve(app.into_make_service()).await.unwrap();
 }
 
 
