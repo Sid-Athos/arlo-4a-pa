@@ -1,18 +1,18 @@
 // @ts-ignore
-import logo from './logo.svg';
+import logo from '../logo.svg';
 // @ts-ignore
-import styles from './App.module.css';
+import styles from '../App.module.css';
 import {
     Box,
 } from "@suid/material";
 import {createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import UnloggedScreen from "./render/unlogged/unlogged-screen";
+import UnloggedScreen from "../render/unlogged/unlogged-screen";
 
-import {AxiosInstance} from "./utils/services/axios-instance";
-import {UserService} from "./utils/services/user-service";
+import {AxiosInstance} from "../utils/services/axios-instance";
+import {UserService} from "../utils/services/user-service";
 
-const App = ({open, setOpen}) => {
+export default function LoginComponent ({open, setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
     const [userSignIn, setUserSignIn] = createSignal({email : "", password: ""});
     const [userSignInError, setUserSignInError] = createSignal(false);
@@ -91,4 +91,3 @@ const App = ({open, setOpen}) => {
     );
 };
 
-export default App;

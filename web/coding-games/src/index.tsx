@@ -1,13 +1,13 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 // @ts-ignore
-import App from "./App";
 import './index.css';
 import {Router, Route, Routes} from "@solidjs/router";
 import {AppBar, Box, Button, Divider, IconButton, Stack, Toolbar, Typography} from "@suid/material";
 import MenuIcon from "@suid/icons-material/Menu";
 import {createSignal} from "solid-js";
-
+// @ts-ignore
+import LoginComponent from "./components/login.jsx";
 const root = document.getElementById('root');
 
 // @ts-ignore
@@ -58,7 +58,7 @@ render(
         <Router>
             <Routes>
                 {/* @ts_ignore */}
-                <Route path={"/"} component={<App open={open} setOpen={setOpen}></App>}></Route>
+                <Route path={"/"} component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
             </Routes>
         </Router>
     </Box>
