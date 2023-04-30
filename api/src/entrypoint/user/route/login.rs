@@ -24,12 +24,14 @@ use crate::service::user_service::UserService;
     tag = "user"
 )]
 pub async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<SessionResponse>, StatusCode> {
+    tracing::info!("Calling login service for user {:?}", user);
     let user_service = UserService::new(
         UserRepository::new(pool.clone()),
         SessionRepository::new(pool.clone())
     );
 
     let session = user_service.login_user(LoginCommand::new(user)).await?;
+    tracing::info!("Creating session for user {:?}", session);
 
     Ok(Json(SessionResponse::from_domain(session)))
 }

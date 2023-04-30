@@ -19,16 +19,17 @@ use crate::middlewares::swagger_security::check_api_key;
 pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/:user_id", get(user_get)).route_layer(middleware::from_fn(check_api_key)).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))
-        .route("/create", post(user_create)).route_layer(middleware::from_fn(check_api_key))
-        .route("/login", post(user_login)).route_layer(middleware::from_fn(check_api_key))
-        .route("/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))
-        .route("/delete", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))
-        .route("/me", get(me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))
-        .route("/change_password", put(change_password).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))
-        .route("/update", put(update_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))
-        .route("/search", get(search)).route_layer(middleware::from_fn(check_api_key))
-        .route("/add_experience", put(add_experience).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))
+        .route("/:user_id", get(user_get).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/create", post(user_create))
+        .route("/login", post(user_login))
+        .route("/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/delete", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/me", get(me).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/change_password", put(change_password).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/update", put(update_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/search", get(search).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/add_experience", put(add_experience).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .layer(middleware::from_fn(check_api_key))
         .with_state(pool)
 
 }

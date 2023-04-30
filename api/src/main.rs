@@ -12,6 +12,8 @@ use std::net::SocketAddr;
 
 
 use dotenv::dotenv;
+use tracing_appender::rolling;
+use tracing_subscriber::fmt::writer::MakeWriterExt;
 use utoipa::{ OpenApi};
 
 
@@ -58,7 +60,7 @@ async fn main() {
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
-    println!("{} : listening on {}", "START", addr);
+    tracing::info!("listening on {:?}", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
