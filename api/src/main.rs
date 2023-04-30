@@ -8,18 +8,18 @@ use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
 
-use axum::http::{Request, StatusCode};
-use axum::middleware::Next;
-use axum::response::Response;
-use dotenv::dotenv;
-use utoipa::{Modify, OpenApi};
 
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme};
+
+
+use dotenv::dotenv;
+use utoipa::{ OpenApi};
+
+
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use crate::database::init::init_db;
-
+use crate::swagger_security::SecurityAddon;
 
 use crate::entrypoint::ranking::ranking_router::ranking_routes;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
@@ -34,16 +34,19 @@ use crate::entrypoint::user::route::request::create_user_request::CreateUserRequ
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
+use crate::middlewares::swagger_security;
+
 
 #[tokio::main]
 async fn main() {
 
     dotenv().ok();
     init_tracer();
-
     let pool = init_db().await.unwrap();
 
     let cors = init_cors_layer();
+
+
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
@@ -103,38 +106,4 @@ schemas(UpdateUserRequest),
 )]
 struct ApiDoc;
 
-struct SecurityAddon;
 
-impl Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        let schemes = vec![("api-key" ,SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key")))),
-                           ("bearer", SecurityScheme::Http(HttpBuilder::new().scheme(HttpAuthScheme::Bearer).build()))].into_iter();
-        if let Some(components) = openapi.components.as_mut() {
-            components.add_security_schemes_from_iter(
-                schemes
-            )
-        }
-    }
-}
-async fn check_api_key<B>(req: Request<B>, next: Next<B>) -> Result<Response, (StatusCode, String)>{
-    match req.headers().get("api-key") {
-        Some(header) if header != &env::var("API_KEY").unwrap() => {
-            tracing::error_span!("Invalid api key");
-            Err((
-                StatusCode::UNAUTHORIZED,
-                "Incorrect or missing Api Key".to_string(),
-            ))
-        },
-        None => {
-            tracing::error_span!("Missing api key");
-            Err((
-                StatusCode::UNAUTHORIZED,
-                "Incorrect or missing Api Key".to_string(),
-            ))
-        },
-        _ => {
-            tracing::info!("Valid api-key provided");
-            Ok(next.run(req).await)
-        },
-    }
-}

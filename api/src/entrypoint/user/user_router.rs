@@ -3,8 +3,6 @@ use axum::routing::{get, post, delete, put};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
-use crate::check_api_key;
-
 use crate::entrypoint::middleware::is_logged::{is_logged};
 use crate::entrypoint::user::route::add_experience::add_experience;
 use crate::entrypoint::user::route::change_password::change_password;
@@ -16,6 +14,7 @@ use crate::entrypoint::user::route::logout::user_logout;
 use crate::entrypoint::user::route::me::me;
 use crate::entrypoint::user::route::search::search;
 use crate::entrypoint::user::route::update::update_user;
+use crate::middlewares::swagger_security::check_api_key;
 
 pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
