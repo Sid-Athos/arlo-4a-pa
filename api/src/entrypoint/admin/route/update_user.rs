@@ -20,6 +20,9 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
         (status = 409, description = "Pseudo already used",),
     ),
+    security(
+        ("api-key" = [])
+    ),
     request_body = UpdateUserRequest,
     tag="admin"
 )]

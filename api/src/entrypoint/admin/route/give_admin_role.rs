@@ -18,6 +18,9 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
         (status = 404, description = "User not found",),
     ),
+    security(
+        ("api-key" = [])
+    ),
     tag="admin"
 )]
 pub async fn give_admin_role(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {

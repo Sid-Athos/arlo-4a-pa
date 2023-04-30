@@ -20,7 +20,7 @@ use crate::entrypoint::user::route::update::update_user;
 pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/:user_id", get(user_get)).route_layer(middleware::from_fn(check_api_key))
+        .route("/:user_id", get(user_get)).route_layer(middleware::from_fn(check_api_key)).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))
         .route("/create", post(user_create)).route_layer(middleware::from_fn(check_api_key))
         .route("/login", post(user_login)).route_layer(middleware::from_fn(check_api_key))
         .route("/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))).route_layer(middleware::from_fn(check_api_key))

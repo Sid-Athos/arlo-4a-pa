@@ -10,10 +10,10 @@ use crate::entrypoint::user::route::response::user_response::UserResponse;
         (status = 200, description = "User found", body = UserResponse),
         (status = 401, description = "Invalid token",),
     ),
-security(
-("api_key" = [])
-),
-
+    security(
+        ("api-key" = []  ),
+        ("bearer" = [])
+    ),
     tag = "user"
 )]
 pub async fn me(Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {

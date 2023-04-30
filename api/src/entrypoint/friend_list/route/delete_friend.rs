@@ -15,7 +15,9 @@ use crate::service::friend_list_service::FriendListService;
         (status = 200, description = "FriendList entry deleted", body = FriendListResponse,),
         (status = 401, description = "Invalid token",),
     ),
-
+    security(
+        ("api-key" = [])
+    ),
     tag="friend_list"
 )]
 pub async fn delete_friend(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Path(friend_list_id): Path<i32>) -> Result<Json<FriendListResponse>, StatusCode> {

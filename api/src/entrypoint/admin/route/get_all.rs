@@ -17,7 +17,9 @@ use crate::service::user_service::UserService;
         (status = 200, description = "List of Users", body = Vec<UserResponse>,),
         (status = 401, description = "Invalid token",),
     ),
-
+    security(
+        ("api-key" = [])
+    ),
     tag = "admin"
 )]
 pub async fn get_all(State(pool): State<ConnectionPool>) -> Result<Json<Vec<UserResponse>>, StatusCode> {

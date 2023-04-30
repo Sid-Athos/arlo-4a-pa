@@ -1,6 +1,6 @@
 use std::str::FromStr;
 use axum::http::HeaderName;
-use tower_http::cors::{AllowCredentials, AllowHeaders, AllowOrigin, Any, CorsLayer};
+use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 
 
 pub fn init_cors_layer()-> CorsLayer {

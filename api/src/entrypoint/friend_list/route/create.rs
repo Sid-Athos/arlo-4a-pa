@@ -16,7 +16,9 @@ use crate::service::friend_list_service::FriendListService;
         (status = 401, description = "Invalid token",),
     ),
     request_body = CreateFriendListRequest,
-
+    security(
+        ("api-key" = [])
+    ),
     tag="friend_list"
 )]
 pub async fn friend_list_create(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(friend_list): Json<CreateFriendListRequest>) -> Result<Json<FriendListResponse>, StatusCode> {

@@ -18,7 +18,7 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token or password",),
     ),
     security(
-    ("api_key" = [])
+        ("api-key" = [])
     ),
     request_body = ChangePasswordRequest,
 

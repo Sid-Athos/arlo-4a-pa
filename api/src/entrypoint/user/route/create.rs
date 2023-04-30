@@ -18,7 +18,7 @@ use crate::service::user_service::UserService;
         (status = 409, description = "User email already exist",),
     ),
     security(
-    ("api_key" = [])
+        ("api-key" = [])
     ),
     tag = "user"
 )]

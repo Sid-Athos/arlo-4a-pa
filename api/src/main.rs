@@ -7,14 +7,14 @@ mod middlewares;
 use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
-use axum::extract::State;
-use axum::http::{HeaderMap, Request, StatusCode};
+
+use axum::http::{Request, StatusCode};
 use axum::middleware::Next;
 use axum::response::Response;
 use dotenv::dotenv;
 use utoipa::{Modify, OpenApi};
-use utoipa::openapi::Schema;
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, Http, HttpAuthScheme, HttpBuilder, SecurityScheme};
+
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
@@ -107,7 +107,8 @@ struct SecurityAddon;
 
 impl Modify for SecurityAddon {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        let schemes = vec![("api-key" ,SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))))].into_iter();
+        let schemes = vec![("api-key" ,SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key")))),
+                           ("bearer", SecurityScheme::Http(HttpBuilder::new().scheme(HttpAuthScheme::Bearer).build()))].into_iter();
         if let Some(components) = openapi.components.as_mut() {
             components.add_security_schemes_from_iter(
                 schemes
@@ -115,7 +116,7 @@ impl Modify for SecurityAddon {
         }
     }
 }
-async fn check_api_key<B>(mut req: Request<B>, next: Next<B>) -> Result<Response, (StatusCode, String)>{
+async fn check_api_key<B>(req: Request<B>, next: Next<B>) -> Result<Response, (StatusCode, String)>{
     match req.headers().get("api-key") {
         Some(header) if header != &env::var("API_KEY").unwrap() => {
             tracing::error_span!("Invalid api key");

@@ -19,7 +19,7 @@ use crate::service::user_service::UserService;
         (status = 404, description = "User not found",),
     ),
     security(
-    ("api_key" = [])
+        ("api-key" = [])
     ),
     tag = "user"
 )]
