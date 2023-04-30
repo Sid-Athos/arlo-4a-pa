@@ -15,9 +15,7 @@ use crate::service::friend_list_service::FriendListService;
         (status = 200, description = "FriendList entry accepted", body = FriendListResponse,),
         (status = 401, description = "Invalid token",),
     ),
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ),
+
     tag="friend_list"
 )]
 pub async fn accept_friend_request(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Path(friend_list_id): Path<i32>) -> Result<Json<FriendListResponse>, StatusCode> {

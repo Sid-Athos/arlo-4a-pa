@@ -18,9 +18,6 @@ use crate::service::ranking_service::RankingService;
         (status = 200, description = "User deleted", body = UserResponse),
         (status = 401, description = "Invalid token",),
     ),
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ),
     tag="ranking"
 )]
 pub async fn delete_by_game(State(pool): State<ConnectionPool>, Path(game_id) : Path<i32>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {

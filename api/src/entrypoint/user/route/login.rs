@@ -18,6 +18,9 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid password",),
         (status = 404, description = "User not found",),
     ),
+    security(
+    ("api_key" = [])
+    ),
     tag = "user"
 )]
 pub async fn user_login(State(pool): State<ConnectionPool>, Json(user): Json<LoginRequest>) -> Result<Json<SessionResponse>, StatusCode> {

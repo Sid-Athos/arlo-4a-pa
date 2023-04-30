@@ -21,9 +21,6 @@ use crate::service::user_service::UserService;
         (status = 409, description = "Pseudo already used",),
     ),
     request_body = UpdateUserRequest,
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ),
     tag="admin"
 )]
 pub async fn update_user(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>, Json(update_request): Json<UpdateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {

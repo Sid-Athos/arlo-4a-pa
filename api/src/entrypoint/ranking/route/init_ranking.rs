@@ -19,9 +19,6 @@ use crate::service::ranking_service::RankingService;
         (status = 200, description = "Ranking initialised", body = RankingResponse,),
         (status = 409, description = "Ranking already init",),
     ),
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ),
     tag="ranking"
 )]
 pub async fn init_ranking(State(pool): State<ConnectionPool>, Json(ranking): Json<RankingRequest>) -> Result<Json<RankingResponse>, StatusCode> {

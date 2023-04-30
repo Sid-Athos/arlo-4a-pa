@@ -17,6 +17,9 @@ use crate::service::user_service::UserService;
         (status = 200, description = "User created", body = UserResponse,),
         (status = 409, description = "User email already exist",),
     ),
+    security(
+    ("api_key" = [])
+    ),
     tag = "user"
 )]
 pub async fn user_create(State(pool): State<ConnectionPool>, Json(user): Json<CreateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {

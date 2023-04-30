@@ -15,9 +15,10 @@ use crate::service::session_service::SessionService;
         (status = 200, description = "User disconnected", body = SessionResponse),
         (status = 401, description = "Invalid token",),
     ),
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ),
+security(
+("api_key" = [])
+),
+
     tag = "user"
 )]
 pub async fn user_logout(State(pool): State<ConnectionPool>, Extension(session): Extension<Session>) -> Result<Json<SessionResponse>, StatusCode> {

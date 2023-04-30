@@ -7,9 +7,13 @@ mod middlewares;
 use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
-use axum::http::{HeaderMap, StatusCode};
+use axum::extract::State;
+use axum::http::{HeaderMap, Request, StatusCode};
+use axum::middleware::Next;
+use axum::response::Response;
 use dotenv::dotenv;
 use utoipa::{Modify, OpenApi};
+use utoipa::openapi::Schema;
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, Http, HttpAuthScheme, HttpBuilder, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -103,23 +107,16 @@ struct SecurityAddon;
 
 impl Modify for SecurityAddon {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let schemes = vec![("api-key" ,SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))))].into_iter();
         if let Some(components) = openapi.components.as_mut() {
-            components.add_security_scheme(
-                "api_key",
-                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))),
-            );
-            components.add_security_scheme(
-                "bearer",
-                SecurityScheme::Http(HttpBuilder::new().scheme(HttpAuthScheme::Bearer).build())
+            components.add_security_schemes_from_iter(
+                schemes
             )
         }
     }
 }
-fn check_api_key(
-    headers: &HeaderMap
-) -> Result<(), (StatusCode, String)> {
-    println!("Headers {:?}", headers);
-    match headers.get("api-key") {
+async fn check_api_key<B>(mut req: Request<B>, next: Next<B>) -> Result<Response, (StatusCode, String)>{
+    match req.headers().get("api-key") {
         Some(header) if header != &env::var("API_KEY").unwrap() => {
             tracing::error_span!("Invalid api key");
             Err((
@@ -136,7 +133,7 @@ fn check_api_key(
         },
         _ => {
             tracing::info!("Valid api-key provided");
-            Ok(())
+            Ok(next.run(req).await)
         },
     }
 }
