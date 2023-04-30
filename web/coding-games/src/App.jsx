@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import logo from './logo.svg';
 // @ts-ignore
@@ -7,19 +6,15 @@ import {
     AppBar,
     Box,
     Button,
-    Card,
-    CardActions,
-    CardContent, Container,
     IconButton,
-    Modal, Stack, TextField,
     Toolbar,
     Typography
 } from "@suid/material";
 import MenuIcon from "@suid/icons-material/Menu";
-import {createMemo, createResource, createSignal, Match, Show, Switch} from "solid-js";
+import {createSignal } from "solid-js";
 import axios from 'axios';
-import dictionary from "./utils/dictionary/dictionary";
-import { Alert } from "@suid/material"
+import { createStore } from "solid-js/store";
+import UnloggedScreen from "./render/unlogged/unlogged-screen";
 
 const instance = axios.create({
     baseURL: 'http://localhost:7590',
@@ -30,60 +25,74 @@ const instance = axios.create({
 });
 
 const App = () => {
-
-
-    const [open, setOpen] = createSignal(false);
-    const [screen, setScreen] = createSignal('signIn');
-
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
-    const  cardInfo = createMemo(() => {
-        return dictionary["eng"].loginCard;
-    })
+    const [user, setUser] = createStore({nickname:"", email:"", token: null});
     const [userSignIn, setUserSignIn] = createSignal({email : "", password: ""});
     const [userSignInError, setUserSignInError] = createSignal(false);
     const [userSignInErrorMessage, setUserSignInErrorMessage] = createSignal("");
     const [userSignUpErrorMessage, setUserSignUpErrorMessage] = createSignal("");
-
     const [userSignUp, setUserSignUp] = createSignal({email : "", password: "", nickname:""});
     const [userSignUpError, setUserSignUpError] = createSignal(false);
+    const [open, setOpen] = createSignal(false);
 
     // @ts-ignore
-
     async function signIn() {
-        console.log(userSignIn())
         if(userSignIn().email.length > 0 && userSignIn().password.length >= 3){
-            const userLogged = await instance.post('/user/login', userSignIn());
-            if(userLogged.status === 200){
-                console.log(userLogged.data)
-                return;
+            try {
+                const userLogged = await instance.post('/user/login', userSignIn());
+                if(userLogged.status === 200){
+                    setClientData(userLogged)
+                }
+            } catch (error) {
+                setUserSignInError(true)
+                setUserSignInErrorMessage("An error occured while connecting")
             }
-            setUserSignInError(!userSignInError())
-            setUserSignInErrorMessage("An error occured while connecting")
         }
     }
 
-    async function signup() {
+    const setClientData = (response) => {
+        let userInfo = {...user}
+        userInfo.email = userSignIn().email
+        userInfo.token = "Bearer " + response.data.token
+        setAuthorizationHeader(userInfo.token)
+        setUser(userInfo);
+    }
+
+    const setAuthorizationHeader = (token) => {
+        instance.interceptors.request.use(conf => {
+            conf.headers.setAuthorization(token)
+            return conf
+        })
+    }
+
+    async function signUp() {
         if(userSignUp().email.length > 0 && userSignUp().password.length >= 3 && userSignUp().nickname.length >= 5){
-            const userCreated = await instance.post('/user/create', userSignUp());
-            if(userCreated.status === 200){
-                console.log(userCreated.data)
+            try {
+                const userCreated = await instance.post('/user/create', userSignUp());
+                if(userCreated.status === 200){
+                    console.log(userCreated.data)
+                }
+            } catch (error) {
+                setUserSignUpError(!userSignInError())
+                setUserSignUpErrorMessage("An error occured while creating your account")
             }
-            setUserSignUpError(!userSignInError())
-            setUserSignUpErrorMessage("An error occured while creating your account")
         }
     }
 
-    function swapScreen(){
-        if(screen() === "signIn"){
-            setScreen('signUp');
-        } else {
-            setScreen('signIn');
+
+    async function submitSignInFormOnPressEnter(key){
+        if (key === 'Enter') {
+            await signIn()
         }
-        setUserSignUpError(false);
-        setUserSignInError(false);
     }
+
+    async function submitSignUpFormOnPressEnter(key){
+        if (key === 'Enter') {
+            await signUp()
+        }
+    }
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     return (
         <Box>
@@ -106,14 +115,6 @@ const App = () => {
                     </Toolbar>
                 </AppBar>
             </Box>
-            <Switch>
-                <Match when={userSignInError()}>
-                    <Alert severity="error">{userSignInErrorMessage()}</Alert>
-                </Match>
-                <Match when={userSignUpError()}>
-                    <Alert severity="error">{userSignUpErrorMessage()}</Alert>
-                </Match>
-            </Switch>
             <header class={styles.header}>
                 <p>
                     Coding Games
@@ -124,127 +125,10 @@ const App = () => {
                     Edit <code>src/App.tsx</code> and save to reload.
                 </p>
             </header>
-            <Modal
-                open={open()}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Card
-                    sx={{
-                        position: "absolute",
-                        top: "30%",
-                        left: "53%",
-                        transform: "translate(-50%, -50%)",
-                        width: 300,
-                        backgroundColor: '#282c34',
-                        border: "2px solid #000",
-                        boxShadow: "24px",
-                        color: 'white',
-                        p: 4,
-                    }}
-                >
-                    <CardContent>
-                        <Switch>
-                            <Match when={screen() === 'signIn'}>
-                                <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
-                                    {cardInfo().signInButton}
-                                </Typography>
-                                <Box component={"form"}>
-                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
-                                        Email / Username
-                                    </Typography>
-                                    <TextField
-                                        required
-                                        id="email"
-                                        label="Required"
-                                        type="email"
-                                        variant="standard"
-                                        inputProps={{ style: { color: "white" } }}
-                                        onChange={(e) =>{
-                                            let user = userSignIn();
-                                            user.email = e.target.value;
-                                            setUserSignIn(user)
-                                        } }
-                                        sx={{  color: '#ffffff'  }}
-                                    />
-                                    <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
-                                        Password
-                                    </Typography>
-                                    <TextField
-                                        id="standard-password-input"
-                                        label="Password"
-                                        type="password"
-                                        autoComplete="current-password"
-                                        inputProps={{ style: { color: "white" } }}
-
-                                        variant="standard"
-                                        v                     onChange={(e) =>{
-                                        let user = userSignIn();
-                                        user.password = e.target.value;
-                                        setUserSignIn(user)
-                                    } }
-                                    />
-                                </Box>
-                            </Match>
-                            <Match when={screen() === 'signUp'}>
-                                <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
-                                    {cardInfo().signInButton}
-                                </Typography>
-                                <Box component={"form"}>
-                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
-                                        Email / Username
-                                    </Typography>
-                                    <TextField
-                                        required
-                                        id="email"
-                                        label="Required"
-                                        type="email"
-                                        variant="standard"
-                                        inputProps={{ style: { color: "white" } }}
-                                        onChange={(e) =>{
-                                            let user = userSignUp();
-                                            user.email = e.target.value;
-                                            setUserSignUp(user)
-                                        } }
-                                        sx={{  color: '#ffffff'  }}
-                                    />
-                                    <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
-                                        Password
-                                    </Typography>
-                                    <TextField
-                                        id="standard-password-input"
-                                        label="Password"
-                                        type="password"
-                                        autoComplete="current-password"
-                                        inputProps={{ style: { color: "white" } }}
-
-                                        variant="standard"
-                                        v                     onChange={(e) =>{
-                                        let user = userSignUp();
-                                        user.password = e.target.value;
-                                        setUserSignUp(user)
-                                    } }
-                                    />
-                                </Box>
-                            </Match>
-                        </Switch>
-                    </CardContent>
-                    <CardActions>
-                        <Container>
-                            <Button size="small" onClick={signIn} sx={{left:'40px'}}>
-                                {cardInfo().signInButton}
-                            </Button>
-                        </Container>
-                        <Container>
-                            <Button size="small" onClick={swapScreen} >
-                                {cardInfo().signUpButton}
-                            </Button>
-                        </Container>
-                    </CardActions>
-                </Card>
-            </Modal>
-
+            <UnloggedScreen open={open} handleClose={handleClose()} userSignIn={userSignIn} userSignUp={userSignUp} userSignInError={userSignInError} userSignUpError={userSignUpError} signIn={signIn}
+            userSignUpErrorMessage={userSignUpErrorMessage} submitSignInFormOnPressEnter={submitSignInFormOnPressEnter} submitSignUpFormOnPressEnter={submitSignUpFormOnPressEnter}
+            userSignInErrorMessage={userSignInErrorMessage} setUserSignInError={setUserSignInError} setUserSignIn={setUserSignIn} setUserSignUp={setUserSignUp}
+            setUserSignUpError={setUserSignUpError}/>
         </Box>
     );
 };
