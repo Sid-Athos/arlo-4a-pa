@@ -7,12 +7,12 @@ mod middlewares;
 use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
-use std::path::PathBuf;
+
 
 
 use dotenv::dotenv;
-use tracing_appender::rolling;
-use tracing_subscriber::fmt::writer::MakeWriterExt;
+
+
 use utoipa::{ OpenApi};
 
 
@@ -36,7 +36,7 @@ use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequ
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
 use crate::middlewares::swagger_security;
-use axum_server::tls_rustls::RustlsConfig;
+
 
 #[tokio::main]
 async fn main() {
