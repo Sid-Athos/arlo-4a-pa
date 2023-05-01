@@ -12,6 +12,7 @@ import {
 } from "@suid/material";
 import {createMemo, createSignal, Match, Show, Switch} from "solid-js";
 import dictionary from "../../utils/dictionary/dictionary";
+import '../../index.css'
 
 const UnloggedScreen = (
     {
@@ -51,19 +52,7 @@ const UnloggedScreen = (
             aria-describedby="modal-modal-description"
         >
             <Card
-                sx={{
-                    position: "absolute",
-                    justifyContent: "center",
-                    top: "40%",
-                    left: "53%",
-                    transform: "translate(-50%, -50%)",
-                    width: 300,
-                    backgroundColor: '#282c34',
-                    border: "2px solid #000",
-                    boxShadow: "24px",
-                    color: 'white',
-                    p: 4,
-                }}
+                className="signCard"
             >
                 <CardContent>
                     <Stack spacing={2}>
@@ -75,7 +64,7 @@ const UnloggedScreen = (
                                 }, 5000);
                             }}
                             >
-                                <Alert sx={{backgroundColor:"rgb(22.899999999999995, 11.499999999999998, 11.499999999999998)", color:"rgb(244.6, 199, 199)"}} severity="error">{userSignInErrorMessage()}</Alert>
+                                <Alert  severity="error">{userSignInErrorMessage()}</Alert>
 
                             </Fade>
                         </Show>
@@ -86,7 +75,7 @@ const UnloggedScreen = (
                                 }, 5000);
                             }}
                             >
-                                <Alert sx={{backgroundColor:"rgb(12.899999999999997, 19.899999999999995, 13.199999999999998)", color:"rgb(204.6, 232.6, 205.8)"}} severity="success">Connexion successful</Alert>
+                                <Alert className="darkThemeSuccessAlert" severity="success">Connexion successful</Alert>
 
                             </Fade>
                         </Show>
@@ -110,17 +99,17 @@ const UnloggedScreen = (
                                        noValidate
                                        autoComplete="off"
                                 >
-                                <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
+                                <Typography className={"logScreenTypography"} gutterBottom>
                                     {cardInfo().signInButton}
                                 </Typography>
-                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
+                                    <Typography className={"logScreenTypography"} gutterBottom>
                                         Email / Username
                                     </Typography>
                                     <TextField
                                         required
-                                        id="email"
+                                        id="nickname"
                                         label="Required"
-                                        type="email"
+                                        type="text"
                                         variant="standard"
                                         onkeypress={async (k) => {
                                             await submitSignInFormOnPressEnter(k.key)
@@ -129,12 +118,11 @@ const UnloggedScreen = (
                                         inputProps={{ style: { color: "white", justifyContent:"center" } }}
                                         onchange={(e) =>{
                                             let user = userSignIn();
-                                            user.email = e.target.value;
+                                            user.nickname = e.target.value;
                                             setUserSignIn(user)
                                         } }
-                                        sx={{  color: '#ffffff'  }}
                                     />
-                                    <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
+                                    <Typography  className={"logScreenTypography"}gutterBottom>
                                         Password
                                     </Typography>
                                     <TextField
@@ -158,11 +146,18 @@ const UnloggedScreen = (
                                 </Stack>
                             </Match>
                             <Match when={screen() === 'signUp'}>
-                                <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
+                                <Stack component={"form"}
+                                       sx={{
+                                           width: '27ch',
+                                       }}
+                                       spacing={2}
+                                       noValidate
+                                       autoComplete="off"
+                                >
+                                <Typography className={"logScreenTypography"} gutterBottom>
                                     {cardInfo().signUpButton}
                                 </Typography>
-                                <Box component={"form"} autocomplete={"off"}>
-                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
+                                    <Typography className={"logScreenTypography"} gutterBottom>
                                         Nickname
                                     </Typography>
                                     <TextField
@@ -181,9 +176,8 @@ const UnloggedScreen = (
                                             user.nickname = e.target.value;
                                             setUserSignUp(user)
                                         } }
-                                        sx={{  color: '#ffffff'  }}
                                     />
-                                    <Typography sx={{ fontSize: 18, textAlign: 'center'}} gutterBottom>
+                                    <Typography className={"logScreenTypography"} gutterBottom>
                                         Email
                                     </Typography>
                                     <TextField
@@ -203,9 +197,8 @@ const UnloggedScreen = (
                                             user.email = e.target.value;
                                             setUserSignUp(user)
                                         } }
-                                        sx={{  color: '#ffffff'  }}
                                     />
-                                    <Typography sx={{ fontSize: 22, textAlign: 'center'}} gutterBottom>
+                                    <Typography className={"logScreenTypography"} gutterBottom>
                                         Password
                                     </Typography>
                                     <TextField
@@ -228,7 +221,7 @@ const UnloggedScreen = (
                                     <Button size="large" onclick={signUp}>
                                         Register
                                     </Button>
-                                </Box>
+                                </Stack>
                             </Match>
                         </Switch>
                     </Stack>

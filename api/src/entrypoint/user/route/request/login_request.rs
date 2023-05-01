@@ -3,6 +3,6 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct LoginRequest {
-    pub email: String,
+    pub nickname: String,
     pub password: String,
 }

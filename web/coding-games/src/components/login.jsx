@@ -14,7 +14,7 @@ import {UserService} from "../utils/services/user-service";
 
 export default function LoginComponent ({open, setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
-    const [userSignIn, setUserSignIn] = createSignal({email : "", password: ""});
+    const [userSignIn, setUserSignIn] = createSignal({nickname : "", password: ""});
     const [userSignInError, setUserSignInError] = createSignal(false);
     const [userSignInErrorMessage, setUserSignInErrorMessage] = createSignal("");
     const [userSignUpErrorMessage, setUserSignUpErrorMessage] = createSignal("");
@@ -24,7 +24,7 @@ export default function LoginComponent ({open, setOpen})  {
 
     // @ts-ignore
     async function signIn() {
-        if(userSignIn().email.length > 0 && userSignIn().password.length >= 3){
+        if(userSignIn().nickname.length > 5 && userSignIn().password.length >= 8){
             try {
                 let res = await UserService.signIn(userSignIn());
                 if(res.status === 200){
@@ -41,7 +41,7 @@ export default function LoginComponent ({open, setOpen})  {
 
     const setClientData = (response) => {
         let userInfo = {...user}
-        userInfo.email = userSignIn().email
+        userInfo.nickname = userSignIn().nickname
         userInfo.token = "Bearer " + response.data.token
         AxiosInstance.updateAuthorizationHeader(userInfo.token)
         setUser(userInfo);

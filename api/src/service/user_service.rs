@@ -63,7 +63,7 @@ impl UserService {
     }
 
     pub async fn login_user(&self, user: LoginCommand) -> Result<Session, StatusCode> {
-        let user_bdd = self.user_repository.get_user_by_email(user.email).await.map_err(database_error_to_status_code)?;
+        let user_bdd = self.user_repository.get_user_by_pseudo(user.pseudo).await.map_err(database_error_to_status_code)?;
 
         if verify(user.password, &user_bdd.password).map_err(internal_error)? {
 

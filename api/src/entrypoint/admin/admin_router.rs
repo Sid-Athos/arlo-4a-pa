@@ -19,8 +19,8 @@ pub fn admin_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/give_admin_role/:user_id", put(give_admin_role))
         .route("/remove_admin_role/:user_id", put(remove_admin_role))
         .route("/update/:user_id", put(update_user))
-        //.layer(middleware::from_fn(check_api_key))
-        //.layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin))
+        .layer(middleware::from_fn(check_api_key))
+        .layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin))
         .with_state(pool)
 
 }
