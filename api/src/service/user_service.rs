@@ -34,20 +34,13 @@ impl UserService {
     }
 
     pub async fn create_user(&self, mut user: CreateUserCommand) -> Result<User, StatusCode> {
+        // 3 positive lookaheads, one for each char you want (digit, lower case, upper case), and we fill with allowed chars) while checking the length
 
-        let password_regex_upper = Regex::new(r"^[A-Z]$").unwrap();
-        let password_regex_lower = Regex::new(r"^[a-z]$").unwrap();
-        let password_regex_number = Regex::new(r"^\d$").unwrap();
-        let password_regex_special = Regex::new(r"^[^a-zA-Z0-9]$").unwrap();
+        let password_regex = Regex::new(r"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$").unwrap();
 
         let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
 
-        if  !password_regex_upper.is_match(&*user.password) &&
-            !password_regex_lower.is_match(&*user.password) &&
-            !password_regex_number.is_match(&*user.password) &&
-            !password_regex_special.is_match(&*user.password) &&
-            user.password.len() < 8
-        {
+        if  !password_regex.is_match(&*user.password) {
             tracing::error!("Password criterion not fulfilled");
             return Err(StatusCode::BAD_REQUEST);
         }
