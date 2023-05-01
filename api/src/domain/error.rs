@@ -10,6 +10,6 @@ pub fn database_error_to_status_code(err: DatabaseError) -> StatusCode {
         DatabaseError::NotFound => StatusCode::NOT_FOUND,
         DatabaseError::DuplicateKey => StatusCode::CONFLICT,
         //DatabaseError::InvalidInput => StatusCode::BAD_REQUEST,
-        DatabaseError::CannotGetConnectionToDatabase => StatusCode::INTERNAL_SERVER_ERROR,
+        DatabaseError::CannotGetConnectionToDatabase => StatusCode::SERVICE_UNAVAILABLE,
     }
 }
