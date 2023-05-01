@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:miku/view/login_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
 
 import 'package:miku/view/home_view.dart';
+import 'package:web_socket_channel/src/channel.dart';
 
 import 'api/game_manager/api_game_manager.dart';
+import 'api/game_manager/response/response_enum_ws.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.containsKey('login_token')) {
-    final channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
-    channel.stream.listen((message) {
-      developer.log('Received message: $message');
-    });
-    runApp(const AppLogged());
+    WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+    channel.stream.listen((message)
+      {
+        ResponseWS.computeResponse(message);
+      }
+    );
+    runApp(AppLogged(channel: channel));
   } else {
     runApp(const AppUnLogged());
   }
@@ -39,7 +42,9 @@ class AppUnLogged extends StatelessWidget {
 }
 
 class AppLogged extends StatelessWidget {
-  const AppLogged({super.key});
+  AppLogged({super.key, required this.channel});
+
+  WebSocketChannel channel;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,7 @@ class AppLogged extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeView(),
+      home: HomeView(channel: channel),
       debugShowCheckedModeBanner: false,
     );
   }
