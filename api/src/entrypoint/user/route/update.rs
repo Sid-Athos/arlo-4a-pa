@@ -18,10 +18,10 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
         (status = 409, description = "Pseudo already used",),
     ),
-    request_body = UpdateUserRequest,
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        ("api-key" = [])
     ),
+    request_body = UpdateUserRequest,
     tag = "user"
 )]
 pub async fn update_user(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(update_request): Json<UpdateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {

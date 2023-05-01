@@ -16,8 +16,9 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ), tag="user"
+        ("api-key" = [])
+    ),
+    tag="user"
 )]
 pub async fn delete_user(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

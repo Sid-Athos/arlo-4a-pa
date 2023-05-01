@@ -12,6 +12,7 @@ use crate::entrypoint::ranking::route::get_ranking_by_game::get_ranking_by_game_
 use crate::entrypoint::ranking::route::get_ranking_by_user::get_ranking_by_user_id;
 use crate::entrypoint::ranking::route::init_ranking::init_ranking;
 use crate::entrypoint::ranking::route::update_ranking::update_ranking;
+use crate::middlewares::swagger_security::check_api_key;
 
 pub fn ranking_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
@@ -23,6 +24,7 @@ pub fn ranking_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/user/:user_id", get(get_ranking_by_user_id).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/friend/:game_id", get(get_ranking_by_friend).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/game/:game_id", get(get_ranking_by_game_id).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .layer(middleware::from_fn(check_api_key))
         .with_state(pool)
 
 }

@@ -7,15 +7,20 @@ mod middlewares;
 use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
-use axum::http::{HeaderMap, StatusCode};
+
+
+
 use dotenv::dotenv;
-use utoipa::{Modify, OpenApi};
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, Http, HttpAuthScheme, HttpBuilder, SecurityScheme};
+
+
+use utoipa::{ OpenApi};
+
+
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use crate::database::init::init_db;
-
+use crate::swagger_security::SecurityAddon;
 
 use crate::entrypoint::ranking::ranking_router::ranking_routes;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
@@ -30,16 +35,19 @@ use crate::entrypoint::user::route::request::create_user_request::CreateUserRequ
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
+use crate::middlewares::swagger_security;
+
 
 #[tokio::main]
 async fn main() {
 
     dotenv().ok();
     init_tracer();
-
     let pool = init_db().await.unwrap();
 
     let cors = init_cors_layer();
+
+    println!(env!("CARGO_MANIFEST_DIR"));
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
@@ -51,7 +59,7 @@ async fn main() {
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
-    println!("{} : listening on {}", "START", addr);
+    tracing::info!("listening on {:?}", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
@@ -99,44 +107,4 @@ schemas(UpdateUserRequest),
 )]
 struct ApiDoc;
 
-struct SecurityAddon;
 
-impl Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        if let Some(components) = openapi.components.as_mut() {
-            components.add_security_scheme(
-                "api_key",
-                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))),
-            );
-            components.add_security_scheme(
-                "bearer",
-                SecurityScheme::Http(HttpBuilder::new().scheme(HttpAuthScheme::Bearer).build())
-            )
-        }
-    }
-}
-fn check_api_key(
-    headers: &HeaderMap
-) -> Result<(), (StatusCode, String)> {
-    println!("Headers {:?}", headers);
-    match headers.get("api-key") {
-        Some(header) if header != &env::var("API_KEY").unwrap() => {
-            tracing::error_span!("Invalid api key");
-            Err((
-                StatusCode::UNAUTHORIZED,
-                "Incorrect or missing Api Key".to_string(),
-            ))
-        },
-        None => {
-            tracing::error_span!("Missing api key");
-            Err((
-                StatusCode::UNAUTHORIZED,
-                "Incorrect or missing Api Key".to_string(),
-            ))
-        },
-        _ => {
-            tracing::info!("Valid api-key provided");
-            Ok(())
-        },
-    }
-}

@@ -16,7 +16,7 @@ use crate::service::session_service::SessionService;
         (status = 401, description = "Invalid token",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        (   "api-key" = [])
     ),
     tag = "user"
 )]

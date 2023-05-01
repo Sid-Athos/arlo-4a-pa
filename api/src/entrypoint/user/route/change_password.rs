@@ -17,10 +17,11 @@ use crate::service::user_service::UserService;
         (status = 200, description = "User found", body = UserResponse),
         (status = 401, description = "Invalid token or password",),
     ),
-    request_body = ChangePasswordRequest,
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        ("api-key" = [])
     ),
+    request_body = ChangePasswordRequest,
+
     tag="user"
 )]
 pub async fn change_password(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(password): Json<ChangePasswordRequest>) -> Result<Json<UserResponse>, StatusCode> {

@@ -16,7 +16,7 @@ use crate::service::friend_list_service::FriendListService;
         (status = 401, description = "Invalid token",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        ("api-key" = [])
     ),
     tag="friend_list"
 )]

@@ -17,7 +17,7 @@ use crate::service::friend_list_service::FriendListService;
     ),
     request_body = CreateFriendListRequest,
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        ("api-key" = [])
     ),
     tag="friend_list"
 )]

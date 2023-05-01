@@ -9,6 +9,7 @@ publish = false
 [dependencies]
 async-trait = "0.1.68"
 axum = "0.6.12"
+axum-server = { version = "0.4.7", features = ["tls-rustls"] }
 bcrypt = "0.14.0"
 bb8 = "0.8.0"
 dotenv = "0.15.0"

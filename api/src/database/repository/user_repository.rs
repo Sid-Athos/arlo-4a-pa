@@ -33,12 +33,12 @@ impl UserRepository {
         Ok(UserEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn get_user_by_email(&self, email: String) -> Result<User, DatabaseError> {
+    pub async fn get_user_by_pseudo(&self, pseudo: String) -> Result<User, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("SELECT * FROM coding_games.user WHERE email = $1", &[&email])
+            .query_one("SELECT * FROM coding_games.user WHERE pseudo = $1", &[&pseudo])
             .await
             .map_err(database_error_not_found)?;
 
@@ -48,7 +48,7 @@ impl UserRepository {
     }
 
     pub async fn create_user(&self, user: CreateUserCommand) -> Result<User, DatabaseError> {
-
+        tracing::info!("Creating user {:?}", user);
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
