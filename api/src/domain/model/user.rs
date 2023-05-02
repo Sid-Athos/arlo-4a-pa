@@ -8,4 +8,6 @@ pub struct User {
     pub email: String,
     pub password: String,
     pub admin: bool,
+    pub experience : i32,
+    pub level : i32
 }

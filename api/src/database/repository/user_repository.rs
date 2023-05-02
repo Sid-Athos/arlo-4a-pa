@@ -33,12 +33,12 @@ impl UserRepository {
         Ok(UserEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn get_user_by_email(&self, email: String) -> Result<User, DatabaseError> {
+    pub async fn get_user_by_pseudo(&self, pseudo: String) -> Result<User, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("SELECT * FROM coding_games.user WHERE email = $1", &[&email])
+            .query_one("SELECT * FROM coding_games.user WHERE pseudo = $1", &[&pseudo])
             .await
             .map_err(database_error_not_found)?;
 
@@ -47,21 +47,8 @@ impl UserRepository {
         Ok(UserEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn get_user_by_pseudo(&self, pseudo: String) -> Result<User, DatabaseError> {
-
-        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
-
-        let row = conn.query_one("SELECT * FROM coding_games.user WHERE pseudo = $1", &[&pseudo])
-                .await
-                .map_err(database_error_not_found)?;
-
-        let result = UserEntity::new(row);
-
-        Ok(UserEntityMapper::entity_to_domain(result))
-    }
-
     pub async fn create_user(&self, user: CreateUserCommand) -> Result<User, DatabaseError> {
-
+        tracing::info!("Creating user {:?}", user);
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
@@ -181,6 +168,18 @@ impl UserRepository {
         let row = conn.query_one("UPDATE coding_games.user SET admin = false WHERE id = $1 RETURNING *", &[&user_id])
                             .await
                             .map_err(database_error_not_found)?;
+
+        let result = UserEntity::new(row);
+
+        Ok(UserEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn add_experience(&self, user_id : i32, experience : i32, level : i32) -> Result<User, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn.query_one("UPDATE coding_games.user SET experience = $1, level = $2 WHERE id = $3 RETURNING *", &[&experience, &level, &user_id])
+            .await
+            .map_err(database_error_not_found)?;
 
         let result = UserEntity::new(row);
 

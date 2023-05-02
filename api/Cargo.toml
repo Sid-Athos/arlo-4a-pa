@@ -1,24 +1,29 @@
 [package]
 name = "api"
-version = "0.1.7"
+version = "0.1.1"
 edition = "2021"
 publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.6.12"
-dotenv = "0.15.0"
-bb8 = "0.7.1"
-bb8-postgres = "0.7.0"
-tokio = { version = "1.0", features = ["full"] }
-tokio-postgres = "0.7.2"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 async-trait = "0.1.68"
+axum = "0.6.12"
+axum-server = { version = "0.4.7", features = ["tls-rustls"] }
+bcrypt = "0.14.0"
+bb8 = "0.8.0"
+dotenv = "0.15.0"
+bb8-postgres = "0.8.1"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+rand = "0.8.5"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-bcrypt = "0.14.0"
-rand = "0.8.5"
+tokio = { version = "1.0", features = ["full"] }
+tokio-postgres = "0.7.2"
+tower-http = { version = "0.4.0", features = ["cors"]}
+tracing = "0.1"
+tracing-appender = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 utoipa = { version = "3.2.1", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "3", features = ["axum"] }
+regex = "1.8.1"

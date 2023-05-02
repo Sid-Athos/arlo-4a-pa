@@ -11,7 +11,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     put,
-    path = "/user/update/{user_id}",
+    path = "/admin/update/{user_id}",
     params(
         ("user_id" = String,),
     ),
@@ -20,10 +20,11 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
         (status = 409, description = "Pseudo already used",),
     ),
-    request_body = UpdateUserRequest,
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    )
+        ("api-key" = [])
+    ),
+    request_body = UpdateUserRequest,
+    tag="admin"
 )]
 pub async fn update_user(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>, Json(update_request): Json<UpdateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

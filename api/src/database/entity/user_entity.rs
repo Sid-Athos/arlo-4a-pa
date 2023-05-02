@@ -6,6 +6,8 @@ pub struct UserEntity {
     pub email: String,
     pub password: String,
     pub admin: bool,
+    pub experience : i32,
+    pub level : i32
 }
 
 impl UserEntity {
@@ -16,6 +18,8 @@ impl UserEntity {
             email: row.get("email"),
             password: row.get("password"),
             admin: row.get("admin"),
+            experience : row.get("experience"),
+            level : row.get("level")
         }
     }
 }

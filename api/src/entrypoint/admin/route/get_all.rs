@@ -1,4 +1,4 @@
-use axum::extract::{Path, State};
+use axum::extract::{State};
 use axum::http::StatusCode;
 use axum::Json;
 use crate::database::init::ConnectionPool;
@@ -10,16 +10,14 @@ use crate::service::user_service::UserService;
 #[utoipa::path(
     get,
     path = "/admin/get_all",
-    params(
-        ("user_id" = String,),
-    ),
     responses(
         (status = 200, description = "List of Users", body = Vec<UserResponse>,),
         (status = 401, description = "Invalid token",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    )
+        ("api-key" = [])
+    ),
+    tag = "admin"
 )]
 pub async fn get_all(State(pool): State<ConnectionPool>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
     let user_service = UserService::new(

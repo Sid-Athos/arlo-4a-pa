@@ -34,7 +34,7 @@ async fn main() {
     let app = Router::new()
         .nest("/ws", ws_routes(connections, pool.clone()));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 7589));
 
     println!("{} : listening on {}", "START".blue(), addr);
 

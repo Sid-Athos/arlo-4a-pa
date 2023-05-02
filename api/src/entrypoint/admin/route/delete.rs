@@ -1,10 +1,10 @@
-use axum::{Extension, Json};
+use axum::{Json};
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use crate::database::init::ConnectionPool;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
-use crate::domain::model::user::User;
+
 use crate::entrypoint::admin::route::response::user_response::UserResponse;
 use crate::service::user_service::UserService;
 
@@ -20,8 +20,9 @@ use crate::service::user_service::UserService;
         (status = 404, description = "User not found",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    )
+        ("api-key" = [])
+    ),
+    tag = "admin"
 )]
 pub async fn delete_user(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

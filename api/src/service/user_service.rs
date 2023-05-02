@@ -1,8 +1,10 @@
 use bcrypt::{hash, verify};
 use axum::http::StatusCode;
+
 use rand::distributions::Alphanumeric;
 use rand::{Rng, thread_rng};
-use crate::database::database_error::DatabaseError;
+use regex::Regex;
+
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::error::{database_error_to_status_code, internal_error};
@@ -32,6 +34,21 @@ impl UserService {
     }
 
     pub async fn create_user(&self, mut user: CreateUserCommand) -> Result<User, StatusCode> {
+        // 3 positive lookaheads, one for each char you want (digit, lower case, upper case), and we fill with allowed chars) while checking the length
+
+        let password_regex = Regex::new(r"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$").unwrap();
+
+        let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+
+        if  !password_regex.is_match(&*user.password) {
+            tracing::error!("Password criterion not fulfilled");
+            return Err(StatusCode::BAD_REQUEST);
+        }
+
+        if !email_regex.is_match(&*user.email) {
+            tracing::error!("Email criterion not fulfilled");
+            return Err(StatusCode::BAD_REQUEST);
+        }
 
         user.password = hash(user.password, 4).map_err(internal_error)?;
 
@@ -39,7 +56,7 @@ impl UserService {
     }
 
     pub async fn login_user(&self, user: LoginCommand) -> Result<Session, StatusCode> {
-        let user_bdd = self.user_repository.get_user_by_email(user.email).await.map_err(database_error_to_status_code)?;
+        let user_bdd = self.user_repository.get_user_by_pseudo(user.pseudo).await.map_err(database_error_to_status_code)?;
 
         if verify(user.password, &user_bdd.password).map_err(internal_error)? {
 
@@ -104,5 +121,15 @@ impl UserService {
         }
 
         Ok(user)
+    }
+
+    pub async fn add_experience(&self, user_id : i32) -> Result<User, StatusCode> {
+        let mut user = self.user_repository.get_user_by_id(user_id).await.map_err(database_error_to_status_code)?;
+        user.experience = user.experience + 1;
+        if user.experience >= user.level*10 {
+            user.experience = 0;
+            user.level = user.level + 1;
+        }
+        self.user_repository.add_experience(user_id,user.experience,user.level).await.map_err(database_error_to_status_code)
     }
 }

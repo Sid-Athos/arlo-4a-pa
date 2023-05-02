@@ -1,13 +1,41 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.signCard {
+    position: absolute;
+    justify-content: center;
+    top: 40%;
+    left: 53%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background-color: #282c34;
+    border: 2px solid #000;
+    color: white;
+    p: 4;
+}
+
+.logScreenTypography{
+    font-size: 22px;
+    text-align: center;
+}
+
+.darkThemeSuccessAlert{
+    background-color:rgb(12.899999999999997, 19.899999999999995, 13.199999999999998);
+    color:rgb(204.6, 232.6, 205.8);
+}
+
+.darkThemeErrorAlert{
+    background-color:rgb(22.899999999999995, 11.499999999999998, 11.499999999999998);
+    color:rgb(244.6, 199, 199);
 }

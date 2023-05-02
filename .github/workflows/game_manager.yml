@@ -12,9 +12,12 @@ env:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       - name: Build
         run: |
           cd game-manager
@@ -27,7 +30,7 @@ jobs:
   build:
     needs: tests
     name: Build docker image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - name: Set up Docker Buildx
@@ -43,12 +46,12 @@ jobs:
           context: ./game-manager
           platforms: linux/arm64
           push: true
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_PROJECT_NAME}}:api-game-${{env.BRANCH_NAME}}-latest
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_PROJECT_NAME}}:game-manager-${{env.BRANCH_NAME}}-latest
 
   redeploy:
     needs: build
     name: Redeploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Connect and exec
         uses: appleboy/ssh-action@master

@@ -13,7 +13,7 @@ COPY ./src ./src
 RUN rm ./target/release/deps/api*
 RUN cargo build --release
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 COPY --from=build /api/target/release/api .
 
 CMD ["./api"]
