@@ -4,7 +4,10 @@ import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'package:miku/api/user/request/create_user_request.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../api/game_manager/api_game_manager.dart';
+import '../api/game_manager/response/response_enum_ws.dart';
 import '../api/user/api_user.dart';
 import '../api/user/request/login_request.dart';
 import '../model/user_model.dart';
@@ -44,10 +47,16 @@ class _SubscribeState extends State<SubscribeView> {
         final session = await ApiUser.login(loginRequest);
         if (session != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
+          WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+          channel.stream.listen((message)
+            {
+              ResponseWS.computeResponse(message);
+            }
+          );
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const HomeView()),
+            MaterialPageRoute(builder: (context) => HomeView(channel: channel)),
           );
         } else {
           wrongCredentials();

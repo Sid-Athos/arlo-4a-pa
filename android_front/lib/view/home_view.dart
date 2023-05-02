@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:miku/api/game_manager/request/ping_request.dart';
 import 'package:miku/view/friends_view.dart';
 import 'dart:developer' as developer;
 
 import 'package:miku/view/game_view.dart';
 import 'package:miku/view/profile_view.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HomeView extends StatefulWidget {
   static String routeName = "Home";
 
-  const HomeView({Key? key}) : super(key: key);
+  HomeView({Key? key, required this.channel}) : super(key: key);
+
+  WebSocketChannel channel;
 
   @override
-  State<HomeView> createState() => _HomeState();
+  State<HomeView> createState() => _HomeState(this.channel);
 }
 
 class _HomeState extends State<HomeView> {
 
   int _selectedIndex = 1;
+  WebSocketChannel channel;
+
   static final List<Widget> _widgetOptions = <Widget>[
     friendsWidget(),
     gameWidget(),
     profileWidget(),
   ];
 
+  _HomeState(this.channel);
+
   void _onItemTapped(int index) {
+
+    channel.sink.add(PingRequest.toJson());
 
     setState(() {
       _selectedIndex = index;
