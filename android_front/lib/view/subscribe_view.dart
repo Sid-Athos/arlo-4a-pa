@@ -33,7 +33,7 @@ class _SubscribeState extends State<SubscribeView> {
   void subscribe() async {
     if (_formKey.currentState!.validate()) {
       CreateUserRequest createUserRequest = CreateUserRequest(
-          pseudo: pseudoController.text,
+          nickname: pseudoController.text,
           email: emailController.text,
           password: passwordController.text
       );
@@ -41,7 +41,7 @@ class _SubscribeState extends State<SubscribeView> {
 
       if (user != null) {
         LoginRequest loginRequest = LoginRequest(
-            email: emailController.text,
+            nickname: pseudoController.text,
             password: passwordController.text
         );
         final session = await ApiUser.login(loginRequest);

@@ -1,17 +1,17 @@
 
 class CreateUserRequest {
-  String pseudo;
+  String nickname;
   String email;
   String password;
 
   CreateUserRequest({
-    required this.pseudo,
+    required this.nickname,
     required this.email,
     required this.password,
   });
 
   Map<String, dynamic> toJson() => {
-    "pseudo": pseudo,
+    "nickname": nickname,
     "email": email,
     "password": password,
   };

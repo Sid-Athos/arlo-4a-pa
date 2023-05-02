@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   void signUserIn() async {
     if (_formKey.currentState!.validate()) {
       LoginRequest loginRequest = LoginRequest(
-          email: emailController.text,
+          nickname: emailController.text,
           password: passwordController.text
       );
       final session = await ApiUser.login(loginRequest);
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.white),
                             ),
-                            labelText: 'Enter your email',
+                            labelText: 'Enter your nickname',
                             labelStyle: TextStyle(color: Colors.white),
                           ),
                           style: const TextStyle(color: Colors.white),
