@@ -10,6 +10,7 @@ use dotenv::dotenv;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use crate::database::init::init_db;
+use crate::entrypoint::game::game_router::game_routes;
 use crate::entrypoint::lobby::lobby_router::lobby_routes;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::router::ws_routes;
@@ -34,6 +35,7 @@ async fn main() {
 
     let app = Router::new()
         .nest("/lobby", lobby_routes(pool.clone()))
+        .nest("/game", game_routes(pool.clone()))
         .nest("/ws", ws_routes(connections, pool.clone()));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 7589));

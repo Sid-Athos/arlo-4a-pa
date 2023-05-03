@@ -30,4 +30,21 @@ impl GameRepository {
 
         Ok(GameEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn get_all(&self) -> Result<Vec<Game>, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn
+            .query("SELECT * FROM coding_games.game", &[])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(GameEntityMapper::entity_to_domain(GameEntity::new(row)));
+        }
+
+        Ok(result)
+    }
 }

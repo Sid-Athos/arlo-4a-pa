@@ -26,7 +26,7 @@ class _HomeState extends State<HomeView> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     friendsWidget(),
-    gameWidget(),
+    const GameScreen(),
     profileWidget(),
   ];
 
@@ -48,18 +48,9 @@ class _HomeState extends State<HomeView> {
       DeviceOrientation.portraitDown,
     ]);
     return Scaffold(
+      backgroundColor: const Color(0xFF21262B),
       body: Center(
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1A2025)
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _widgetOptions.elementAt(_selectedIndex)
-            ],
-          ),
-        ),
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

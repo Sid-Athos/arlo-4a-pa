@@ -19,6 +19,7 @@ Future<void> main() async {
         ResponseWS.computeResponse(message);
       }
     );
+    //runApp(const AppUnLogged());
     runApp(AppLogged(channel: channel));
   } else {
     runApp(const AppUnLogged());
