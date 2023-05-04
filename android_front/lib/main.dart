@@ -31,12 +31,9 @@ class AppUnLogged extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Miku',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const LoginPage(),
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -51,9 +48,6 @@ class AppLogged extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Miku',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: HomeView(channel: channel),
       debugShowCheckedModeBanner: false,
     );
