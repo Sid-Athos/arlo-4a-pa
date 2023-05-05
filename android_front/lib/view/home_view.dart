@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:miku/view/friends_view.dart';
+import 'package:miku/view/friend_list_view.dart';
 
 import 'package:miku/view/game_list_view.dart';
 import 'package:miku/view/profile_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../api/game_manager/response/response_enum_ws.dart';
 
 enum TabItem { friends, game, profile }
 
@@ -30,6 +32,16 @@ class _HomeState extends State<HomeView> {
   ];
   int currentTab = 1;
 
+  @override
+  void initState() {
+    super.initState();
+    channel.stream.listen((message)
+      {
+        ResponseWS.computeResponse(message, context, channel);
+      }
+    );
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       currentTab = index;
@@ -43,7 +55,7 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[0],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => const FriendsScreen(),
+              builder: (context) => const FriendListView(),
             );
           }
       ),
@@ -71,7 +83,7 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[2],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => const ProfileScreen(),
+              builder: (context) => const ProfileView(),
             );
           }
       ),

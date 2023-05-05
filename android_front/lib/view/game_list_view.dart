@@ -57,7 +57,7 @@ class _GameScreenState extends State<GameScreen> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => LobbyScreen(game: snapshot.data![index], channel: channel)),
+                            MaterialPageRoute(builder: (context) => LobbyListView(game: snapshot.data![index], channel: channel)),
                           );
                         },
                         child: Text(

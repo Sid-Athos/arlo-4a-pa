@@ -8,17 +8,17 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../api/game_manager/api_game_manager.dart';
 
-class LobbyScreen extends StatefulWidget {
-  LobbyScreen({super.key, required this.game, required this.channel});
+class LobbyListView extends StatefulWidget {
+  LobbyListView({super.key, required this.game, required this.channel});
   Game game;
   WebSocketChannel channel;
 
   @override
-  _LobbyScreenState createState() => _LobbyScreenState(game: game, channel: channel);
+  _LobbyListViewState createState() => _LobbyListViewState(game: game, channel: channel);
 }
 
-class _LobbyScreenState extends State<LobbyScreen> {
-  _LobbyScreenState({required this.game, required this.channel});
+class _LobbyListViewState extends State<LobbyListView> {
+  _LobbyListViewState({required this.game, required this.channel});
 
   late Future<List<Lobby>> lobbies;
   Game game;

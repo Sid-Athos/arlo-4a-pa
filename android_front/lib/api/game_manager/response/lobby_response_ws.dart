@@ -1,7 +1,13 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:miku/model/lobby_model.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
 import '../../../model/lobby_member_model.dart';
 import '../../../model/mapper/lobby_member_response_mapper.dart';
+import '../../../view/lobby_view.dart';
 
 class LobbyResponseWS {
   final int id;
@@ -28,14 +34,23 @@ class LobbyResponseWS {
     );
   }
 
-  static void compute(Map<String, dynamic> json) {
+  Lobby toDomainLobby() {
+    return Lobby(
+        id: id,
+        code: code,
+        gameId: gameId,
+        private: private,
+        members: members
+    );
+  }
+
+  static void compute(Map<String, dynamic> json, BuildContext context, WebSocketChannel channel) {
 
     LobbyResponseWS messageResponse = LobbyResponseWS.fromJson(json['Lobby']);
 
-    developer.log(messageResponse.id.toString());
-    developer.log(messageResponse.code);
-    developer.log(messageResponse.gameId.toString());
-    developer.log(messageResponse.private.toString());
-    developer.log(messageResponse.members.toString());
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LobbyView(lobby: messageResponse.toDomainLobby(), channel: channel))
+    );
   }
 }

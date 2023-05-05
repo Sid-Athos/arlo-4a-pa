@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class FriendsScreen extends StatefulWidget {
-  const FriendsScreen({super.key});
+class FriendListView extends StatefulWidget {
+  const FriendListView({super.key});
 
   @override
-  _FriendsScreenState createState() => _FriendsScreenState();
+  _FriendListViewState createState() => _FriendListViewState();
 }
 
-class _FriendsScreenState extends State<FriendsScreen> {
+class _FriendListViewState extends State<FriendListView> {
 
   @override
   Widget build(BuildContext context) {

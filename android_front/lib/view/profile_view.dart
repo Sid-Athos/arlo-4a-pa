@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class ProfileView extends StatefulWidget {
+  const ProfileView({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  _ProfileViewState createState() => _ProfileViewState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
