@@ -9,7 +9,7 @@ class LobbyMemberResponseMapper {
       pseudo: json['pseudo'],
       email: json['email'],
       admin: json['admin'],
-      isHost: json['isHost'],
+      isHost: json['is_host'],
     );
   }
 }

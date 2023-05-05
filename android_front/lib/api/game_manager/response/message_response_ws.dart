@@ -1,16 +1,16 @@
 import 'dart:developer' as developer;
 
-class MessageResponse {
+class MessageResponseWS {
   final String message;
   final int fromUser;
 
-  MessageResponse({
+  MessageResponseWS({
     required this.message,
     required this.fromUser,
   });
 
-  factory MessageResponse.fromJson(Map<String, dynamic> json) {
-    return MessageResponse(
+  factory MessageResponseWS.fromJson(Map<String, dynamic> json) {
+    return MessageResponseWS(
       message: json['message'],
       fromUser: json['from_user'],
     );
@@ -18,7 +18,7 @@ class MessageResponse {
 
   static void compute(Map<String, dynamic> json) {
 
-    MessageResponse messageResponse = MessageResponse.fromJson(json['Message']);
+    MessageResponseWS messageResponse = MessageResponseWS.fromJson(json['Message']);
 
     developer.log(messageResponse.message);
     developer.log(messageResponse.fromUser.toString());

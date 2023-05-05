@@ -15,7 +15,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
     return const Scaffold(
       backgroundColor: Color(0xFF21262B),
       body: Center(
-        child: Text("Profile"),
+        child: Text("Friends"),
       ),
     );
   }

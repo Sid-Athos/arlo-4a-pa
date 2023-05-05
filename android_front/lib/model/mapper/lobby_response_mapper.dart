@@ -8,7 +8,7 @@ class LobbyResponseMapper {
     return Lobby(
       id: json['id'],
       code: json['code'],
-      gameId: json['gameId'],
+      gameId: json['game_id'],
       private: json['private'],
       members: (json['members'] as List<dynamic>).map((member) => LobbyMemberResponseMapper.fromJson(member)).toList(),
     );

@@ -2,20 +2,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/game_manager/api_game_manager.dart';
 import 'package:miku/model/game_model.dart';
-import 'dart:developer' as developer;
 
 import 'package:miku/view/lobby_list_view.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  GameScreen({super.key, required this.channel});
+  WebSocketChannel channel;
 
   @override
-  _GameScreenState createState() => _GameScreenState();
+  _GameScreenState createState() => _GameScreenState(channel: channel);
 }
 
 class _GameScreenState extends State<GameScreen> {
+  _GameScreenState({required this.channel});
 
   late Future<List<Game>> games;
+  WebSocketChannel channel;
 
   @override
   void initState() {
@@ -52,10 +55,9 @@ class _GameScreenState extends State<GameScreen> {
                           ),
                         ),
                         onPressed: () {
-                          developer.log("Pressed ${snapshot.data?[index].name}");
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const LobbyScreen()),
+                            MaterialPageRoute(builder: (context) => LobbyScreen(game: snapshot.data![index], channel: channel)),
                           );
                         },
                         child: Text(

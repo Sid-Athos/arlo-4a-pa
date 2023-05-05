@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:miku/api/game_manager/request/ping_request.dart';
 import 'package:miku/view/friends_view.dart';
-import 'dart:developer' as developer;
 
 import 'package:miku/view/game_list_view.dart';
-import 'package:miku/view/lobby_list_view.dart';
 import 'package:miku/view/profile_view.dart';
-import 'package:miku/view/tab_navigatior.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 enum TabItem { friends, game, profile }
@@ -24,20 +20,17 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeState extends State<HomeView> {
+  _HomeState(this.channel);
+
+  WebSocketChannel channel;
   List<GlobalKey<NavigatorState>> navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
-
   int currentTab = 1;
-  WebSocketChannel channel;
-
-  _HomeState(this.channel);
 
   void _onItemTapped(int index) {
-    channel.sink.add(PingRequest.toJson());
-
     setState(() {
       currentTab = index;
     });
@@ -64,7 +57,7 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[1],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => const GameScreen(),
+              builder: (context) => GameScreen(channel: channel),
             );
           }
       ),
