@@ -16,6 +16,7 @@ class ResponseWS {
       case "\"Pong\"": developer.log("Pong"); return;
       case "\"LobbyJoined\"": developer.log("LobbyJoined"); return;
       case "\"LobbyExited\"": developer.log("LobbyExited"); return;
+      case "\"Kicked\"": Navigator.pop(context); developer.log("Kicked"); return;
     }
 
     Map<String, dynamic> json = jsonDecode(message);

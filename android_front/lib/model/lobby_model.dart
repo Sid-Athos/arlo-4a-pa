@@ -16,4 +16,8 @@ class Lobby {
     required this.private,
     required this.members,
   });
+
+  LobbyMember getHost() {
+    return members.firstWhere((element) => element.isHost);
+  }
 }

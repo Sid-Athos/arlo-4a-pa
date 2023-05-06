@@ -6,7 +6,7 @@ import 'package:miku/view/game_list_view.dart';
 import 'package:miku/view/profile_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../api/game_manager/response/response_enum_ws.dart';
+import '../api/game_manager/response/response_ws.dart';
 
 enum TabItem { friends, game, profile }
 
@@ -35,11 +35,6 @@ class _HomeState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    channel.stream.listen((message)
-      {
-        ResponseWS.computeResponse(message, context, channel);
-      }
-    );
   }
 
   void _onItemTapped(int index) {

@@ -7,7 +7,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
 import '../api/game_manager/api_game_manager.dart';
-import '../api/game_manager/response/response_enum_ws.dart';
+import '../api/game_manager/response/response_ws.dart';
 import '../api/user/api_user.dart';
 import '../api/user/request/login_request.dart';
 import 'home_view.dart';

@@ -6,6 +6,8 @@ import 'package:miku/model/game_model.dart';
 import 'package:miku/view/lobby_list_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../api/game_manager/response/response_ws.dart';
+
 class GameScreen extends StatefulWidget {
   GameScreen({super.key, required this.channel});
   WebSocketChannel channel;
@@ -24,6 +26,11 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     games = ApiGameManager.getAllGames();
+    channel.stream.listen((message)
+      {
+        ResponseWS.computeResponse(message, context, channel);
+      }
+    );
   }
 
   @override
