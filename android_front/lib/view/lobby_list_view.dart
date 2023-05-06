@@ -6,6 +6,7 @@ import 'package:miku/model/lobby_model.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../api/game_manager/api_game_manager.dart';
+import '../api/game_manager/request/create_lobby_request.dart';
 
 class LobbyListView extends StatefulWidget {
   LobbyListView({super.key, required this.game, required this.channel});
@@ -41,13 +42,14 @@ class _LobbyListViewState extends State<LobbyListView> {
           Padding(
               padding: const EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                onTap: _showMyDialog,
+                onTap: () {
+                  showConfirmationDialog(context);
+                },
                 child: const Icon(
                   Icons.add,
                   size: 32.0,
                 ),
-              )
-          ),
+              )),
         ],
       ),
       backgroundColor: const Color(0xFF21262B),
@@ -82,59 +84,12 @@ class _LobbyListViewState extends State<LobbyListView> {
     );
   }
 
-  Future<void> _showMyDialog() async {
-    bool isPrivate = false;
-    return showDialog<void>(
+  showConfirmationDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
       context: context,
-      barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF21262B),
-          title: const Text(
-            "Create Lobby",
-            style: TextStyle(
-              color: Colors.white,
-            )
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  "Max Players : ${game.nbPlayer}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                CheckboxListTile(
-                  title:
-                  const Text(
-                    "Private : ",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  value: isPrivate,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      isPrivate = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                primary: const Color(0xFF626af7),
-              ),
-              child: const Text('Create'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return CustomDialog(game: game, channel: channel);
       },
     );
   }
@@ -165,7 +120,8 @@ class LobbyCardWidget extends StatelessWidget {
           ),
           color: const Color(0xFF1A2025),
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
+            padding:
+                const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -193,6 +149,95 @@ class LobbyCardWidget extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class CustomDialog extends StatefulWidget {
+  CustomDialog({required this.game, required this.channel});
+
+  Game game;
+  WebSocketChannel channel;
+
+  @override
+  _CustomDialogState createState() => _CustomDialogState(game: game, channel: channel);
+}
+
+class _CustomDialogState extends State<CustomDialog> {
+  _CustomDialogState({required this.game, required this.channel});
+
+  Game game;
+  WebSocketChannel channel;
+  bool _isChecked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color(0xFF21262B),
+      title: const Text(
+        "Create Lobby",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Number of Players  : ${game.nbPlayer}",
+            style: const TextStyle(
+                color: Colors.white
+            ),
+          ),
+          Theme(
+            data: Theme.of(context).copyWith(
+              unselectedWidgetColor: Colors.white,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 32.0),
+              child: CheckboxListTile(
+                title: const Text(
+                  "Private",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                value: _isChecked,
+                onChanged: (bool? val) {
+                  setState(() {
+                    _isChecked = val!;
+                  });
+                },
+              ),
+            )
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            "Cancel",
+            style: TextStyle(
+              color: Color(0xFF626af7),
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            channel.sink.add(CreateLobbyRequest.toJson(game.id, _isChecked));
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            "Create",
+            style: TextStyle(
+              color: Color(0xFF626af7),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
