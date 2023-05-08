@@ -9,6 +9,7 @@ services:
     tty: true
     volumes:
       - "./api/.env:/.env"
+      - "./api/logs:/logs"
   gamemanager:
     container_name: "gamemanager"
     image: dixennaxos/pa-4al2-gr5:game-manager-${ENV}-latest
@@ -18,6 +19,7 @@ services:
     tty: true
     volumes:
       - "./game-manager/.env:/.env"
+      - "./game-manager/logs:/logs"
   front:
     container_name: "front"
     image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest

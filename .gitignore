@@ -1,5 +1,6 @@
 .idea
 .idea/*.iml
 **/.env
-**/logs
 **/.idea
+**/infos.*
+**/warnings.*
