@@ -34,3 +34,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    restart: always
+    volumes:
+      - ../arlo-4a-pa-conf/nginx/conf/:/etc/nginx/conf.d/:ro
