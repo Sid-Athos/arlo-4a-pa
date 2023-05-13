@@ -14,4 +14,11 @@ class LobbyMember {
     required this.admin,
     required this.isHost,
   });
+
+  LobbyMember.fromJson(Map<String, dynamic> json) :
+    id = json['id'],
+    pseudo = json['pseudo'],
+    email = json['email'],
+    admin = json['admin'],
+    isHost = json['is_host'];
 }

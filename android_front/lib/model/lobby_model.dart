@@ -1,7 +1,8 @@
-
+import 'package:flutter/cupertino.dart';
 import 'package:miku/model/lobby_member_model.dart';
+import 'dart:developer' as developer;
 
-class Lobby {
+class Lobby extends ChangeNotifier {
 
   int id;
   String code;
@@ -10,14 +11,23 @@ class Lobby {
   List<LobbyMember> members;
 
   Lobby({
-    required this.id,
-    required this.code,
-    required this.gameId,
-    required this.private,
-    required this.members,
+    this.id = 0,
+    this.code = "",
+    this.gameId = 0,
+    this.private = false,
+    this.members = const [],
   });
 
   LobbyMember getHost() {
     return members.firstWhere((element) => element.isHost);
+  }
+
+  void update(Map<String, dynamic> json) {
+    id = json['id'];
+    code = json['code'];
+    gameId = json['game_id'];
+    private = json['private'];
+    members = json['members'].map<LobbyMember>((member) => LobbyMember.fromJson(member)).toList();
+    notifyListeners();
   }
 }

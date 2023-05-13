@@ -9,22 +9,24 @@ import '../api/game_manager/api_game_manager.dart';
 import '../api/game_manager/request/create_lobby_request.dart';
 
 class LobbyListView extends StatefulWidget {
-  LobbyListView({super.key, required this.game, required this.channel});
+  LobbyListView({super.key, required this.game, required this.channel, required this.lobby});
 
   Game game;
   WebSocketChannel channel;
+  Lobby lobby;
 
   @override
   _LobbyListViewState createState() =>
-      _LobbyListViewState(game: game, channel: channel);
+      _LobbyListViewState(game: game, channel: channel, lobby: lobby);
 }
 
 class _LobbyListViewState extends State<LobbyListView> {
-  _LobbyListViewState({required this.game, required this.channel});
+  _LobbyListViewState({required this.game, required this.channel, required this.lobby});
 
   late Future<List<Lobby>> lobbies;
   Game game;
   WebSocketChannel channel;
+  Lobby lobby;
 
   @override
   void initState() {

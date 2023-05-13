@@ -1,12 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:miku/view/friend_list_view.dart';
 
 import 'package:miku/view/game_list_view.dart';
 import 'package:miku/view/profile_view.dart';
+import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:developer' as developer;
 
-import '../api/game_manager/response/response_ws.dart';
+import '../api/game_manager/response/message_response_ws.dart';
+import '../model/lobby_model.dart';
+import 'lobby_view.dart';
 
 enum TabItem { friends, game, profile }
 
@@ -23,6 +29,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeState extends State<HomeView> {
   _HomeState(this.channel);
+  Lobby lobby = Lobby();
 
   WebSocketChannel channel;
   List<GlobalKey<NavigatorState>> navigatorKeys = [
@@ -35,6 +42,38 @@ class _HomeState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+    channel.stream.listen((message)
+      {
+        switch (message) {
+          case "\"BadMessage\"": developer.log("BadMessage"); return;
+          case "\"Pong\"": developer.log("Pong"); return;
+          case "\"LobbyJoined\"":
+          case "\"LobbyCreated\"":
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ChangeNotifierProvider(
+                    create: (context) => lobby,
+                    builder: (context, child) => LobbyView(channel: channel),
+                  ),
+                ),
+            ).then((value) => lobby = Lobby());
+            return;
+          case "\"LobbyExited\"": developer.log("LobbyExited"); return;
+          case "\"Kicked\"": Navigator.pop(context); developer.log("Kicked"); return;
+        }
+
+        Map<String, dynamic> json = jsonDecode(message);
+        for (var key in json.keys) {
+          switch (key) {
+            case "Message": MessageResponseWS.compute(json); break;
+            case "Lobby":
+              lobby.update(json["Lobby"]);
+              break;
+          }
+        }
+      }
+    );
   }
 
   void _onItemTapped(int index) {
@@ -64,7 +103,7 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[1],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => GameScreen(channel: channel),
+              builder: (context) => GameScreen(channel: channel, lobby: lobby,),
             );
           }
       ),

@@ -43,14 +43,4 @@ class LobbyResponseWS {
         members: members
     );
   }
-
-  static void compute(Map<String, dynamic> json, BuildContext context, WebSocketChannel channel) {
-
-    LobbyResponseWS messageResponse = LobbyResponseWS.fromJson(json['Lobby']);
-
-    Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LobbyView(lobby: messageResponse.toDomainLobby(), channel: channel))
-    );
-  }
 }
