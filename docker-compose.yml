@@ -29,7 +29,8 @@ services:
     tty: true
     volumes:
       - "./web/coding-games/.env:/.env"
-  webserver:
+  nginx:
+    container_name: "nginx"
     image: nginx:latest
     ports:
       - "80:80"
@@ -37,3 +38,9 @@ services:
     restart: always
     volumes:
       - ../arlo-4a-pa-conf/nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+  certbot:
+    container_name: "certbot"
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
