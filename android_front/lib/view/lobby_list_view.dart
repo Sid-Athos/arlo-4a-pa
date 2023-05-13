@@ -65,14 +65,15 @@ class _LobbyListViewState extends State<LobbyListView> {
           child: FutureBuilder<List<Lobby>>(
             future: lobbies,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.hasData && snapshot.data!.length > 0) {
                 return ListView.builder(
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
                     return LobbyCardWidget(
                         lobby: snapshot.data![index],
                         game: game,
-                        channel: channel);
+                        channel: channel
+                    );
                   },
                 );
               } else if (snapshot.hasError) {

@@ -49,8 +49,7 @@ class _HomeState extends State<HomeView> {
           case "\"Pong\"": developer.log("Pong"); return;
           case "\"LobbyJoined\"":
           case "\"LobbyCreated\"":
-            Navigator.push(
-                context,
+          navigatorKeys[1].currentState?.push(
                 MaterialPageRoute(
                   builder: (BuildContext context) => ChangeNotifierProvider(
                     create: (context) => lobby,
