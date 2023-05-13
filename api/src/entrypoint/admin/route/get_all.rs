@@ -9,7 +9,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     get,
-    path = "/admin/get_all",
+    path = "/admin/",
     responses(
         (status = 200, description = "List of Users", body = Vec<UserResponse>,),
         (status = 401, description = "Invalid token",),

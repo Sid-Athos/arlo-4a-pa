@@ -93,6 +93,8 @@ entrypoint::ranking::route::update_ranking::update_ranking,
 entrypoint::ranking::route::get_ranking_by_friend::get_ranking_by_friend,
 entrypoint::ranking::route::get_ranking_by_game::get_ranking_by_game_id,
 entrypoint::ranking::route::get_ranking_by_user::get_ranking_by_user_id,
+entrypoint::ranking::route::delete_by_game::delete_by_game,
+entrypoint::ranking::route::delete_by_user::delete_by_user
 ),
 modifiers(&SecurityAddon),
 components(

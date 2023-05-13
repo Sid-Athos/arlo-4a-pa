@@ -17,7 +17,7 @@ use crate::middlewares::swagger_security::check_api_key;
 pub fn ranking_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/init", post(init_ranking).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
+        .route("/", post(init_ranking).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .route("/", put(update_ranking).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .route("/user/:user_id", delete(delete_by_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .route("/game/:game_id", delete(delete_by_game).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
