@@ -1,5 +1,7 @@
 .idea
 .idea/*.iml
 **/.env
-**/logs
 **/.idea
+**/info.*
+**/warnings.*
+certbot
