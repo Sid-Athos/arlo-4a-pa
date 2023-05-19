@@ -9,6 +9,7 @@ import 'dart:developer' as developer;
 import '../api/game_manager/api_game_manager.dart';
 import '../api/user/api_user.dart';
 import '../api/user/request/login_request.dart';
+import '../model/user_model.dart';
 import 'home_view.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,10 +35,11 @@ class _LoginPageState extends State<LoginPage> {
       if (session != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+        User user = (await ApiUser.me(prefs.getString('login_token')!))!;
         Navigator.pop(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeView(channel: channel)),
+          MaterialPageRoute(builder: (context) => HomeView(channel: channel, user: user)),
         );
       } else {
         wrongCredentials();

@@ -78,6 +78,28 @@ class _LobbyListViewState extends State<LobbyListView> {
                 );
               } else if (snapshot.hasError) {
                 return Text("${snapshot.error}");
+              } else if (snapshot.hasData && snapshot.data!.length == 0) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Icon(
+                        Icons.search_off,
+                        color: Colors.white,
+                        size: 48,
+                      ),
+                    ),
+
+                    Text(
+                      "No lobbies found",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                );
               }
               return CircularProgressIndicator();
             },

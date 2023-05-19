@@ -6,6 +6,8 @@ import 'package:miku/view/home_view.dart';
 import 'package:web_socket_channel/src/channel.dart';
 
 import 'api/game_manager/api_game_manager.dart';
+import 'api/user/api_user.dart';
+import 'model/user_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,8 +15,9 @@ Future<void> main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.containsKey('login_token')) {
     WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+    User user = (await ApiUser.me(prefs.getString('login_token')!))!;
     //runApp(const AppUnLogged());
-    runApp(AppLogged(channel: channel));
+    runApp(AppLogged(channel: channel, user: user));
   } else {
     runApp(const AppUnLogged());
   }
@@ -34,15 +37,16 @@ class AppUnLogged extends StatelessWidget {
 }
 
 class AppLogged extends StatelessWidget {
-  AppLogged({super.key, required this.channel});
+  AppLogged({super.key, required this.channel, required this.user});
 
   WebSocketChannel channel;
+  User user;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Miku',
-      home: HomeView(channel: channel),
+      home: HomeView(channel: channel, user: user),
       debugShowCheckedModeBanner: false,
     );
   }

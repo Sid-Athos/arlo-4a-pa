@@ -24,6 +24,10 @@ impl LobbyService {
         }
     }
 
+    pub async fn get_by_id(&self, lobby_id: i32) -> Result<Lobby, String> {
+        self.lobby_repository.get_by_id(lobby_id).await.map_err(database_error_to_response_error)
+    }
+
     pub async fn get_by_user_id(&self, user_id: i32) -> Result<Lobby, String> {
         let lobby_member = self.lobby_member_repository.get_by_user_id(user_id).await.map_err(database_error_to_response_error)?;
         self.lobby_repository.get_by_id(lobby_member.lobby_id).await.map_err(database_error_to_response_error)
