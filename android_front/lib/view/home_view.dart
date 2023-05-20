@@ -64,7 +64,7 @@ class _HomeState extends State<HomeView> {
             ).then((value) => lobby = Lobby());
             return;
           case "\"LobbyExited\"": developer.log("LobbyExited"); return;
-          case "\"Kicked\"": Navigator.pop(context); developer.log("Kicked"); return;
+          case "\"Kicked\"": navigatorKeys[1].currentState?.pop(context); developer.log("Kicked"); return;
         }
 
         Map<String, dynamic> json = jsonDecode(message);
