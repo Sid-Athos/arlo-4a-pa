@@ -12,7 +12,7 @@ import '../../model/session_model.dart';
 import '../../model/user_model.dart';
 
 class ApiUser {
-  static const String baseURL = "http://192.168.137.117:7590";
+  static const String baseURL = "https://dev.mikusupremacy.fr/api";
   static final dio = Dio();
 
   static Future<User?> getById(int id) async {
