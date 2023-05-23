@@ -20,6 +20,16 @@ services:
     volumes:
       - "./game-manager/.env:/.env"
       - "./game-manager/logs:/logs"
+  dockermanager:
+    container_name: "dockermanager"
+    image: dixennaxos/pa-4al2-gr5:docker-manager-${ENV}-latest
+    ports:
+      - '7588:7588'
+    restart: "always"
+    tty: true
+    volumes:
+      - "./docker-manager/.env:/.env"
+      - "./docker-manager/logs:/logs"
   front:
     container_name: "front"
     image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest
