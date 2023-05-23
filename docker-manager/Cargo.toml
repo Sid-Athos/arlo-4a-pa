@@ -31,3 +31,4 @@ utoipa-swagger-ui = { version = "3", features = ["axum"] }
 bcrypt = "0.14.0"
 tracing-appender = "0.2"
 regex = "1.8.1"
+docker-api = "0.13.0"

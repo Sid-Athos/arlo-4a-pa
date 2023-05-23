@@ -1,4 +1,4 @@
-name: GAME MANAGER
+name: DOCKER MANAGER
 
 on:
   push:
