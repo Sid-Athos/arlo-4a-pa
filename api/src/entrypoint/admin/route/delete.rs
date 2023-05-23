@@ -10,7 +10,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     delete,
-    path = "/admin/delete/{user_id}",
+    path = "/admin/{user_id}",
     params(
         ("user_id" = String,),
     ),

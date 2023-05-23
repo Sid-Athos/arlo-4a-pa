@@ -10,7 +10,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     delete,
-    path = "/user/delete",
+    path = "/user/",
     responses(
         (status = 200, description = "User deleted", body = UserResponse),
         (status = 401, description = "Invalid token",),

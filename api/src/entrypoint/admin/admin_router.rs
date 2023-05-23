@@ -14,11 +14,11 @@ use crate::middlewares::swagger_security::check_api_key;
 pub fn admin_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/get_all", get(get_all))
-        .route("/delete/:user_id", delete(delete_user))
+        .route("/", get(get_all))
+        .route("/:user_id", delete(delete_user))
         .route("/give_admin_role/:user_id", put(give_admin_role))
         .route("/remove_admin_role/:user_id", put(remove_admin_role))
-        .route("/update/:user_id", put(update_user))
+        .route("/:user_id", put(update_user))
         .layer(middleware::from_fn(check_api_key))
         .layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin))
         .with_state(pool)
