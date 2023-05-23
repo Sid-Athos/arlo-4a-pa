@@ -10,7 +10,7 @@ use crate::service::friend_list_service::FriendListService;
 
 #[utoipa::path(
     put,
-    path = "/accept/{friend_list_id}",
+    path = "/friend_list/{friend_list_id}",
     responses(
         (status = 200, description = "FriendList entry accepted", body = FriendListResponse,),
         (status = 401, description = "Invalid token",),

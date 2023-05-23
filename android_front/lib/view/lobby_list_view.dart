@@ -164,7 +164,7 @@ class LobbyCardWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      "Players : ${lobby.members.length} / ${game.nbPlayer}",
+                      "Players : ${lobby.members.length} / ${game.maxPlayers}",
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -209,7 +209,7 @@ class _CustomDialogState extends State<CustomDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "Number of Players  : ${game.nbPlayer}",
+            "Number of Players  : ${game.minPlayers} - ${game.maxPlayers}",
             style: const TextStyle(
                 color: Colors.white
             ),

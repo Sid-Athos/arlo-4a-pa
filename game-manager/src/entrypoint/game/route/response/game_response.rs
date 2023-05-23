@@ -6,7 +6,9 @@ use crate::domain::model::game::Game;
 pub struct GameResponse {
     pub id: i32,
     pub name: String,
-    pub nb_player: i32,
+    pub description: Option<String>,
+    pub min_players: i32,
+    pub max_players: i32,
 }
 
 impl GameResponse {
@@ -15,7 +17,9 @@ impl GameResponse {
         GameResponse {
             id: game.id,
             name: game.name,
-            nb_player: game.nb_player,
+            description: game.description,
+            min_players: game.min_players,
+            max_players: game.max_players,
         }
     }
 

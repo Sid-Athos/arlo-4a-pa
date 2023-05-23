@@ -11,7 +11,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     put,
-    path = "/admin/update/{user_id}",
+    path = "/admin/{user_id}",
     params(
         ("user_id" = String,),
     ),

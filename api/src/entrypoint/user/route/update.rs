@@ -12,7 +12,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     put,
-    path = "/user/update",
+    path = "/user/",
     responses(
         (status = 200, description = "User found", body = UserResponse),
         (status = 401, description = "Invalid token",),
