@@ -1,6 +1,5 @@
 mod entrypoint;
 mod domain;
-mod database;
 mod service;
 mod middlewares;
 
@@ -8,7 +7,6 @@ use std::env;
 use std::net::SocketAddr;
 use axum::Router;
 use dotenv::dotenv;
-use crate::database::init::init_db;
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use utoipa::{ OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
@@ -19,8 +17,6 @@ use crate::middlewares::swagger_security::SecurityAddon;
 async fn main() {
     dotenv().ok();
     init_tracer();
-    let pool = init_db().await.unwrap();
-
     let cors = init_cors_layer();
 
     let app = Router::new()
