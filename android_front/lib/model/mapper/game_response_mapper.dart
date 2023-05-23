@@ -9,7 +9,7 @@ class GameResponseMapper {
       name: json['name'],
       description: json['description'],
       minPlayers: json['min_players'],
-      maxPlayers: json['max_players'],
+      maxPlayers: json['max_players']
     );
   }
 }
