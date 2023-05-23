@@ -4,6 +4,7 @@ import 'package:miku/api/user/request/create_user_request.dart';
 import 'package:miku/api/user/request/login_request.dart';
 import 'package:miku/api/user/request/update_user_request.dart';
 import 'package:miku/model/mapper/user_response_mapper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 import '../../model/mapper/session_response_mapper.dart';
@@ -115,6 +116,20 @@ class ApiUser {
     } catch (e) {
       developer.log(e.toString());
       return null;
+    }
+  }
+
+  static Future<List<User>> getFriendList() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.get('$baseURL/friend_list/');
+      final data = response.data as List<dynamic>;
+      return data.map((json) => UserResponseMapper.fromJson(json)).toList();
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
     }
   }
 
