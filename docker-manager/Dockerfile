@@ -1,7 +1,7 @@
 FROM rust:1.68 as build
 
-RUN USER=root cargo new --bin game-manager
-WORKDIR /game-manager
+RUN USER=root cargo new --bin docker-manager
+WORKDIR /docker-manager
 
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./Cargo.toml ./Cargo.toml
@@ -10,10 +10,10 @@ RUN cargo build --release
 RUN rm src/*.rs
 COPY ./src ./src
 
-RUN rm ./target/release/deps/game_manager*
+RUN rm ./target/release/deps/docker_manager*
 RUN cargo build --release
 
 FROM debian:bullseye-slim
-COPY --from=build /game-manager/target/release/game-manager .
+COPY --from=build /docker-manager/target/release/docker-manager .
 
-CMD ["./game-manager"]
+CMD ["./docker-manager"]

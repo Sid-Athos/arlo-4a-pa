@@ -2,10 +2,18 @@ mod entrypoint;
 mod domain;
 mod database;
 mod service;
+mod middlewares;
 
 use std::env;
 use std::net::SocketAddr;
+use axum::Router;
+use dotenv::dotenv;
 use crate::database::init::init_db;
+use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
+use utoipa::{ OpenApi};
+use utoipa_swagger_ui::SwaggerUi;
+use crate::middlewares::swagger_security::SecurityAddon;
+
 
 #[tokio::main]
 async fn main() {
@@ -25,3 +33,15 @@ async fn main() {
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
+
+#[derive(OpenApi)]
+#[openapi(
+paths(
+
+),
+modifiers(&SecurityAddon),
+components(
+
+),
+)]
+struct ApiDoc;
