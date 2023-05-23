@@ -74,7 +74,6 @@ impl RequestEnum {
             RequestEnum::ExitLobby => {
                 let response = ExitLobbyRequest::compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
-                LobbyResponse::send_lobby_to_members(pool, connections.clone(), user.clone()).await.log_error();
             }
             RequestEnum::GiveHost(give_host_request) => {
                 let response = give_host_request.compute(pool.clone(), connections.clone(), user.clone()).await;
@@ -97,6 +96,11 @@ impl RequestEnum {
             RequestEnum::DeclineInviteLobby(decline_invite_lobby_request) => {
                 let response = decline_invite_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
+            }
+            RequestEnum::AcceptInviteLobby(accept_invite_lobby_request) => {
+                let response = accept_invite_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
+                LobbyResponse::send_lobby_to_members(pool, connections.clone(), user.clone()).await.log_error();
             }
             _ => {},
         }

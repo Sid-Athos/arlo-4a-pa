@@ -1,6 +1,6 @@
 [package]
 name = "game-manager"
-version = "0.1.11"
+version = "0.1.12"
 edition = "2021"
 publish = false
 
@@ -28,3 +28,5 @@ bb8-postgres = "0.8.1"
 rand = "0.8.5"
 dotenv = "0.15.0"
 colored = "2.0.0"
+utoipa = { version = "3.2.1", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "3", features = ["axum"] }

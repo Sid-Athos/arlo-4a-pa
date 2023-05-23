@@ -30,7 +30,31 @@ impl LobbyResponse {
         }
     }
 
-    pub(crate) async fn send_lobby_to_members(pool: ConnectionPool, connections: Extension<Connections>, user: User) -> Result<(), String> {
+    pub async fn send_lobby_to_members_from_lobby_id(pool: ConnectionPool, connections: Extension<Connections>, lobby_id: i32) -> Result<(), String> {
+        let lobby_service = LobbyService::new(pool.clone());
+        let user_service = UserService::new(pool);
+
+        let lobby = lobby_service.get_by_id(lobby_id).await?;
+
+        let members = lobby_service.get_lobby_member(lobby.id).await?;
+
+        let mut lobby_members_response = Vec::new();
+        let mut members_user_id = Vec::new();
+
+        for member in members {
+            members_user_id.push(member.user_id);
+            let user = user_service.get_user_by_id(member.user_id).await?;
+            lobby_members_response.push(LobbyMemberResponse::from_domain(user, member));
+        }
+
+        let lobby_response = LobbyResponse::from_domain(lobby, lobby_members_response);
+
+        connections.send_to_vec_user_id(ResponseEnum::Lobby(lobby_response), members_user_id).await;
+
+        Ok(())
+    }
+
+    pub async fn send_lobby_to_members(pool: ConnectionPool, connections: Extension<Connections>, user: User) -> Result<(), String> {
         let lobby_service = LobbyService::new(pool.clone());
         let user_service = UserService::new(pool);
 

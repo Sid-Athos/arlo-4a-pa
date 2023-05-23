@@ -1,113 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:miku/api/user/api_user.dart';
-import 'dart:developer' as developer;
+import 'package:miku/view/login_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:miku/view/home_view.dart';
+import 'package:web_socket_channel/src/channel.dart';
+
+import 'api/game_manager/api_game_manager.dart';
+import 'api/user/api_user.dart';
+import 'model/user_model.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey('login_token')) {
+    WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+    User user = (await ApiUser.me(prefs.getString('login_token')!))!;
+    //runApp(const AppUnLogged());
+    runApp(AppLogged(channel: channel, user: user));
+  } else {
+    runApp(const AppUnLogged());
+  }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class AppUnLogged extends StatelessWidget {
+  const AppUnLogged({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(),
+    return const MaterialApp(
+      title: 'Miku',
+      home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class AppLogged extends StatelessWidget {
+  AppLogged({super.key, required this.channel, required this.user});
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  void signUserIn() async {
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    developer.log('log me', name: 'my.app.category');
-    final session = await ApiUser().login(emailController.text, passwordController.text);
-    developer.log('log me2', name: 'my.app.category');
-    developer.log(session as String, name: 'my.app.category');
-  }
-
-  String? _textFieldValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Saisissez un texte';
-    }
-    return null;
-  }
+  WebSocketChannel channel;
+  User user;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-              child: Text(
-                "Login",
-                style: TextStyle(fontSize: 40),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-              child: TextFormField(
-                validator: _textFieldValidator,
-                controller: emailController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your email',
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-              child: TextFormField(
-                validator: _textFieldValidator,
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter your password',
-                ),
-                obscureText: true,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: signUserIn,
-              child: const Text("Log In"),
-            ),
-            const SizedBox(height: 50),
-          ],
-        ),
-      ),
+    return MaterialApp(
+      title: 'Miku',
+      home: HomeView(channel: channel, user: user),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
