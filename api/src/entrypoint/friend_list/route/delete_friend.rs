@@ -10,7 +10,7 @@ use crate::service::friend_list_service::FriendListService;
 
 #[utoipa::path(
     delete,
-    path = "/friend_list/{friend_list_id}",
+    path = "/friend_list/{user_id}",
     responses(
         (status = 200, description = "FriendList entry deleted", body = FriendListResponse,),
         (status = 401, description = "Invalid token",),
@@ -25,7 +25,8 @@ pub async fn delete_friend(State(pool): State<ConnectionPool>, Extension(user): 
         FriendListRepository::new(pool.clone()),
     );
 
-    let result = friend_list_service.delete_friend(friend_list_id,user.id).await?;
+    let friend_request = friend_list_service.get_request(user.id, friend_list_id).await?;
+    let result = friend_list_service.delete_friend(friend_request.id,user.id).await?;
 
     Ok(Json(FriendListResponse::from_domain(result)))
 }

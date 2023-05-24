@@ -28,7 +28,7 @@ class ApiUser {
   static Future<User?> createUser(CreateUserRequest createUserRequest) async {
     try {
       dio.options.headers["api-key"] = "coding_games";
-      final response = await dio.post('$baseURL/user/create', data: createUserRequest.toJson());
+      final response = await dio.post('$baseURL/user/', data: createUserRequest.toJson());
       return UserResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
@@ -51,7 +51,7 @@ class ApiUser {
     try {
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer $token";
-      final response = await dio.post('$baseURL/user/login');
+      final response = await dio.post('$baseURL/user/logout');
       return SessionResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
@@ -63,7 +63,7 @@ class ApiUser {
     try {
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer $token";
-      final response = await dio.delete('$baseURL/user/delete');
+      final response = await dio.delete('$baseURL/user/');
       return UserResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
@@ -99,7 +99,7 @@ class ApiUser {
     try {
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer $token";
-      final response = await dio.put('$baseURL/user/update', data: updateUserRequest.toJson());
+      final response = await dio.put('$baseURL/user/', data: updateUserRequest.toJson());
       return UserResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
