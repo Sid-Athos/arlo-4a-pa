@@ -32,6 +32,11 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text("Games"),
+        backgroundColor: const Color(0xFF21262B),
+      ),
       backgroundColor: const Color(0xFF21262B),
       body: Center(
         child: RefreshIndicator(
@@ -47,28 +52,7 @@ class _GameScreenState extends State<GameScreen> {
                 return ListView.builder(
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: const Color(0xFF1A2025),
-                          minimumSize: const Size(200, 75),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => LobbyListView(game: snapshot.data![index], channel: channel, lobby: lobby)),
-                          );
-                        },
-                        child: Text(
-                          snapshot.data?[index].name ?? "",
-                          style: const TextStyle(fontSize: 20, color: Colors.white),
-                        ),
-                      ),
-                    );
+                    return GameCardWidget(game: snapshot.data![index], channel: channel, lobby: lobby);
                   },
                 );
               } else if (snapshot.hasError) {
@@ -77,6 +61,54 @@ class _GameScreenState extends State<GameScreen> {
 
               return CircularProgressIndicator();
             },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GameCardWidget extends StatelessWidget {
+  GameCardWidget({super.key, required this.game, required this.channel, required this.lobby});
+
+  Game game;
+  Lobby lobby;
+  WebSocketChannel channel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LobbyListView(game: game, channel: channel, lobby: lobby)),
+          );
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          color: const Color(0xFF1A2025),
+          child: Padding(
+            padding:
+            const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  title: Text(
+                    game.name,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    "Number Players: ${game.minPlayers} - ${game.maxPlayers}",
+                    style: const TextStyle(color: Colors.white38),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

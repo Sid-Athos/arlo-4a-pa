@@ -20,9 +20,14 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text("Profile"),
+          backgroundColor: const Color(0xFF21262B),
+        ),
       backgroundColor: const Color(0xFF21262B),
       body: Padding(
-        padding: const EdgeInsets.only(top: 64, left: 16, right: 16),
+        padding: const EdgeInsets.only(top: 32, left: 16, right: 16),
         child: Column(
           children: <Widget> [
             Row(

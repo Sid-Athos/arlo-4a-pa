@@ -90,6 +90,19 @@ impl FriendListRepository {
         Ok(FriendListEntityMapper::entity_to_domain(result))
     }
 
+    pub async fn get_friend_list_request_by_users_id(&self, user_id1: i32, user_id2 : i32) -> Result<FriendList, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.friend_list WHERE (applicant_id = $1 AND recipient_id = $2) OR (applicant_id = $2 AND recipient_id = $1)", &[&user_id1,&user_id2])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = FriendListEntity::new(row);
+        Ok(FriendListEntityMapper::entity_to_domain(result))
+    }
+
     pub async fn get_friend_list_by_user(&self, user_id: i32) -> Result<Vec<FriendList>, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
