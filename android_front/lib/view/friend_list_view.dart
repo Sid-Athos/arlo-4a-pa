@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
 import 'package:miku/model/user_model.dart';
+import 'package:miku/view/search_user_view.dart';
 
 class FriendListView extends StatefulWidget {
   const FriendListView({super.key});
@@ -27,6 +28,22 @@ class _FriendListViewState extends State<FriendListView> {
         automaticallyImplyLeading: false,
         title: const Text("Friends"),
         backgroundColor: const Color(0xFF21262B),
+        actions: <Widget>[
+          Padding(
+              padding: const EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SearchUserView()),
+                  );
+                },
+                child: const Icon(
+                  Icons.search,
+                  size: 32.0,
+                ),
+              )),
+        ],
       ),
       backgroundColor: Color(0xFF21262B),
       body: Center(
@@ -104,12 +121,32 @@ class FriendCardWidget extends StatelessWidget {
             const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ListTile(
-                  title: Text(
-                    user.pseudo,
-                    style: TextStyle(color: Colors.white),
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: ListTile(
+                        title: Text(
+                          user.pseudo,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          onPressed: () {
+                            ApiUser.deleteFriend(user.id);
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
