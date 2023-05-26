@@ -51,10 +51,10 @@ async fn main() {
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .nest("/user", user_routes(pool.clone()))
-        .nest("/admin", admin_routes(pool.clone()))
-        .nest("/ranking", ranking_routes(pool.clone()))
-        .nest("/friend_list", friend_list_routes(pool.clone()))
+        .merge( user_routes(pool.clone()))
+        .merge( admin_routes(pool.clone()))
+        .merge( ranking_routes(pool.clone()))
+        .merge(friend_list_routes(pool.clone()))
         .layer(cors);
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
@@ -74,7 +74,8 @@ entrypoint::user::route::login::user_login,
 entrypoint::user::route::logout::user_logout,
 entrypoint::user::route::add_experience::add_experience,
 entrypoint::user::route::me::me,
-entrypoint::user::route::search::search,
+entrypoint::user::route::search::search_user,
+entrypoint::user::route::search::get_other_players,
 entrypoint::user::route::delete::delete_user,
 entrypoint::user::route::update::update_user,
 entrypoint::user::route::change_password::change_password,

@@ -1,0 +1,95 @@
+<html>
+<head>
+    <title> Rectangle noir </title>
+</head>
+
+<body onload="jsonToSvg()">
+</body>
+
+<script>
+    function jsonToSvg(){
+        let svgFieldsList = {
+            "width": "300",
+            "height": "300",
+            "content": [
+                {
+                    "tag": "style",
+                    "content": "line{stroke:black;stroke-width:4;}"
+                },
+                {
+                    "tag": "line",
+                    "x1": "0",
+                    "y1": "100",
+                    "x2": "300",
+                    "y2": "100"
+                },
+                {
+                    "tag": "line",
+                    "x1": "100",
+                    "y1": "0",
+                    "x2": "100",
+                    "y2": "300"
+                },
+                {
+                    "tag": "line",
+                    "x1": "0",
+                    "y1": "200",
+                    "x2": "300",
+                    "y2": "200"
+                },
+                {
+                    "tag": "line",
+                    "x1": "200",
+                    "y1": "0",
+                    "x2": "200",
+                    "y2": "300"
+                },
+                {
+                    "tag": "circle",
+                    "cx": "50",
+                    "cy": "50",
+                    "r": "33",
+                    "fill": "blue"
+                }
+            ],
+            "player": 2
+        };
+        if(!svgFieldsList.width || !svgFieldsList.height || !svgFieldsList.content || !svgFieldsList.content[0].content){
+            return alert("Cannot generate SVG");
+        }
+        let svg = `<svg width=${svgFieldsList.width} height=${svgFieldsList.height} onClick=test(event)>`;
+        svgFieldsList.content.forEach(item => {
+            switch (item.tag){
+                case "style":
+                    svg += `<style>
+                                ${item.content}
+                            </style>`
+                    break;
+                case "line":
+                    svg += `<line
+                                x1=${item.x1} y1=${item.y1}
+                                x2=${item.x2}  y2=${item.y2}
+                            />`
+                    break;
+                case "circle":
+                    svg += `<circle
+                                cx=${item.cx} cy=${item.cy} r=${item.r} fill="#2c3e50"
+                            />`
+                    break;
+                default:
+                    console.error("Illegal SVG operation")
+            }
+        })
+        svg += `</svg>`
+        document.getElementsByTagName("body")[0].innerHTML = svg;
+        //return svg
+    }
+
+    function test(event){
+        console.log(document.getElementsByTagName("svg")[0].style.left)
+        console.log(Math.ceil(event.clientX / 100) * 100 / 100 - 1)
+        console.log(Math.ceil(event.clientY / 100) * 100 / 100 - 1)
+        alert("Ok");
+    }
+</script>
+</html>

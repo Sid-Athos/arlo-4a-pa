@@ -15,9 +15,10 @@ use crate::service::friend_list_service::FriendListService;
         (status = 200, description = "Friends requests found", body = Vec<UserResponse>),
         (status = 401, description = "Invalid token",),
     ),
-    security(
-        ("api-key" = [])
-    ),
+security(
+("api-key" = []),
+("bearer" = [])
+),
     tag="friend_list"
 )]
 pub async fn show_friend_request(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<Vec<FriendListResponse>>, StatusCode> {
