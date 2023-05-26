@@ -21,14 +21,14 @@ impl Modify for SecurityAddon {
 pub async fn check_api_key<B>(req: Request<B>, next: Next<B>) -> Result<Response, (StatusCode, String)>{
     match req.headers().get("api-key") {
         Some(header) if header != &env::var("API_KEY").unwrap() => {
-            tracing::error!("Invalid api key");
+            tracing::warn!("Invalid api key");
             Err((
                 StatusCode::UNAUTHORIZED,
                 "Incorrect or missing Api Key".to_string(),
             ))
         },
         None => {
-            tracing::error!("Missing api key");
+            tracing::warn!("Missing api key");
             Err((
                 StatusCode::UNAUTHORIZED,
                 "Incorrect or missing Api Key".to_string(),

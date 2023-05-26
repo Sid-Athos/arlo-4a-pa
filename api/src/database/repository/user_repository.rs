@@ -1,7 +1,7 @@
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
-use tracing::debug;
+
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_duplicate_key, database_error_not_found, DatabaseError};
 use crate::database::entity::user_entity::UserEntity;
 use crate::database::mapper::user_entity_mapper::UserEntityMapper;
