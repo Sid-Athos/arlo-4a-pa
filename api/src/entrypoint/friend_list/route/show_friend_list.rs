@@ -7,7 +7,7 @@ use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::user::User;
 
-use crate::entrypoint::friend_list::route::response::friend_list_response::FriendListResponse;
+
 use crate::entrypoint::friend_list::route::response::user_response::UserResponse;
 use crate::service::friend_list_service::FriendListService;
 use crate::service::user_service::UserService;
@@ -20,7 +20,8 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
     ),
     security(
-        ("api-key" = [])
+    ("api-key" = []),
+    ("bearer" = [])
     ),
     tag="friend_list"
 )]

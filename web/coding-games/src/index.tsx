@@ -8,6 +8,8 @@ import MenuIcon from "@suid/icons-material/Menu";
 import {createSignal} from "solid-js";
 // @ts-ignore
 import LoginComponent from "./components/login.jsx";
+// @ts-ignore
+import LobbyComponent from "./components/lobby.jsx";
 const root = document.getElementById('root');
 
 // @ts-ignore
@@ -59,6 +61,7 @@ render(
             <Routes>
                 {/* @ts_ignore */}
                 <Route path={"/"} component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
+                <Route path={"/lobby"} component={<LobbyComponent open={open} setOpen={setOpen}></LobbyComponent>}></Route>
             </Routes>
         </Router>
     </Box>

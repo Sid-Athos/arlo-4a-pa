@@ -8,9 +8,9 @@ import {
 import {createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import UnloggedScreen from "../render/unlogged/unlogged-screen";
-
 import {AxiosInstance} from "../utils/services/axios-instance";
 import {UserService} from "../utils/services/user-service";
+import {useNavigate} from "@solidjs/router";
 
 export default function LoginComponent ({open, setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
@@ -21,21 +21,25 @@ export default function LoginComponent ({open, setOpen})  {
     const [userSignUp, setUserSignUp] = createSignal({email : "", password: "", nickname:""});
     const [userSignUpError, setUserSignUpError] = createSignal(false);
     const [userIsSignedIn, setUserIsSignedIn] = createSignal(false);
-
+    const navigate = useNavigate();
     // @ts-ignore
     async function signIn() {
-        if(userSignIn().nickname.length > 5 && userSignIn().password.length >= 8){
+        if(userSignIn().nickname.length >= 5 && userSignIn().password.length >= 8){
             try {
                 let res = await UserService.signIn(userSignIn());
                 if(res.status === 200){
                     setClientData(res);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
+                    navigate("/lobby")
                 }
             } catch (error) {
+                console.log(error)
                 setUserSignInError(true)
                 setUserSignInErrorMessage("An error occured while connecting")
             }
+        } else {
+            alert("teubé")
         }
     }
 
