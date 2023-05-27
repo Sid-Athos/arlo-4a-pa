@@ -30,14 +30,11 @@ use crate::entrypoint::user::route::response::session_response::SessionResponse;
 use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::entrypoint::admin::admin_router::admin_routes;
 use crate::entrypoint::friend_list::friend_list_router::friend_list_routes;
-use crate::entrypoint::game::game_router::game_routes;
 use crate::entrypoint::user::user_router::user_routes;
 use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
-use crate::entrypoint::game::route::request::create_game_request::CreateGameRequest;
-
 use crate::middlewares::swagger_security;
 
 
@@ -58,7 +55,6 @@ async fn main() {
         .nest("/admin", admin_routes(pool.clone()))
         .nest("/ranking", ranking_routes(pool.clone()))
         .nest("/friend_list", friend_list_routes(pool.clone()))
-        .nest("/game", game_routes(pool.clone()))
         .layer(cors);
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
@@ -98,9 +94,7 @@ entrypoint::ranking::route::get_ranking_by_friend::get_ranking_by_friend,
 entrypoint::ranking::route::get_ranking_by_game::get_ranking_by_game_id,
 entrypoint::ranking::route::get_ranking_by_user::get_ranking_by_user_id,
 entrypoint::ranking::route::delete_by_game::delete_by_game,
-entrypoint::ranking::route::delete_by_user::delete_by_user,
-entrypoint::game::route::create::create_game
-
+entrypoint::ranking::route::delete_by_user::delete_by_user
 ),
 modifiers(&SecurityAddon),
 components(
@@ -110,7 +104,6 @@ schemas(LoginRequest),
 schemas(CreateUserRequest),
 schemas(ChangePasswordRequest),
 schemas(UpdateUserRequest),
-schemas(CreateGameRequest),
 
 ),
 )]
