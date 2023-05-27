@@ -7,7 +7,9 @@ class GameResponseMapper {
     return Game(
       id: json['id'],
       name: json['name'],
-      nbPlayer: json['nb_player'],
+      description: json['description'],
+      minPlayers: json['min_players'],
+      maxPlayers: json['max_players']
     );
   }
 }

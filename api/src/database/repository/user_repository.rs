@@ -1,6 +1,7 @@
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
+
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_duplicate_key, database_error_not_found, DatabaseError};
 use crate::database::entity::user_entity::UserEntity;
 use crate::database::mapper::user_entity_mapper::UserEntityMapper;
@@ -32,6 +33,8 @@ impl UserRepository {
 
         Ok(UserEntityMapper::entity_to_domain(result))
     }
+
+
 
     pub async fn get_user_by_pseudo(&self, pseudo: String) -> Result<User, DatabaseError> {
 
@@ -139,6 +142,21 @@ impl UserRepository {
                                 .await
                                 .map_err(database_error_not_found)?;
 
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(UserEntityMapper::entity_to_domain(UserEntity::new(row)));
+        }
+
+        Ok(result)
+    }
+
+    pub async fn get_everyone_but_me(&self, user_id: i32) -> Result<Vec<User>, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+        tracing::info!("lol");
+        let rows = conn.query("SELECT * FROM coding_games.user WHERE id != $1", &[&user_id])
+            .await
+            .map_err(database_error_cannot_get_connection_to_database)?;
         let mut result = Vec::new();
 
         for row in rows {

@@ -12,14 +12,15 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     put,
-    path = "/user/update",
+    path = "/user/",
     responses(
         (status = 200, description = "User found", body = UserResponse),
         (status = 401, description = "Invalid token",),
         (status = 409, description = "Pseudo already used",),
     ),
     security(
-        ("api-key" = [])
+        ("api-key" = []),
+        ("bearer" = [])
     ),
     request_body = UpdateUserRequest,
     tag = "user"

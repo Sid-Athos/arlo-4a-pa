@@ -13,11 +13,15 @@ use crate::service::ranking_service::RankingService;
 
 #[utoipa::path(
     post,
-    path = "/ranking/init",
+    path = "/ranking/",
     request_body = RankingRequest,
     responses(
         (status = 200, description = "Ranking initialised", body = RankingResponse,),
         (status = 409, description = "Ranking already init",),
+    ),
+    security(
+    ("api-key" = []),
+    ("bearer" = [])
     ),
     tag="ranking"
 )]

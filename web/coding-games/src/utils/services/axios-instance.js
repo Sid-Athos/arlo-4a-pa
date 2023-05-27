@@ -13,6 +13,7 @@ const setAuthorizationHeader = (token) => {
         conf.headers.setAuthorization(token)
         return conf
     })
+
 }
 
 export const AxiosInstance = {

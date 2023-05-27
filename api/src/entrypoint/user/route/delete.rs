@@ -10,14 +10,15 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     delete,
-    path = "/user/delete",
+    path = "/user/",
     responses(
         (status = 200, description = "User deleted", body = UserResponse),
         (status = 401, description = "Invalid token",),
     ),
-    security(
-        ("api-key" = [])
-    ),
+security(
+("api-key" = []),
+("bearer" = [])
+),
     tag="user"
 )]
 pub async fn delete_user(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<UserResponse>, StatusCode> {

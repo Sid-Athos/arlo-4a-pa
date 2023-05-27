@@ -3,12 +3,16 @@ class Game {
 
   int id;
   String name;
-  int nbPlayer;
+  String? description;
+  int minPlayers;
+  int maxPlayers;
 
   Game({
     required this.id,
     required this.name,
-    required this.nbPlayer,
+    required this.description,
+    required this.minPlayers,
+    required this.maxPlayers
   });
 
 }

@@ -97,7 +97,7 @@ impl LobbyService {
 
         let game = self.game_repository.get_by_id(lobby.game_id).await.map_err(database_error_to_response_error)?;
 
-        if game.nb_player <= self.lobby_member_repository.get_by_lobby_id(lobby_id).await.map_err(database_error_to_response_error)?.len() as i32 {
+        if game.max_players <= self.lobby_member_repository.get_by_lobby_id(lobby_id).await.map_err(database_error_to_response_error)?.len() as i32 {
             return Err("Lobby is full".to_string());
         }
 
