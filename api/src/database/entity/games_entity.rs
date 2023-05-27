@@ -2,6 +2,7 @@ use tokio_postgres::Row;
 
 pub struct GamesEntity {
     pub id: i32,
+    pub name: String,
     pub min_players: i32,
     pub max_players: i32,
     pub description : String,
@@ -12,6 +13,7 @@ impl GamesEntity {
     pub fn new(row: Row) -> Self {
         GamesEntity {
             id: row.get("id"),
+            name: row.get("name"),
             min_players: row.get("min_players"),
             max_players: row.get("max_players"),
             description: row.get("description"),

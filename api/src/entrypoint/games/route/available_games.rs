@@ -15,7 +15,7 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
 get,
-path = "/games/search/",
+path = "/games",
 responses(
 (status = 200, description = "Found games"),
 (status = 401, description = "Unauthorized")

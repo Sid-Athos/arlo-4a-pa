@@ -28,7 +28,7 @@ impl GamesRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let rows = conn
-            .query("SELECT * FROM coding_games.games", &[])
+            .query("SELECT * FROM coding_games.game", &[])
             .await
             .map_err(database_error_not_found)?;
 

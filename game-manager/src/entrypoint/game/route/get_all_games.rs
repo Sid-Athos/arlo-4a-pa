@@ -7,7 +7,7 @@ use crate::service::game_service::GameService;
 
 pub async fn get_all_games(State(pool): State<ConnectionPool>) -> Result<Json<Vec<GameResponse>>, StatusCode> {
 
-    let game_service = GameService::new(pool);
+    let game_service = GameS::new(pool);
 
     let games = game_service.get_all_games().await.unwrap();
 

@@ -11,6 +11,7 @@ import UnloggedScreen from "../render/unlogged/unlogged-screen";
 import {AxiosInstance} from "../utils/services/axios-instance";
 import {UserService} from "../utils/services/user-service";
 import {useNavigate} from "@solidjs/router";
+import {getUser} from "./user-provider";
 
 export default function LoginComponent ({open, setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
@@ -22,6 +23,7 @@ export default function LoginComponent ({open, setOpen})  {
     const [userSignUpError, setUserSignUpError] = createSignal(false);
     const [userIsSignedIn, setUserIsSignedIn] = createSignal(false);
     const navigate = useNavigate();
+    const [userToken, { updateToken }] = getUser();
     // @ts-ignore
     async function signIn() {
         if(userSignIn().nickname.length >= 5 && userSignIn().password.length >= 8){
@@ -31,10 +33,10 @@ export default function LoginComponent ({open, setOpen})  {
                     setClientData(res);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
-                    navigate("/lobby")
+                    navigate("/lobby",{token: res.data.token})
+                    handleClose();
                 }
             } catch (error) {
-                console.log(error)
                 setUserSignInError(true)
                 setUserSignInErrorMessage("An error occured while connecting")
             }
@@ -47,8 +49,8 @@ export default function LoginComponent ({open, setOpen})  {
         let userInfo = {...user}
         userInfo.nickname = userSignIn().nickname
         userInfo.token = "Bearer " + response.data.token
-        AxiosInstance.updateAuthorizationHeader(userInfo.token)
-        setUser(userInfo);
+
+        updateToken(userInfo.token)
     }
 
 
@@ -61,6 +63,8 @@ export default function LoginComponent ({open, setOpen})  {
                     setClientData(userCreated);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
+                    navigate("/lobby")
+                    handleClose();
                 }
             } catch (error) {
                 setUserSignUpError(!userSignUpError())

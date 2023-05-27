@@ -5,13 +5,14 @@ import './index.css';
 import {Router, Route, Routes} from "@solidjs/router";
 import {AppBar, Box, Button, Divider, IconButton, Stack, Toolbar, Typography} from "@suid/material";
 import MenuIcon from "@suid/icons-material/Menu";
-import {createSignal} from "solid-js";
+import {createContext, createSignal} from "solid-js";
 // @ts-ignore
 import LoginComponent from "./components/login.jsx";
 // @ts-ignore
 import LobbyComponent from "./components/lobby.jsx";
 const root = document.getElementById('root');
-
+// @ts-ignore
+import { UserProvider  } from "./components/user-provider";
 // @ts-ignore
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
     throw new Error(
@@ -21,8 +22,11 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 const handleOpen = () => setOpen(true);
 const [open, setOpen] = createSignal(false);
 
+
+
 render(
     () => (
+
         <Box>
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="sticky" sx={{backgroundColor:'#282c34'}}>
@@ -57,6 +61,7 @@ render(
                     </Toolbar>
                 </AppBar>
             </Box>
+    <UserProvider token={""}>
         <Router>
             <Routes>
                 {/* @ts_ignore */}
@@ -64,5 +69,7 @@ render(
                 <Route path={"/lobby"} component={<LobbyComponent open={open} setOpen={setOpen}></LobbyComponent>}></Route>
             </Routes>
         </Router>
+
+    </UserProvider>
     </Box>
     ), root!);
