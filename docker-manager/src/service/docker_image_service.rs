@@ -7,51 +7,11 @@ use crate::service::command::build_image_command::BuildImageCommand;
 use futures::StreamExt;
 
 
+
 pub struct DockerImageService {
     pub docker: Docker,
 }
 
-#[derive(Parser)]
-pub struct Opts {
-    #[command(subcommand)]
-    subcmd: Cmd,
-}
-
-#[derive(Parser)]
-enum Cmd {
-    /// Build an image.
-    Build {
-        /// A path to the directory containing Dockerfile for the image.
-        path: PathBuf,
-        #[arg(default_value = "latest")]
-        tag: String,
-        language: String,
-    },
-    /// Delete an image.
-    Delete {
-        image: String,
-        #[arg(short, long)]
-        force: bool,
-        #[arg(long)]
-        noprune: bool,
-    },
-    /// Pull an image from image registry.
-    Pull {
-        /// The name or id of the image to pull.
-        image: String,
-        /// Username in case authentication is required.
-        username: Option<String>,
-        /// Password in case authentication is required.
-        password: Option<String>,
-    },
-    Tag {
-        /// Repository containing the image to tag.
-        repo: String,
-        /// The name or id of the image to tag.
-        image: String,
-        tag: String,
-    },
-}
 
 impl DockerImageService {
     #[cfg(not(unix))]
