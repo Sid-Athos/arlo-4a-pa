@@ -24,7 +24,7 @@ use crate::service::user_service::UserService;
     ),
     tag="friend_list"
 )]
-pub async fn show_friend_list(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
+pub async fn show_friend_list(State(pool): State<ConnectionPool>, Extension(user): Extension<User>) -> Result<Json<Vec<FriendListResponse>>, StatusCode> {
     let friend_list_service = FriendListService::new(
         FriendListRepository::new(pool.clone()),
     );
@@ -35,14 +35,12 @@ pub async fn show_friend_list(State(pool): State<ConnectionPool>, Extension(user
 
     let result = friend_list_service.get_all_friends(user.id).await?;
 
-    let mut users = Vec::new();
+    let mut responses = Vec::new();
     for friend in &result {
-        if friend.applicant_id == user.id {
-            users.push(UserResponse::from_domain(user_service.get_user_by_id(friend.recipient_id).await?));
-        } else {
-            users.push(UserResponse::from_domain(user_service.get_user_by_id(friend.applicant_id).await?));
-        }
+        let applicant = UserResponse::from_domain(user_service.get_user_by_id(friend.recipient_id).await?);
+        let recipient = UserResponse::from_domain(user_service.get_user_by_id(friend.applicant_id).await?);
+        responses.push(FriendListResponse::from_domain(friend.clone(), applicant, recipient))
     }
 
-    Ok(Json(users))
+    Ok(Json(responses))
 }

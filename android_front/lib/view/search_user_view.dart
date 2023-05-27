@@ -124,7 +124,7 @@ class UserCardWidget extends StatelessWidget {
                           ApiUser.sendFriendRequest(sendFriendRequestRequest);
                         },
                         icon: const Icon(
-                            Icons.add,
+                            Icons.send,
                             color: Colors.white
                         ),
                       ),

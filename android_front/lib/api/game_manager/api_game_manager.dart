@@ -12,10 +12,13 @@ class ApiGameManager {
   static const String baseURL = "https://dev.mikusupremacy.fr/gamemanager";
   static final dio = Dio();
 
-  static WebSocketChannel openWebSocketConnection(String token) {
-    final headers = {'Authorization': 'Bearer $token'};
-    final channel = IOWebSocketChannel.connect('$baseURLWS/ws', headers: headers);
-    return channel;
+  static WebSocketChannel? openWebSocketConnection(String token) {
+    try {
+      final headers = {'Authorization': 'Bearer $token'};
+      return IOWebSocketChannel.connect('$baseURLWS/ws', headers: headers);
+    } catch (e) {
+      return null;
+    }
   }
 
   static Future<List<Game>> getAllGames() async {

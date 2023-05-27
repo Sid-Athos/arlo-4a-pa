@@ -2,17 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
 import 'package:miku/model/user_model.dart';
+import 'package:miku/view/friend_request_list_view.dart';
 import 'package:miku/view/search_user_view.dart';
 
 class FriendListView extends StatefulWidget {
-  const FriendListView({super.key});
+  FriendListView({super.key, required this.user});
+
+  User user;
 
   @override
-  _FriendListViewState createState() => _FriendListViewState();
+  _FriendListViewState createState() => _FriendListViewState(user: user);
 }
 
 class _FriendListViewState extends State<FriendListView> {
+  _FriendListViewState({required this.user});
 
+  User user;
   late Future<List<User>> users;
 
   @override
@@ -43,6 +48,20 @@ class _FriendListViewState extends State<FriendListView> {
                   size: 32.0,
                 ),
               )),
+          Padding(
+              padding: const EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FriendRequestListScreen(user: user)),
+                  );
+                },
+                child: const Icon(
+                  Icons.mail,
+                  size: 32.0,
+                ),
+              )),
         ],
       ),
       backgroundColor: Color(0xFF21262B),
@@ -60,33 +79,34 @@ class _FriendListViewState extends State<FriendListView> {
                 return ListView.builder(
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
-                    return FriendCardWidget(
-                        user: snapshot.data![index]
-                    );
+                    return buildFriendCardWidget(snapshot.data![index]);
                   },
                 );
               } else if (snapshot.hasError) {
                 return Text("${snapshot.error}");
               } else if (snapshot.hasData && snapshot.data!.length == 0) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Icon(
-                        Icons.no_accounts,
-                        color: Colors.white,
-                        size: 48,
+                return SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Icon(
+                          Icons.no_accounts,
+                          color: Colors.white,
+                          size: 48,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "No Friends",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                      Text(
+                        "No Friends",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               }
               return CircularProgressIndicator();
@@ -96,20 +116,12 @@ class _FriendListViewState extends State<FriendListView> {
       ),
     );
   }
-}
 
-class FriendCardWidget extends StatelessWidget {
-  FriendCardWidget({super.key, required this.user});
-
-  User user;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildFriendCardWidget(User use) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: InkWell(
         onTap: () {
-
         },
         child: Card(
           shape: RoundedRectangleBorder(
@@ -138,10 +150,13 @@ class FriendCardWidget extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             ApiUser.deleteFriend(user.id);
+                            setState(() {
+                              users = ApiUser.getFriendList();
+                            });
                           },
                           icon: const Icon(
-                            Icons.close,
-                            color: Colors.white
+                              Icons.close,
+                              color: Colors.white
                           ),
                         ),
                       ],
