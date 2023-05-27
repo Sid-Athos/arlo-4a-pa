@@ -27,9 +27,9 @@ impl FriendListService {
         let exist = self.friend_list_repository.get_friend_list_request_by_users(applicant_id, recipient_id).await.map_err(database_error_to_status_code);
 
         return if exist.is_ok() {
-            if exist?.recipient_id == applicant_id && exist?.accepted == false {
-                self.friend_list_repository.accept_friend_list_request(exist.unwrap().id,applicant_id).await.map_err(database_error_to_status_code)
-            }
+            if exist.clone()?.recipient_id == applicant_id && exist.clone()?.accepted == false {
+                return self.friend_list_repository.accept_friend_list_request(exist?.id,applicant_id).await.map_err(database_error_to_status_code)
+            };
             Err(StatusCode::BAD_REQUEST)
         } else {
             self.friend_list_repository.create_friend_list_request(recipient_id, applicant_id).await.map_err(database_error_to_status_code)
