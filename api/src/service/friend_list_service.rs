@@ -20,10 +20,17 @@ impl FriendListService {
     }
 
     pub async fn create_friend_request(&self, recipient_id: i32, applicant_id: i32) -> Result<FriendList, StatusCode> {
+        if recipient_id == applicant_id {
+            return Err(StatusCode::BAD_REQUEST);
+        }
+
         let exist = self.friend_list_repository.get_friend_list_request_by_users(applicant_id, recipient_id).await.map_err(database_error_to_status_code);
 
         return if exist.is_ok() {
-            self.friend_list_repository.accept_friend_list_request(exist.unwrap().id,applicant_id).await.map_err(database_error_to_status_code)
+            if exist?.recipient_id == applicant_id && exist?.accepted == false {
+                self.friend_list_repository.accept_friend_list_request(exist.unwrap().id,applicant_id).await.map_err(database_error_to_status_code)
+            }
+            Err(StatusCode::BAD_REQUEST)
         } else {
             self.friend_list_repository.create_friend_list_request(recipient_id, applicant_id).await.map_err(database_error_to_status_code)
         }
