@@ -2,7 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:miku/api/user/request/change_password_request.dart';
 import 'package:miku/api/user/request/create_user_request.dart';
 import 'package:miku/api/user/request/login_request.dart';
+import 'package:miku/api/user/request/send_friend_request_request.dart';
 import 'package:miku/api/user/request/update_user_request.dart';
+import 'package:miku/model/friend_list_model.dart';
+import 'package:miku/model/mapper/friend_list_response_mapper.dart';
 import 'package:miku/model/mapper/user_response_mapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
@@ -28,7 +31,7 @@ class ApiUser {
   static Future<User?> createUser(CreateUserRequest createUserRequest) async {
     try {
       dio.options.headers["api-key"] = "coding_games";
-      final response = await dio.post('$baseURL/user/', data: createUserRequest.toJson());
+      final response = await dio.post('$baseURL/user', data: createUserRequest.toJson());
       return UserResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
@@ -47,10 +50,11 @@ class ApiUser {
     }
   }
 
-  static Future<Session?> logout(String token) async {
+  static Future<Session?> logout() async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
-      dio.options.headers["Authorization"] = "Bearer $token";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
       final response = await dio.post('$baseURL/user/logout');
       return SessionResponseMapper.fromJson(response.data);
     } catch (e) {
@@ -107,15 +111,15 @@ class ApiUser {
     }
   }
 
-  static Future<List<User>?> search(String searched) async {
+  static Future<List<User>> search(String searched) async {
     try {
       dio.options.headers["api-key"] = "coding_games";
-      final response = await dio.get('$baseURL/user/search?pseudo=$searched');
+      final response = await dio.get('$baseURL/user/search/$searched');
       final data = response.data as List<dynamic>;
       return data.map((json) => UserResponseMapper.fromJson(json)).toList();
     } catch (e) {
       developer.log(e.toString());
-      return null;
+      return [];
     }
   }
 
@@ -124,12 +128,70 @@ class ApiUser {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.get('$baseURL/friend_list/');
+      final response = await dio.get('$baseURL/friend_list');
       final data = response.data as List<dynamic>;
       return data.map((json) => UserResponseMapper.fromJson(json)).toList();
     } catch (e) {
       developer.log(e.toString());
       return [];
+    }
+  }
+
+  static Future<User?> deleteFriend(int user_id) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.delete('$baseURL/friend_list/$user_id');
+      return UserResponseMapper.fromJson(response.data);
+    } catch (e) {
+      developer.log(e.toString());
+      return null;
+    }
+  }
+
+  static Future<FriendList?> sendFriendRequest(SendFriendRequestRequest sendFriendRequestRequest) async {
+    try {
+      dio.options.headers["api-key"] = "coding_games";
+      final response = await dio.post('$baseURL/friend_list', data: sendFriendRequestRequest.toJson());
+      return FriendListResponseMapper.fromJson(response.data);
+    } catch (e) {
+      developer.log(e.toString());
+      return null;
+    }
+  }
+
+  static Future<List<FriendList>> getAllUnacceptedRequest() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.get('$baseURL/friend_list/requests');
+      final data = response.data as List<dynamic>;
+      var friendsRequest = data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
+      var friendsRequestWithUser = <FriendList>[];
+      for (var friendRequest in friendsRequest) {
+        friendRequest.recipient = await getById(friendRequest.recipientId);
+        friendRequest.applicant = await getById(friendRequest.applicantId);
+        friendsRequestWithUser.add(friendRequest);
+      }
+      return friendsRequestWithUser;
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
+    }
+  }
+
+  static Future<User?> acceptFriendRequest(int requestId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.put('$baseURL/friend_list/$requestId');
+      return UserResponseMapper.fromJson(response.data);
+    } catch (e) {
+      developer.log(e.toString());
+      return null;
     }
   }
 

@@ -93,7 +93,7 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[0],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => const FriendListView(),
+              builder: (context) => FriendListView(user: user),
             );
           }
       ),

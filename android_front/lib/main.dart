@@ -14,10 +14,19 @@ Future<void> main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.containsKey('login_token')) {
-    WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
-    User user = (await ApiUser.me(prefs.getString('login_token')!))!;
-    //runApp(const AppUnLogged());
-    runApp(AppLogged(channel: channel, user: user));
+    WebSocketChannel? channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+    if (channel == null) {
+      prefs.remove('login_token');
+      runApp(const AppUnLogged());
+    } else {
+      User? user = await ApiUser.me(prefs.getString('login_token')!);
+      if (user == null) {
+        prefs.remove('login_token');
+        runApp(const AppUnLogged());
+      } else {
+        runApp(AppLogged(channel: channel, user: user));
+      }
+    }
   } else {
     runApp(const AppUnLogged());
   }

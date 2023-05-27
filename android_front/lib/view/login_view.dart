@@ -34,12 +34,18 @@ class _LoginPageState extends State<LoginPage> {
       final session = await ApiUser.login(loginRequest);
       if (session != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+        prefs.setString("login_token", session.token);
+        WebSocketChannel? channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+        if (channel == null) {
+          prefs.remove('login_token');
+          wrongCredentials();
+          return;
+        }
         User user = (await ApiUser.me(prefs.getString('login_token')!))!;
         Navigator.pop(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeView(channel: channel, user: user)),
+          MaterialPageRoute(builder: (context) => HomeView(channel: channel!, user: user)),
         );
       } else {
         wrongCredentials();
