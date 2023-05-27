@@ -12,6 +12,7 @@ impl GameEntityMapper {
             description: game_entity.description,
             min_players: game_entity.min_players,
             max_players: game_entity.max_players,
+            language : game_entity.language
         }
     }
 }

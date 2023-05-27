@@ -47,4 +47,17 @@ impl GameRepository {
 
         Ok(result)
     }
+
+    pub async fn create(&self, name : String, min_players: i32, max_players : i32, description : String , language : String, user_id : i32) -> Result<Game, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = GameEntity::new(row);
+
+        Ok(GameEntityMapper::entity_to_domain(result))
+    }
 }

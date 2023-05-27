@@ -6,6 +6,7 @@ pub struct GameEntity {
     pub description: Option<String>,
     pub min_players: i32,
     pub max_players: i32,
+    pub language : String
 }
 
 impl GameEntity {
@@ -16,6 +17,7 @@ impl GameEntity {
             description: row.get("description"),
             min_players: row.get("min_players"),
             max_players: row.get("max_players"),
+            language: row.get("language")
         }
     }
 }

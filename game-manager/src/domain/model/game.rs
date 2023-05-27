@@ -7,4 +7,5 @@ pub struct Game {
     pub description: Option<String>,
     pub min_players: i32,
     pub max_players: i32,
+    pub language: String
 }
