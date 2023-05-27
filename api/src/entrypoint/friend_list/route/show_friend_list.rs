@@ -6,6 +6,7 @@ use crate::database::repository::friend_list_repository::FriendListRepository;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
 use crate::domain::model::user::User;
+use crate::entrypoint::friend_list::route::response::friend_list_response::FriendListResponse;
 
 
 use crate::entrypoint::friend_list::route::response::user_response::UserResponse;
