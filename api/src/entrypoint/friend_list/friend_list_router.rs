@@ -16,11 +16,11 @@ use crate::middlewares::swagger_security::check_api_key;
 pub fn friend_list_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/", post(friend_list_create))
-        .route("/:friend_list_id", delete(delete_friend))
-        .route("/:friend_list_id", put(accept_friend_request))
-        .route("/", get(show_friend_list))
-        .route("/requests", get(show_friend_request))
+        .route("/friend_list", post(friend_list_create))
+        .route("/friend_list/:friend_list_id", delete(delete_friend))
+        .route("/friend_list/:friend_list_id", put(accept_friend_request))
+        .route("/friend_list", get(show_friend_list))
+        .route("/friend_list/requests", get(show_friend_request))
         .layer(middleware::from_fn(check_api_key))
         .layer(middleware::from_fn_with_state(pool.clone(), is_logged))
         .with_state(pool)
