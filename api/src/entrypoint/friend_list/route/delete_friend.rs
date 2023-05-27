@@ -34,8 +34,7 @@ pub async fn delete_friend(State(pool): State<ConnectionPool>, Extension(user): 
         SessionRepository::new(pool.clone()),
     );
 
-    let friend_request = friend_list_service.get_request(user.id, friend_list_id).await?;
-    let result = friend_list_service.delete_friend(friend_request.id,user.id).await?;
+    let result = friend_list_service.delete_friend(friend_list_id,user.id).await?;
 
     let applicant = UserResponse::from_domain(user_service.get_user_by_id(result.recipient_id).await?);
     let recipient = UserResponse::from_domain(user_service.get_user_by_id(result.applicant_id).await?);
