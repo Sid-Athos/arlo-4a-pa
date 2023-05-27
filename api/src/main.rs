@@ -11,6 +11,7 @@ use std::net::SocketAddr;
 
 
 use dotenv::dotenv;
+use tower_http::cors::CorsLayer;
 
 
 use utoipa::{ OpenApi};
@@ -30,6 +31,7 @@ use crate::entrypoint::user::route::response::session_response::SessionResponse;
 use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::entrypoint::admin::admin_router::admin_routes;
 use crate::entrypoint::friend_list::friend_list_router::friend_list_routes;
+use crate::entrypoint::games::games_router::games_routes;
 use crate::entrypoint::user::user_router::user_routes;
 use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
@@ -51,11 +53,12 @@ async fn main() {
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .nest("/user", user_routes(pool.clone()))
-        .nest("/admin", admin_routes(pool.clone()))
-        .nest("/ranking", ranking_routes(pool.clone()))
-        .nest("/friend_list", friend_list_routes(pool.clone()))
-        .layer(cors);
+        .merge( user_routes(pool.clone()))
+        .merge( admin_routes(pool.clone()))
+        .merge( ranking_routes(pool.clone()))
+        .merge(friend_list_routes(pool.clone()))
+        .merge(games_routes(pool.clone()))
+        .layer(CorsLayer::permissive());
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
@@ -74,7 +77,9 @@ entrypoint::user::route::login::user_login,
 entrypoint::user::route::logout::user_logout,
 entrypoint::user::route::add_experience::add_experience,
 entrypoint::user::route::me::me,
-entrypoint::user::route::search::search,
+entrypoint::games::route::available_games::get_available_games,
+entrypoint::user::route::search::search_user,
+entrypoint::user::route::search::get_other_players,
 entrypoint::user::route::delete::delete_user,
 entrypoint::user::route::update::update_user,
 entrypoint::user::route::change_password::change_password,

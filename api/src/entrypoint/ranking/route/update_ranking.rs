@@ -21,6 +21,10 @@ use crate::service::ranking_service::RankingService;
     responses(
         (status = 200, description = "Ranking updated", body = RankingResponse,),
     ),
+    security(
+    ("api-key" = []),
+    ("bearer" = [])
+    ),
     tag="ranking"
 )]
 pub async fn update_ranking(State(pool): State<ConnectionPool>, Json(ranking): Json<UpdateRankingRequest>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {

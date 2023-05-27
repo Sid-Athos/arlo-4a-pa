@@ -19,9 +19,10 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
         (status = 404, description = "User not found",),
     ),
-    security(
-        ("api-key" = [])
-    ),
+security(
+("api-key" = []),
+("bearer" = [])
+),
     tag = "admin"
 )]
 pub async fn delete_user(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {

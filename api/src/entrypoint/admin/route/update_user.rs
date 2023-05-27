@@ -21,7 +21,8 @@ use crate::service::user_service::UserService;
         (status = 409, description = "Pseudo already used",),
     ),
     security(
-        ("api-key" = [])
+    ("api-key" = []),
+    ("bearer" = [])
     ),
     request_body = UpdateUserRequest,
     tag="admin"
