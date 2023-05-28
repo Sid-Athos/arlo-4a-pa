@@ -123,27 +123,27 @@ class ApiUser {
     }
   }
 
-  static Future<List<User>> getFriendList() async {
+  static Future<List<FriendList>> getFriendList() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
       final response = await dio.get('$baseURL/friend_list');
       final data = response.data as List<dynamic>;
-      return data.map((json) => UserResponseMapper.fromJson(json)).toList();
+      return data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
     } catch (e) {
       developer.log(e.toString());
       return [];
     }
   }
 
-  static Future<User?> deleteFriend(int user_id) async {
+  static Future<FriendList?> deleteFriend(int user_id) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
       final response = await dio.delete('$baseURL/friend_list/$user_id');
-      return UserResponseMapper.fromJson(response.data);
+      return FriendListResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
       return null;
@@ -161,21 +161,21 @@ class ApiUser {
     }
   }
 
-  static Future<List<FriendList>> getAllUnacceptedRequest() async {
+  static Future<List<FriendList>> getAllUnacceptedRequest(int userId) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
       final response = await dio.get('$baseURL/friend_list/requests');
       final data = response.data as List<dynamic>;
-      var friendsRequest = data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
-      var friendsRequestWithUser = <FriendList>[];
-      for (var friendRequest in friendsRequest) {
-        friendRequest.recipient = await getById(friendRequest.recipientId);
-        friendRequest.applicant = await getById(friendRequest.applicantId);
-        friendsRequestWithUser.add(friendRequest);
+      List<FriendList> friendsRequest =  data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
+      List<FriendList> friendsRequestFiltered = [];
+      for (FriendList friend in friendsRequest) {
+        if (friend.recipientId == userId) {
+          friendsRequestFiltered.add(friend);
+        }
       }
-      return friendsRequestWithUser;
+      return friendsRequestFiltered;
     } catch (e) {
       developer.log(e.toString());
       return [];

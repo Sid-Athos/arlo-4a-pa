@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
+import 'package:miku/model/friend_list_model.dart';
 import 'package:miku/model/user_model.dart';
 import 'package:miku/view/friend_request_list_view.dart';
+import 'package:miku/view/profile_other_view.dart';
 import 'package:miku/view/search_user_view.dart';
 
 class FriendListView extends StatefulWidget {
@@ -18,14 +20,14 @@ class _FriendListViewState extends State<FriendListView> {
   _FriendListViewState({required this.user});
 
   User user;
-  late Future<List<User>> users;
+  late Future<List<FriendList>> users;
 
   @override
   void initState() {
     super.initState();
     users = ApiUser.getFriendList();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +42,11 @@ class _FriendListViewState extends State<FriendListView> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SearchUserView()),
-                  );
+                    MaterialPageRoute(
+                        builder: (context) => SearchUserView(user: user)),
+                  ).then((_) => setState(() {
+                        users = ApiUser.getFriendList();
+                      }));
                 },
                 child: const Icon(
                   Icons.search,
@@ -54,8 +59,12 @@ class _FriendListViewState extends State<FriendListView> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => FriendRequestListScreen(user: user)),
-                  );
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            FriendRequestListScreen(user: user)),
+                  ).then((_) => setState(() {
+                        users = ApiUser.getFriendList();
+                      }));
                 },
                 child: const Icon(
                   Icons.mail,
@@ -64,7 +73,7 @@ class _FriendListViewState extends State<FriendListView> {
               )),
         ],
       ),
-      backgroundColor: Color(0xFF21262B),
+      backgroundColor: const Color(0xFF21262B),
       body: Center(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -72,7 +81,7 @@ class _FriendListViewState extends State<FriendListView> {
               users = ApiUser.getFriendList();
             });
           },
-          child: FutureBuilder<List<User>>(
+          child: FutureBuilder<List<FriendList>>(
             future: users,
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data!.length > 0) {
@@ -117,11 +126,19 @@ class _FriendListViewState extends State<FriendListView> {
     );
   }
 
-  Widget buildFriendCardWidget(User use) {
+  Widget buildFriendCardWidget(FriendList friendList) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: InkWell(
         onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfileOtherView(
+                    user: friendList.applicantId == user.id
+                        ? friendList.recipient
+                        : friendList.applicant)),
+          );
         },
         child: Card(
           shape: RoundedRectangleBorder(
@@ -130,7 +147,7 @@ class _FriendListViewState extends State<FriendListView> {
           color: const Color(0xFF1A2025),
           child: Padding(
             padding:
-            const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
+                const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -140,24 +157,23 @@ class _FriendListViewState extends State<FriendListView> {
                     Flexible(
                       child: ListTile(
                         title: Text(
-                          user.pseudo,
-                          style: TextStyle(color: Colors.white),
+                          friendList.applicantId == user.id
+                              ? friendList.recipient.pseudo
+                              : friendList.applicant.pseudo,
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
                     Row(
                       children: <Widget>[
                         IconButton(
-                          onPressed: () {
-                            ApiUser.deleteFriend(user.id);
+                          onPressed: () async {
+                            await ApiUser.deleteFriend(friendList.id);
                             setState(() {
                               users = ApiUser.getFriendList();
                             });
                           },
-                          icon: const Icon(
-                              Icons.close,
-                              color: Colors.white
-                          ),
+                          icon: const Icon(Icons.close, color: Colors.white),
                         ),
                       ],
                     ),
@@ -171,4 +187,3 @@ class _FriendListViewState extends State<FriendListView> {
     );
   }
 }
-

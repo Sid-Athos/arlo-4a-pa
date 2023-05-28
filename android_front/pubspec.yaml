@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  percent_indicator: ^4.0.1
   provider: ^6.0.0
   dio: ^5.0.1
   shared_preferences: ^2.1.0
