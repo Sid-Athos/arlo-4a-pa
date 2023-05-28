@@ -52,7 +52,7 @@ impl UserRepository {
 
     pub async fn create_user(&self, user: CreateUserCommand) -> Result<User, DatabaseError> {
         tracing::info!("Creating user {:?}", user);
-        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+        let conn = selfLvL.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
             .query_one("INSERT INTO coding_games.user (pseudo, email, password) VALUES ($1, $2, $3) RETURNING *", &[&user.pseudo, &user.email, &user.password])
