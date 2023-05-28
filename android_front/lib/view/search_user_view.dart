@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/request/send_friend_request_request.dart';
 import 'package:miku/model/friend_list_model.dart';
+import 'package:miku/view/profile_other_view.dart';
 import 'dart:developer' as developer;
 
 import '../api/user/api_user.dart';
@@ -117,42 +118,52 @@ class UserCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: const Color(0xFF1A2025),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Row(
-                children: [
-                  Flexible(
-                    child: ListTile(
-                      title: Text(
-                        user.pseudo,
-                        style: const TextStyle(color: Colors.white),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfileOtherView(user: user)),
+          );
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          color: const Color(0xFF1A2025),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Row(
+                  children: [
+                    Flexible(
+                      child: ListTile(
+                        title: Text(
+                          user.pseudo,
+                          style: const TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      IconButton(
-                        onPressed: () {
-                          SendFriendRequestRequest sendFriendRequestRequest =
-                              SendFriendRequestRequest(recipientId: user.id);
-                          ApiUser.sendFriendRequest(sendFriendRequestRequest);
-                        },
-                        icon: const Icon(Icons.send, color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+                    Row(
+                      children: <Widget>[
+                        IconButton(
+                          onPressed: () {
+                            SendFriendRequestRequest sendFriendRequestRequest =
+                                SendFriendRequestRequest(recipientId: user.id);
+                            ApiUser.sendFriendRequest(sendFriendRequestRequest);
+                          },
+                          icon: const Icon(Icons.send, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
