@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
+import 'package:miku/model/friend_list_model.dart';
 import 'package:miku/model/user_model.dart';
 import 'package:miku/view/friend_request_list_view.dart';
 import 'package:miku/view/search_user_view.dart';
@@ -18,7 +19,7 @@ class _FriendListViewState extends State<FriendListView> {
   _FriendListViewState({required this.user});
 
   User user;
-  late Future<List<User>> users;
+  late Future<List<FriendList>> users;
 
   @override
   void initState() {
@@ -40,7 +41,11 @@ class _FriendListViewState extends State<FriendListView> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SearchUserView()),
+                    MaterialPageRoute(builder: (context) => SearchUserView(user: user)),
+                  ).then((_) =>
+                    setState(() {
+                      users = ApiUser.getFriendList();
+                    })
                   );
                 },
                 child: const Icon(
@@ -55,6 +60,10 @@ class _FriendListViewState extends State<FriendListView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => FriendRequestListScreen(user: user)),
+                  ).then((_) =>
+                      setState(() {
+                        users = ApiUser.getFriendList();
+                      })
                   );
                 },
                 child: const Icon(
@@ -64,7 +73,7 @@ class _FriendListViewState extends State<FriendListView> {
               )),
         ],
       ),
-      backgroundColor: Color(0xFF21262B),
+      backgroundColor: const Color(0xFF21262B),
       body: Center(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -72,7 +81,7 @@ class _FriendListViewState extends State<FriendListView> {
               users = ApiUser.getFriendList();
             });
           },
-          child: FutureBuilder<List<User>>(
+          child: FutureBuilder<List<FriendList>>(
             future: users,
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data!.length > 0) {
@@ -117,7 +126,7 @@ class _FriendListViewState extends State<FriendListView> {
     );
   }
 
-  Widget buildFriendCardWidget(User use) {
+  Widget buildFriendCardWidget(FriendList friendList) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: InkWell(
@@ -140,8 +149,8 @@ class _FriendListViewState extends State<FriendListView> {
                     Flexible(
                       child: ListTile(
                         title: Text(
-                          user.pseudo,
-                          style: TextStyle(color: Colors.white),
+                          friendList.applicantId == user.id ? friendList.recipient.pseudo : friendList.applicant.pseudo,
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
@@ -149,7 +158,7 @@ class _FriendListViewState extends State<FriendListView> {
                       children: <Widget>[
                         IconButton(
                           onPressed: () {
-                            ApiUser.deleteFriend(user.id);
+                            ApiUser.deleteFriend(friendList.id);
                             setState(() {
                               users = ApiUser.getFriendList();
                             });
