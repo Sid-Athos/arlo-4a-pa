@@ -26,7 +26,7 @@ class _FriendRequestListScreenState extends State<FriendRequestListScreen> {
   @override
   void initState() {
     super.initState();
-    friends = ApiUser.getAllUnacceptedRequest(user.id);
+    friends = ApiUser.getAllUnacceptedRequestWithRecipient(user.id);
   }
 
   @override
@@ -41,7 +41,7 @@ class _FriendRequestListScreenState extends State<FriendRequestListScreen> {
         child: RefreshIndicator(
           onRefresh: () async {
             setState(() {
-              friends = ApiUser.getAllUnacceptedRequest(user.id);
+              friends = ApiUser.getAllUnacceptedRequestWithRecipient(user.id);
             });
           },
           child: FutureBuilder<List<FriendList>>(
@@ -128,7 +128,7 @@ class _FriendRequestListScreenState extends State<FriendRequestListScreen> {
                           onPressed: () {
                             ApiUser.acceptFriendRequest(friendRequest.id);
                             setState(() {
-                              friends = ApiUser.getAllUnacceptedRequest(user.id);
+                              friends = ApiUser.getAllUnacceptedRequestWithRecipient(user.id);
                             });
                           },
                           icon: const Icon(
@@ -138,9 +138,9 @@ class _FriendRequestListScreenState extends State<FriendRequestListScreen> {
                         ),
                         IconButton(
                           onPressed: () {
-                            ApiUser.deleteFriend(friendRequest.applicantId);
+                            ApiUser.deleteFriend(friendRequest.id);
                             setState(() {
-                              friends = ApiUser.getAllUnacceptedRequest(user.id);
+                              friends = ApiUser.getAllUnacceptedRequestWithRecipient(user.id);
                             });
                           },
                           icon: const Icon(
