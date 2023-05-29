@@ -50,7 +50,7 @@ class _LobbyViewState extends State<LobbyView> {
           children: <Widget>[
             Expanded(
               child: ListView.builder(
-                itemCount: lobby.members.length < 1 ? lobby.members.length + 1 : lobby.members.length,
+                itemCount: lobby.members.length < lobby.game.maxPlayers ? lobby.members.length + 1 : lobby.members.length,
                 itemBuilder: (context, index) {
                   return (index < lobby.members.length)
                       ? LobbyMemberCardWidget(
