@@ -161,7 +161,28 @@ class ApiUser {
     }
   }
 
-  static Future<List<FriendList>> getAllUnacceptedRequest(int userId) async {
+  static Future<List<FriendList>> getAllUnacceptedRequestWithApplicant(int userId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.get('$baseURL/friend_list/requests');
+      final data = response.data as List<dynamic>;
+      List<FriendList> friendsRequest =  data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
+      List<FriendList> friendsRequestFiltered = [];
+      for (FriendList friend in friendsRequest) {
+        if (friend.applicantId == userId) {
+          friendsRequestFiltered.add(friend);
+        }
+      }
+      return friendsRequestFiltered;
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
+    }
+  }
+
+  static Future<List<FriendList>> getAllUnacceptedRequestWithRecipient(int userId) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";

@@ -1,6 +1,7 @@
 use axum::Extension;
 use serde::Deserialize;
 use crate::database::init::ConnectionPool;
+use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::invite_response::InviteResponse;
@@ -18,7 +19,7 @@ impl InviteUserLobbyRequest {
 
         let invite_service = InviteService::new(pool);
 
-        let invite = invite_service.create_invite(user.id, self.user_id).await?;
+        let invite = invite_service.create_invite(user.id, self.user_id).await.map_err(status_code_to_string)?;
 
         let invite_response = InviteResponse::from_domain(invite);
 

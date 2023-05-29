@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/user_model.dart';
@@ -49,6 +50,40 @@ class _ProfileOtherViewState extends State<ProfileOtherView> {
                     ),
                   ),
                 ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 32),
+                child: Text(
+                  "Level ${user.level}",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    LinearPercentIndicator(
+                      width: 250.0,
+                      animation: true,
+                      animationDuration: 1000,
+                      lineHeight: 20.0,
+                      percent: user.experience / (user.level * 10),
+                      center: Text(
+                        "${user.experience} / ${user.level * 10}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      linearStrokeCap: LinearStrokeCap.butt,
+                      progressColor: Colors.blueAccent,
+                    ),
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 32, bottom: 32),

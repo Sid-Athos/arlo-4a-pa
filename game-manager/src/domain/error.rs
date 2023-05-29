@@ -15,6 +15,19 @@ pub fn database_error_to_response_error(err: DatabaseError) -> String {
     }
 }
 
+pub fn database_error_to_status_code(err: DatabaseError) -> StatusCode {
+    match err {
+        DatabaseError::NotFound => StatusCode::NOT_FOUND,
+        DatabaseError::DuplicateKey => StatusCode::CONFLICT,
+        DatabaseError::InvalidInput => StatusCode::BAD_REQUEST,
+        DatabaseError::CannotGetConnectionToDatabase => StatusCode::SERVICE_UNAVAILABLE,
+    }
+}
+
+pub fn status_code_to_string(err: StatusCode) -> String {
+    err.to_string()
+}
+
 pub trait LogError {
     fn log_error(&self);
 }

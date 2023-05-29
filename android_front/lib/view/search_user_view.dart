@@ -21,10 +21,15 @@ class _SearchUserViewState extends State<SearchUserView> {
   _SearchUserViewState({required this.user});
 
   User user;
+  List<FriendList> sentRequest = [];
   final TextEditingController _searchController = TextEditingController();
   Future<List<User>> users = Future(() => []);
 
   Future<List<User>> search(String search) async {
+    List<FriendList> tmp = await ApiUser.getAllUnacceptedRequestWithApplicant(user.id);
+    setState(() {
+      sentRequest = tmp;
+    });
     List<User> users = await ApiUser.search(search);
     List<FriendList> alreadyFriends = await ApiUser.getFriendList();
     List<User> result = [];
@@ -96,7 +101,7 @@ class _SearchUserViewState extends State<SearchUserView> {
                 return ListView.builder(
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
-                    return UserCardWidget(user: snapshot.data![index]);
+                    return userCardWidget(snapshot.data![index]);
                   },
                 );
               } else if (snapshot.hasError) {
@@ -107,15 +112,26 @@ class _SearchUserViewState extends State<SearchUserView> {
           ),
         ));
   }
-}
 
-class UserCardWidget extends StatelessWidget {
-  UserCardWidget({super.key, required this.user});
+  bool isRequested(User friendRequestUser) {
+    for (FriendList request in sentRequest) {
+      if (request.recipientId == friendRequestUser.id) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-  User user;
+  FriendList? getRequested(User friendRequestUser) {
+    for (FriendList request in sentRequest) {
+      if (request.recipientId == friendRequestUser.id) {
+        return request;
+      }
+    }
+    return null;
+  }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget userCardWidget(User friendRequestUser) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: InkWell(
@@ -123,7 +139,7 @@ class UserCardWidget extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfileOtherView(user: user)),
+                builder: (context) => ProfileOtherView(user: friendRequestUser)),
           );
         },
         child: Card(
@@ -133,7 +149,7 @@ class UserCardWidget extends StatelessWidget {
           color: const Color(0xFF1A2025),
           child: Padding(
             padding:
-                const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
+            const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -143,18 +159,25 @@ class UserCardWidget extends StatelessWidget {
                     Flexible(
                       child: ListTile(
                         title: Text(
-                          user.pseudo,
+                          friendRequestUser.pseudo,
                           style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
                     Row(
                       children: <Widget>[
-                        IconButton(
-                          onPressed: () {
+                        isRequested(friendRequestUser) ? IconButton(
+                          onPressed: () async {
+                            await ApiUser.deleteFriend(getRequested(friendRequestUser)!.id);
+                            users = search(_searchController.text);
+                          },
+                          icon: const Icon(Icons.cancel_schedule_send, color: Colors.white),
+                        ): IconButton(
+                          onPressed: () async {
                             SendFriendRequestRequest sendFriendRequestRequest =
-                                SendFriendRequestRequest(recipientId: user.id);
-                            ApiUser.sendFriendRequest(sendFriendRequestRequest);
+                            SendFriendRequestRequest(recipientId: friendRequestUser.id);
+                            await ApiUser.sendFriendRequest(sendFriendRequestRequest);
+                            users = search(_searchController.text);
                           },
                           icon: const Icon(Icons.send, color: Colors.white),
                         ),

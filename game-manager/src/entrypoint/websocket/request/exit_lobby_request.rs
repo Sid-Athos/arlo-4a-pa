@@ -1,5 +1,6 @@
 use axum::Extension;
 use crate::database::init::ConnectionPool;
+use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::invite_response::InviteResponse;
@@ -16,8 +17,8 @@ impl ExitLobbyRequest {
         let lobby_service = LobbyService::new(pool.clone());
         let invite_service = InviteService::new(pool.clone());
 
-        let lobby = lobby_service.exit_lobby(user.id).await?;
-        let invites = invite_service.cancel_all_from_user_id(user.id).await?;
+        let lobby = lobby_service.exit_lobby(user.id).await.map_err(status_code_to_string)?;
+        let invites = invite_service.cancel_all_from_user_id(user.id).await.map_err(status_code_to_string)?;
 
         for invite in invites {
             let invite_response = InviteResponse::from_domain(invite.clone());

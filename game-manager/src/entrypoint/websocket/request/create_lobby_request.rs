@@ -1,6 +1,7 @@
 use axum::Extension;
 use serde::Deserialize;
 use crate::database::init::ConnectionPool;
+use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
@@ -21,7 +22,7 @@ impl CreateLobbyRequest {
 
         let command = CreateLobbyCommand::new(user.id, self.game_id, self.private);
 
-        let lobby = lobby_service.create(command).await?;
+        lobby_service.create(command).await.map_err(status_code_to_string)?;
 
         connections.send_to_vec_user_id(ResponseEnum::LobbyCreated, vec![user.id]).await;
 

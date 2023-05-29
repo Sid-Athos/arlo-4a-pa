@@ -14,11 +14,13 @@ import '../model/user_model.dart';
 
 class LobbyView extends StatefulWidget {
   LobbyView({super.key, required this.channel, required this.user});
+
   WebSocketChannel channel;
   User user;
 
   @override
-  _LobbyViewState createState() => _LobbyViewState(channel: channel, user: user);
+  _LobbyViewState createState() =>
+      _LobbyViewState(channel: channel, user: user);
 }
 
 class _LobbyViewState extends State<LobbyView> {
@@ -29,37 +31,35 @@ class _LobbyViewState extends State<LobbyView> {
 
   @override
   Widget build(BuildContext context) {
-
     final lobby = Provider.of<Lobby>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-            "Lobby"
-        ),
-        backgroundColor: const Color(0xFF21262B),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            channel.sink.add(ExitLobbyRequest.toJson());
-            Navigator.pop(context);
-          },
-        )
-      ),
+          title: const Text("Lobby"),
+          backgroundColor: const Color(0xFF21262B),
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              channel.sink.add(ExitLobbyRequest.toJson());
+              Navigator.pop(context);
+            },
+          )),
       backgroundColor: const Color(0xFF21262B),
       body: Center(
         child: Column(
           children: <Widget>[
             Expanded(
               child: ListView.builder(
-                itemCount: lobby.members.length,
+                itemCount: lobby.members.length < 1 ? lobby.members.length + 1 : lobby.members.length,
                 itemBuilder: (context, index) {
-                  return LobbyMemberCardWidget(
-                    lobbyMember: lobby.members[index],
-                    channel: channel,
-                    user: user,
-                    isHost: lobby.getHost().id == user.id,
-                  );
+                  return (index < lobby.members.length)
+                      ? LobbyMemberCardWidget(
+                          lobbyMember: lobby.members[index],
+                          channel: channel,
+                          user: user,
+                          isHost: lobby.getHost().id == user.id,
+                        )
+                      : buttonInviteFriend();
                 },
               ),
             ),
@@ -74,10 +74,32 @@ class _LobbyViewState extends State<LobbyView> {
     channel.sink.add(ExitLobbyRequest.toJson());
     super.dispose();
   }
+
+  Widget buttonInviteFriend() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          primary: const Color(0xFF1A2025),
+          minimumSize: const Size(double.infinity, 64),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
 }
 
 class LobbyMemberCardWidget extends StatelessWidget {
-  LobbyMemberCardWidget({super.key, required this.lobbyMember, required this.channel, required this.user, required this.isHost});
+  LobbyMemberCardWidget(
+      {super.key,
+      required this.lobbyMember,
+      required this.channel,
+      required this.user,
+      required this.isHost});
 
   LobbyMember lobbyMember;
   WebSocketChannel channel;
@@ -94,8 +116,7 @@ class LobbyMemberCardWidget extends StatelessWidget {
         ),
         color: const Color(0xFF1A2025),
         child: Padding(
-          padding:
-          const EdgeInsets.only(bottom: 16.0, right: 16.0, left: 16.0),
+          padding: const EdgeInsets.only(bottom: 16.0, right: 16.0, left: 16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -116,23 +137,35 @@ class LobbyMemberCardWidget extends StatelessWidget {
                   ),
                   Row(
                     children: <Widget>[
-                      isHost && user.id != lobbyMember.id ? IconButton(
-                        onPressed: () {
-                          channel.sink.add(GiveHostRequest.toJson(lobbyMember.id));
-                        },
-                        icon: const Icon(Icons.diamond, color: Colors.white,),
-                      ): Container(),
-                      isHost || user.id == lobbyMember.id ? IconButton(
-                        onPressed: () {
-                          if (user.id == lobbyMember.id) {
-                            channel.sink.add(ExitLobbyRequest.toJson());
-                            Navigator.pop(context);
-                          } else {
-                            channel.sink.add(KickUserRequest.toJson(lobbyMember.id));
-                          }
-                        },
-                        icon: const Icon(Icons.close, color: Colors.white,),
-                      ): Container(),
+                      isHost && user.id != lobbyMember.id
+                          ? IconButton(
+                              onPressed: () {
+                                channel.sink.add(
+                                    GiveHostRequest.toJson(lobbyMember.id));
+                              },
+                              icon: const Icon(
+                                Icons.diamond,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Container(),
+                      isHost || user.id == lobbyMember.id
+                          ? IconButton(
+                              onPressed: () {
+                                if (user.id == lobbyMember.id) {
+                                  channel.sink.add(ExitLobbyRequest.toJson());
+                                  Navigator.pop(context);
+                                } else {
+                                  channel.sink.add(
+                                      KickUserRequest.toJson(lobbyMember.id));
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ],

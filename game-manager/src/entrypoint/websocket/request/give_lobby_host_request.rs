@@ -1,6 +1,7 @@
 use axum::Extension;
 use serde::Deserialize;
 use crate::database::init::ConnectionPool;
+use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
@@ -20,15 +21,14 @@ impl GiveHostRequest {
 
         let user_service = UserService::new(pool);
 
-        let lobby_member = lobby_service.get_lobby_member_by_user_id(user.id).await?;
+        let lobby_member = lobby_service.get_lobby_member_by_user_id(user.id).await.map_err(status_code_to_string)?;
 
         if !lobby_member.is_host {
             return Err("You are not the host of this lobby".to_string());
         }
 
-        let user_to_give_host = user_service.get_user_by_id(self.user_id).await?;
-
-        let lobby_member = lobby_service.give_host(user.id, self.user_id, lobby_member.lobby_id).await?;
+        user_service.get_user_by_id(self.user_id).await.map_err(status_code_to_string)?;
+        lobby_service.give_host(user.id, self.user_id, lobby_member.lobby_id).await.map_err(status_code_to_string)?;
 
         connections.send_to_vec_user_id(ResponseEnum::LobbyHostGiven, vec![user.id]).await;
         connections.send_to_vec_user_id(ResponseEnum::LobbyHostTaken, vec![self.user_id]).await;
