@@ -13,6 +13,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
 import '../api/game_manager/response/message_response_ws.dart';
+import '../model/game_model.dart';
 import '../model/lobby_model.dart';
 import '../model/user_model.dart';
 import 'lobby_view.dart';
@@ -22,7 +23,8 @@ enum TabItem { friends, game, profile }
 class HomeView extends StatefulWidget {
   static String routeName = "Home";
 
-  HomeView({Key? key, required this.channel, required this.user}) : super(key: key);
+  HomeView({Key? key, required this.channel, required this.user})
+      : super(key: key);
 
   WebSocketChannel channel;
   User user;
@@ -33,6 +35,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeState extends State<HomeView> {
   _HomeState(this.channel, this.user);
+
   WebSocketChannel channel;
   User user;
 
@@ -42,42 +45,77 @@ class _HomeState extends State<HomeView> {
     GlobalKey<NavigatorState>(),
   ];
   int currentTab = 1;
-  Lobby lobby = Lobby();
+  Lobby lobby = Lobby(
+      id: 0,
+      code: "",
+      gameId: 0,
+      private: false,
+      members: [],
+      game: Game(
+          id: 0,
+          name: "",
+          description: "",
+          minPlayers: 0,
+          maxPlayers: 0));
 
   @override
   void initState() {
     super.initState();
-    channel.stream.listen((message)
-      {
-        switch (message) {
-          case "\"BadMessage\"": developer.log("BadMessage"); return;
-          case "\"Pong\"": developer.log("Pong"); return;
-          case "\"LobbyJoined\"":
-          case "\"LobbyCreated\"":
-          navigatorKeys[1].currentState?.push(
+    channel.stream.listen((message) {
+      switch (message) {
+        case "\"BadMessage\"":
+          developer.log("BadMessage");
+          return;
+        case "\"Pong\"":
+          developer.log("Pong");
+          return;
+        case "\"LobbyJoined\"":
+        case "\"LobbyCreated\"":
+          navigatorKeys[1]
+              .currentState
+              ?.push(
                 MaterialPageRoute(
                   builder: (BuildContext context) => ChangeNotifierProvider(
                     create: (context) => lobby,
-                    builder: (context, child) => LobbyView(channel: channel, user: user),
+                    builder: (context, child) =>
+                        LobbyView(channel: channel, user: user),
                   ),
                 ),
-            ).then((value) => lobby = Lobby());
-            return;
-          case "\"LobbyExited\"": developer.log("LobbyExited"); return;
-          case "\"Kicked\"": navigatorKeys[1].currentState?.pop(context); developer.log("Kicked"); return;
-        }
+              )
+              .then((value) => lobby = Lobby(
+                  id: 0,
+                  code: "",
+                  gameId: 0,
+                  private: false,
+                  members: [],
+                  game: Game(
+                      id: 0,
+                      name: "",
+                      description: "",
+                      minPlayers: 0,
+                      maxPlayers: 0)));
+          return;
+        case "\"LobbyExited\"":
+          developer.log("LobbyExited");
+          return;
+        case "\"Kicked\"":
+          navigatorKeys[1].currentState?.pop(context);
+          developer.log("Kicked");
+          return;
+      }
 
-        Map<String, dynamic> json = jsonDecode(message);
-        for (var key in json.keys) {
-          switch (key) {
-            case "Message": MessageResponseWS.compute(json); break;
-            case "Lobby":
-              lobby.update(json["Lobby"]);
-              break;
-          }
+      Map<String, dynamic> json = jsonDecode(message);
+      for (var key in json.keys) {
+        switch (key) {
+          case "Message":
+            MessageResponseWS.compute(json);
+            break;
+          case "Lobby":
+            lobby.update(json["Lobby"]);
+            break;
         }
       }
-    );
+    });
   }
 
   void _onItemTapped(int index) {
@@ -95,8 +133,7 @@ class _HomeState extends State<HomeView> {
             return MaterialPageRoute(
               builder: (context) => FriendListView(user: user),
             );
-          }
-      ),
+          }),
     );
   }
 
@@ -107,10 +144,12 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[1],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => GameScreen(channel: channel, lobby: lobby,),
+              builder: (context) => GameScreen(
+                channel: channel,
+                lobby: lobby,
+              ),
             );
-          }
-      ),
+          }),
     );
   }
 
@@ -123,8 +162,7 @@ class _HomeState extends State<HomeView> {
             return MaterialPageRoute(
               builder: (context) => ProfileView(user: user),
             );
-          }
-      ),
+          }),
     );
   }
 
@@ -135,7 +173,8 @@ class _HomeState extends State<HomeView> {
       DeviceOrientation.portraitDown,
     ]);
     return WillPopScope(
-      onWillPop: () async => !await navigatorKeys[currentTab].currentState!.maybePop(),
+      onWillPop: () async =>
+          !await navigatorKeys[currentTab].currentState!.maybePop(),
       child: Scaffold(
         backgroundColor: const Color(0xFF21262B),
         body: Stack(children: <Widget>[

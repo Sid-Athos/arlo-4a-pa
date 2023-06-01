@@ -13,12 +13,15 @@ use crate::database::init::ConnectionPool;
 use crate::domain::model::user::User;
 use crate::entrypoint::middleware::is_logged::is_logged;
 use crate::entrypoint::websocket::connections::Connections;
+use crate::entrypoint::websocket::get_connected_friends::get_connected_friends;
 use crate::entrypoint::websocket::request::request_enum::RequestEnum;
 
 pub fn ws_routes(connections: Connections, pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/", get(ws_handler).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/", get(ws_handler))
+        .route("/connected_friends", get(get_connected_friends))
+        .layer(middleware::from_fn_with_state(pool.clone(), is_logged))
         .layer(Extension(connections.clone()))
         .with_state(pool)
 }
