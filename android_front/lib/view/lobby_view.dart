@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:miku/api/game_manager/api_game_manager.dart';
 import 'package:miku/api/game_manager/request/exit_lobby_request.dart';
 import 'package:miku/api/game_manager/request/give_host_request.dart';
 import 'package:miku/model/lobby_member_model.dart';
+import 'package:miku/view/invite_friend_view.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:developer' as developer;
 
 import '../api/game_manager/request/kick_user_request.dart';
 import '../model/lobby_model.dart';
@@ -50,7 +53,9 @@ class _LobbyViewState extends State<LobbyView> {
           children: <Widget>[
             Expanded(
               child: ListView.builder(
-                itemCount: lobby.members.length < lobby.game.maxPlayers ? lobby.members.length + 1 : lobby.members.length,
+                itemCount: lobby.members.length < lobby.game.maxPlayers
+                    ? lobby.members.length + 1
+                    : lobby.members.length,
                 itemBuilder: (context, index) {
                   return (index < lobby.members.length)
                       ? LobbyMemberCardWidget(
@@ -79,7 +84,12 @@ class _LobbyViewState extends State<LobbyView> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => InviteFriendView(channel: channel,)),
+          );
+        },
         style: ElevatedButton.styleFrom(
           primary: const Color(0xFF1A2025),
           minimumSize: const Size(double.infinity, 64),

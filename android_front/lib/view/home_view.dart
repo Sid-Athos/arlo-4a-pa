@@ -102,6 +102,11 @@ class _HomeState extends State<HomeView> {
           navigatorKeys[1].currentState?.pop(context);
           developer.log("Kicked");
           return;
+        case "\"UserInvited\"":
+          developer.log("UserInvited");
+          return;
+        default:
+          developer.log(message);
       }
 
       Map<String, dynamic> json = jsonDecode(message);
