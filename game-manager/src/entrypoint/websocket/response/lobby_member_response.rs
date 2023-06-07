@@ -2,7 +2,7 @@ use serde::Serialize;
 use crate::domain::model::lobby_member::LobbyMember;
 use crate::domain::model::user::User;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct LobbyMemberResponse {
     pub id: i32,
     pub pseudo: String,

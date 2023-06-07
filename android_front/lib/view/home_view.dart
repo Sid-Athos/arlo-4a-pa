@@ -7,6 +7,7 @@ import 'package:miku/view/friend_list_view.dart';
 
 import 'package:miku/view/game_list_view.dart';
 import 'package:miku/view/profile_view.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -121,6 +122,31 @@ class _HomeState extends State<HomeView> {
         }
       }
     });
+  }
+
+  void showNotificationInvitedInLobby(Lobby lobby) {
+    showOverlayNotification((context) {
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        child: SafeArea(
+          child: ListTile(
+            leading: SizedBox.fromSize(
+                size: const Size(40, 40),
+                child: ClipOval(
+                    child: Container(
+                      color: Colors.black,
+                    ))),
+            title: Text('FilledStacks'),
+            subtitle: Text('Thanks for checking out my tutorial'),
+            trailing: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  OverlaySupportEntry.of(context)?.dismiss();
+                }),
+          ),
+        ),
+      );
+    }, duration: Duration(days: 1));
   }
 
   void _onItemTapped(int index) {

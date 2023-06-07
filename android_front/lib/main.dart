@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miku/view/login_view.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:miku/view/home_view.dart';
@@ -37,10 +38,12 @@ class AppUnLogged extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Miku',
-      home: LoginPage(),
-      debugShowCheckedModeBanner: false,
+    return const OverlaySupport(
+      child: MaterialApp(
+        title: 'Miku',
+        home: LoginPage(),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
@@ -53,10 +56,12 @@ class AppLogged extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Miku',
-      home: HomeView(channel: channel, user: user),
-      debugShowCheckedModeBanner: false,
+    return OverlaySupport(
+      child: MaterialApp(
+        title: 'Miku',
+        home: HomeView(channel: channel, user: user),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
