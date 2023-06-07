@@ -21,7 +21,7 @@ impl ExitLobbyRequest {
         let invites = invite_service.cancel_all_from_user_id(user.id).await.map_err(status_code_to_string)?;
 
         for invite in invites {
-            let invite_response = InviteResponse::from_domain(invite.clone());
+            let invite_response = InviteResponse::from_domain(invite.clone(), pool.clone()).await?;
             connections.send_to_vec_user_id(ResponseEnum::InviteLobbyCancelled(invite_response), vec![invite.to_user_id]).await;
         }
 

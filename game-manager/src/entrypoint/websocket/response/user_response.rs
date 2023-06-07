@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use crate::domain::model::user::User;
 
-#[derive(Serialize, Deserialize, ToSchema)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct UserResponse {
     pub id: i32,
     pub pseudo: String,
