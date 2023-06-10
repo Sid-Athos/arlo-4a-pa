@@ -1,4 +1,5 @@
 use axum::http::StatusCode;
+use crate::database::database_error::DatabaseError;
 use crate::database::init::ConnectionPool;
 use crate::database::repository::invite_repository::InviteRepository;
 use crate::database::repository::lobby_member_repository::LobbyMemberRepository;
@@ -25,7 +26,18 @@ impl InviteService {
     pub async fn create_invite(&self, from_user_id: i32, to_user_id: i32) -> Result<Invite, StatusCode> {
         let lobby_member = self.lobby_member_repository.get_by_user_id(from_user_id).await.map_err(database_error_to_status_code)?;
         let lobby = self.lobby_repository.get_by_id(lobby_member.lobby_id).await.map_err(database_error_to_status_code)?;
-        self.invite_repository.create(lobby.id, from_user_id, to_user_id).await.map_err(database_error_to_status_code)
+        let invite = self.invite_repository.get_by_users_id_and_lobby_id(from_user_id, to_user_id, lobby.id).await;
+        match invite {
+            Ok(i) => Ok(i),
+            Err(e) => {
+                match e {
+                    DatabaseError::NotFound => {
+                        self.invite_repository.create(lobby.id, from_user_id, to_user_id).await.map_err(database_error_to_status_code)
+                    },
+                    _ => Err(database_error_to_status_code(e))
+                }
+            }
+        }
     }
 
     pub async fn cancel_invite(&self, from_user_id: i32, to_user_id: i32) -> Result<Invite, StatusCode> {
