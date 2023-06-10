@@ -56,7 +56,6 @@ class _HomeState extends State<HomeView> {
       members: [],
       game:
           Game(id: 0, name: "", description: "", minPlayers: 0, maxPlayers: 0));
-
   @override
   void initState() {
     super.initState();
