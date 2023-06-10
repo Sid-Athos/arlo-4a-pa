@@ -2,20 +2,22 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:miku/api/user/api_user.dart';
+import 'package:miku/api/game_manager/request/accept_invite_lobby_request.dart';
+import 'package:miku/api/game_manager/request/decline_invite_lobby_request.dart';
+import 'package:miku/model/invite_model.dart';
 import 'package:miku/view/friend_list_view.dart';
 
 import 'package:miku/view/game_list_view.dart';
 import 'package:miku/view/profile_view.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
 import '../api/game_manager/response/message_response_ws.dart';
 import '../model/game_model.dart';
 import '../model/lobby_model.dart';
+import '../model/mapper/invite_response_mapper.dart';
 import '../model/user_model.dart';
 import 'lobby_view.dart';
 
@@ -52,17 +54,14 @@ class _HomeState extends State<HomeView> {
       gameId: 0,
       private: false,
       members: [],
-      game: Game(
-          id: 0,
-          name: "",
-          description: "",
-          minPlayers: 0,
-          maxPlayers: 0));
+      game:
+          Game(id: 0, name: "", description: "", minPlayers: 0, maxPlayers: 0));
 
   @override
   void initState() {
     super.initState();
     channel.stream.listen((message) {
+      developer.log(message);
       switch (message) {
         case "\"BadMessage\"":
           developer.log("BadMessage");
@@ -119,34 +118,60 @@ class _HomeState extends State<HomeView> {
           case "Lobby":
             lobby.update(json["Lobby"]);
             break;
+          case "InviteReceived":
+            developer.log("InviteReceived");
+            showNotificationInvitedInLobby(
+                InviteResponseMapper.fromJson(json["InviteReceived"]));
+            break;
         }
       }
     });
   }
 
-  void showNotificationInvitedInLobby(Lobby lobby) {
+  void showNotificationInvitedInLobby(Invite invite) {
     showOverlayNotification((context) {
       return Card(
+        color: const Color(0xFF3A4045),
         margin: const EdgeInsets.symmetric(horizontal: 4),
-        child: SafeArea(
-          child: ListTile(
-            leading: SizedBox.fromSize(
-                size: const Size(40, 40),
-                child: ClipOval(
-                    child: Container(
-                      color: Colors.black,
-                    ))),
-            title: Text('FilledStacks'),
-            subtitle: Text('Thanks for checking out my tutorial'),
-            trailing: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  OverlaySupportEntry.of(context)?.dismiss();
-                }),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 32),
+          child: Row(
+            children: [
+              Expanded(
+                child: ListTile(
+                  title: Text(
+                    'Invite Received From ${invite.from.pseudo}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    'Game : ${invite.lobby.game.name}',
+                    style: const TextStyle(color: Colors.white38),
+                  ),
+                ),
+              ),
+              IconButton(
+                  icon: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    channel.sink.add(AcceptInviteLobbyRequest.toJson(invite.from.id));
+                    OverlaySupportEntry.of(context)?.dismiss();
+                  }),
+              IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    channel.sink.add(DeclineInviteLobbyRequest.toJson(invite.from.id));
+                    OverlaySupportEntry.of(context)?.dismiss();
+                  }),
+            ],
           ),
-        ),
+        )
       );
-    }, duration: Duration(days: 1));
+    }, duration: const Duration(days: 1));
   }
 
   void _onItemTapped(int index) {
