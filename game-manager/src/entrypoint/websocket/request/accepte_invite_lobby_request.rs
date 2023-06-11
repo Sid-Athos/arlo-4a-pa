@@ -29,6 +29,7 @@ impl AcceptInviteLobbyRequest {
         let invite_response = InviteResponse::from_domain(invite, pool).await?;
 
         connections.send_to_vec_user_id(ResponseEnum::InviteLobbyAccepted(invite_response), vec![user.id, self.user_id]).await;
+        connections.send_to_vec_user_id(ResponseEnum::LobbyJoined, vec![user.id]).await;
 
         Ok(())
     }
