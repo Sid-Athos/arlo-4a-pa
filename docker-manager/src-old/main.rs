@@ -10,7 +10,10 @@ use dotenv::dotenv;
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use utoipa::{ OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
+use crate::entrypoint::docker_image::docker_image_router::docker_image_routes;
 use crate::middlewares::swagger_security::SecurityAddon;
+use crate::entrypoint::docker_image::route::request::create_image_request::CreateImageRequest;
+use crate::entrypoint::docker_image::route::response::create_image_response::CreateImageResponse;
 
 
 #[tokio::main]
@@ -21,6 +24,7 @@ async fn main() {
 
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .merge(docker_image_routes())
         .layer(cors);
 
     let addr: SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
@@ -33,11 +37,12 @@ async fn main() {
 #[derive(OpenApi)]
 #[openapi(
 paths(
-
+entrypoint::docker_image::route::create::image_create
 ),
 modifiers(&SecurityAddon),
 components(
-
+schemas(CreateImageRequest),
+schemas(CreateImageResponse)
 ),
 )]
 struct ApiDoc;
