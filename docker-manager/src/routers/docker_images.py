@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from ..service import docker_image_service
 
 router = APIRouter(
@@ -21,10 +21,9 @@ async def build_image(language: str, tag: str):
     if tag != "":
         if docker_image_service.push_image(tag=tag) == "OK":
             return JSONResponse(status_code=status.HTTP_201_CREATED, content={"tag": tag})
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="")
+    return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @router.delete("/")
 async def delete_image(tag: str):
     return docker_image_service.delete_image(tag=tag)
-
