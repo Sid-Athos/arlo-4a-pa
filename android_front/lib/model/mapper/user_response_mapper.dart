@@ -9,6 +9,8 @@ class UserResponseMapper {
       pseudo: json['pseudo'],
       email: json['email'],
       admin: json['admin'],
+      experience: json['experience'],
+      level: json['level'],
     );
   }
 }

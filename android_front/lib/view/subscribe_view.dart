@@ -46,7 +46,12 @@ class _SubscribeState extends State<SubscribeView> {
         final session = await ApiUser.login(loginRequest);
         if (session != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          WebSocketChannel channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+          WebSocketChannel? channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
+          if (channel == null) {
+            prefs.remove('login_token');
+            wrongCredentials();
+            return;
+          }
           User user = (await ApiUser.me(prefs.getString('login_token')!))!;
           Navigator.pop(context);
           Navigator.push(

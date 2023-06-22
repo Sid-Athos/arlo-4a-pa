@@ -13,6 +13,7 @@ use crate::entrypoint::websocket::request::give_lobby_host_request::GiveHostRequ
 use crate::entrypoint::websocket::request::invite_user_lobby_request::InviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::join_lobby_request::JoinLobbyRequest;
 use crate::entrypoint::websocket::request::kick_user_lobby_request::KickUserRequest;
+use crate::entrypoint::websocket::request::launch_game_request::LaunchGameRequest;
 use crate::entrypoint::websocket::request::message_request::MessageRequest;
 use crate::entrypoint::websocket::response::error_response::ErrorResponse;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
@@ -34,6 +35,7 @@ pub enum RequestEnum {
     CancelInviteUserLobby(CancelInviteUserLobbyRequest),
     AcceptInviteLobby(AcceptInviteLobbyRequest),
     DeclineInviteLobby(DeclineInviteLobbyRequest),
+    LaunchGame,
     BadMessage,
 }
 
@@ -52,11 +54,8 @@ impl RequestEnum {
                 return true;
             }
             RequestEnum::Message(message) => {
-                let response = MessageResponse {
-                    from_user: user.id,
-                    message: message.message.clone(),
-                };
-                connections.send_to_vec_user_id(ResponseEnum::Message(response), vec![message.to_user]).await;
+                let response = message.compute(pool, connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user).await;
             }
             RequestEnum::BadMessage => {
                 connections.send_to_vec_user_id(ResponseEnum::BadMessage, vec![user.id]).await;
@@ -101,6 +100,10 @@ impl RequestEnum {
                 let response = accept_invite_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
                 LobbyResponse::send_lobby_to_members(pool, connections.clone(), user.clone()).await.log_error();
+            }
+            RequestEnum::LaunchGame => {
+                let response = LaunchGameRequest::compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
             _ => {},
         }

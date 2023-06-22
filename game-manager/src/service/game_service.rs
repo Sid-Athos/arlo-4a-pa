@@ -1,9 +1,10 @@
 use std::fs::File;
 use std::io::Write;
 use axum::http::StatusCode;
+use tokio_tungstenite::tungstenite::http::StatusCode;
 use crate::database::init::ConnectionPool;
 use crate::database::repository::game_repository::GameRepository;
-use crate::domain::error::database_error_to_response_error;
+use crate::domain::error::{database_error_to_response_error, database_error_to_status_code};
 use crate::domain::model::game::Game;
 use crate::service::command::update_game_command::UpdateGameCommand;
 
@@ -19,8 +20,12 @@ impl GameService {
         }
     }
 
-    pub async fn get_all_games(&self) -> Result<Vec<Game>, String> {
-        self.game_repository.get_all().await.map_err(database_error_to_response_error)
+    pub async fn get_all_games(&self) -> Result<Vec<Game>, StatusCode> {
+        self.game_repository.get_all().await.map_err(database_error_to_status_code)
+    }
+
+    pub async fn get_by_id(&self, game_id: i32) -> Result<Game, StatusCode> {
+        self.game_repository.get_by_id(game_id).await.map_err(database_error_to_status_code)
     }
 
     pub async fn create_game(&self, name : String, max_players : i32, min_players : i32, description : Option<String>, language : String, code : String, user_id : i32)-> Result<Game, String>{

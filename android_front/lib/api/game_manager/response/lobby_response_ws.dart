@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:miku/model/lobby_model.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../model/game_model.dart';
 import '../../../model/lobby_member_model.dart';
+import '../../../model/mapper/game_response_mapper.dart';
 import '../../../model/mapper/lobby_member_response_mapper.dart';
 import '../../../view/lobby_view.dart';
 
@@ -15,6 +17,7 @@ class LobbyResponseWS {
   final int gameId;
   final bool private;
   final List<LobbyMember> members;
+  final Game game;
 
   LobbyResponseWS({
     required this.id,
@@ -22,6 +25,7 @@ class LobbyResponseWS {
     required this.gameId,
     required this.private,
     required this.members,
+    required this.game,
   });
 
   factory LobbyResponseWS.fromJson(Map<String, dynamic> json) {
@@ -30,17 +34,21 @@ class LobbyResponseWS {
       code: json['code'],
       gameId: json['game_id'],
       private: json['private'],
-      members: (json['members'] as List<dynamic>).map((member) => LobbyMemberResponseMapper.fromJson(member)).toList(),
+      members: (json['members'] as List<dynamic>)
+          .map((member) => LobbyMemberResponseMapper.fromJson(member))
+          .toList(),
+      game: GameResponseMapper.fromJson(json['game']),
     );
   }
 
   Lobby toDomainLobby() {
     return Lobby(
-        id: id,
-        code: code,
-        gameId: gameId,
-        private: private,
-        members: members
+      id: id,
+      code: code,
+      gameId: gameId,
+      private: private,
+      members: members,
+      game: game,
     );
   }
 }
