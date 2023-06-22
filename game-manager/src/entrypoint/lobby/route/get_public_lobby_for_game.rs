@@ -5,6 +5,7 @@ use crate::database::init::ConnectionPool;
 use crate::database::repository::game_repository::GameRepository;
 use crate::database::repository::lobby_member_repository::LobbyMemberRepository;
 use crate::database::repository::lobby_repository::LobbyRepository;
+use crate::domain::error::database_error_to_status_code;
 use crate::entrypoint::lobby::route::response::game_response::GameResponse;
 use crate::entrypoint::lobby::route::response::lobby_member_response::LobbyMemberResponse;
 use crate::entrypoint::lobby::route::response::lobby_response::LobbyResponse;
@@ -18,7 +19,7 @@ pub async fn get_public_lobby_for_game(State(pool): State<ConnectionPool>, Path(
     let game_service = GameService::new(pool.clone());
     let user_service = UserService::new(pool);
 
-    let lobbies = lobby_service.get_public_by_game_id(game_id).await.unwrap();
+    let lobbies = lobby_service.get_public_by_game_id(game_id).await?;
 
     let mut result = Vec::new();
 

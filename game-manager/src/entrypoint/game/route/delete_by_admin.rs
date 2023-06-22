@@ -23,7 +23,7 @@ pub async fn delete_by_admin(State(pool): State<ConnectionPool>, Path(game_id): 
         pool.clone()
     );
 
-    let game = game_service.delete_by_admin(game_id).await.unwrap();
+    let game = game_service.delete_by_admin(game_id).await?;
 
     Ok(Json(GameResponse::from_domain(game)))
 }

@@ -29,7 +29,7 @@ pub async fn update_game(State(pool): State<ConnectionPool>, Extension(user): Ex
 
     let command = UpdateGameCommand::new(game_id, update_game_request.name, update_game_request.description, update_game_request.language, update_game_request.min_players, update_game_request.max_players, update_game_request.code );
 
-    let game = game_service.update_game(command, user.id).await.unwrap();
+    let game = game_service.update_game(command, user.id).await?;
 
     Ok(Json(GameResponse::from_domain(game)))
 }

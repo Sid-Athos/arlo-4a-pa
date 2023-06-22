@@ -23,7 +23,7 @@ pub async fn delete_by_user(State(pool): State<ConnectionPool>, Extension(user):
         pool.clone()
     );
 
-    let game = game_service.delete_by_user(game_id,user.id).await.unwrap();
+    let game = game_service.delete_by_user(game_id,user.id).await?;
 
     Ok(Json(GameResponse::from_domain(game)))
 }

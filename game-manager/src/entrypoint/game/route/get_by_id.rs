@@ -23,7 +23,7 @@ pub async fn get_by_id(State(pool): State<ConnectionPool>, Extension(user): Exte
         pool.clone()
     );
 
-    let game = game_service.get_game_by_id(game_id, user.id).await.unwrap();
+    let game = game_service.get_game_by_id(game_id, user.id).await?;
 
     Ok(Json(GameResponse::from_domain(game)))
 }
