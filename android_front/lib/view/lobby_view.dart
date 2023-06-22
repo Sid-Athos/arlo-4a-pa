@@ -53,9 +53,10 @@ class _LobbyViewState extends State<LobbyView> {
           children: <Widget>[
             Expanded(
               child: ListView.builder(
-                itemCount: lobby.members.length < lobby.game.maxPlayers
-                    ? lobby.members.length + 1
-                    : lobby.members.length,
+                itemCount: (lobby.members.length < lobby.game.maxPlayers
+                        ? lobby.members.length + 1
+                        : lobby.members.length) +
+                    (isHost(lobby.members) ? 1 : 0),
                 itemBuilder: (context, index) {
                   return (index < lobby.members.length)
                       ? LobbyMemberCardWidget(
@@ -64,7 +65,11 @@ class _LobbyViewState extends State<LobbyView> {
                           user: user,
                           isHost: lobby.getHost().id == user.id,
                         )
-                      : buttonInviteFriend();
+                      : (index == lobby.members.length + 2 ||
+                              (index == lobby.members.length + 1 &&
+                                  isHost(lobby.members)))
+                          ? buttonInviteFriend()
+                          : buttonStartGame();
                 },
               ),
             ),
@@ -72,6 +77,16 @@ class _LobbyViewState extends State<LobbyView> {
         ),
       ),
     );
+  }
+
+  bool isHost(List<LobbyMember> lobbyMembers) {
+    for (int i = 0; i < lobbyMembers.length; i++) {
+      if (user.id == lobbyMembers[i].id && lobbyMembers[i].isHost) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -87,7 +102,10 @@ class _LobbyViewState extends State<LobbyView> {
         onPressed: () async {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => InviteFriendView(channel: channel,)),
+            MaterialPageRoute(
+                builder: (context) => InviteFriendView(
+                      channel: channel,
+                    )),
           );
         },
         style: ElevatedButton.styleFrom(
@@ -98,6 +116,25 @@ class _LobbyViewState extends State<LobbyView> {
           ),
         ),
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget buttonStartGame() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: ElevatedButton(
+        onPressed: () async {
+
+        },
+        style: ElevatedButton.styleFrom(
+          primary: const Color(0xFF1A2025),
+          minimumSize: const Size(double.infinity, 64),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Text("Start Game"),
       ),
     );
   }

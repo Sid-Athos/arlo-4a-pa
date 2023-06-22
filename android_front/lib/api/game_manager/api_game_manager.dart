@@ -39,7 +39,7 @@ class ApiGameManager {
 
   static Future<List<Game>> getAllGames() async {
     try {
-      final response = await dio.get('$baseURL/game/all');
+      final response = await dio.get('$baseURL/game/');
       final data = response.data as List<dynamic>;
       return data.map((json) => GameResponseMapper.fromJson(json)).toList();
     } catch (e) {
