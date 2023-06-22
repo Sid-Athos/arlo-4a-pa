@@ -13,6 +13,7 @@ use crate::entrypoint::websocket::request::give_lobby_host_request::GiveHostRequ
 use crate::entrypoint::websocket::request::invite_user_lobby_request::InviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::join_lobby_request::JoinLobbyRequest;
 use crate::entrypoint::websocket::request::kick_user_lobby_request::KickUserRequest;
+use crate::entrypoint::websocket::request::launch_game_request::LaunchGameRequest;
 use crate::entrypoint::websocket::request::message_request::MessageRequest;
 use crate::entrypoint::websocket::response::error_response::ErrorResponse;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
@@ -34,6 +35,7 @@ pub enum RequestEnum {
     CancelInviteUserLobby(CancelInviteUserLobbyRequest),
     AcceptInviteLobby(AcceptInviteLobbyRequest),
     DeclineInviteLobby(DeclineInviteLobbyRequest),
+    LaunchGame,
     BadMessage,
 }
 
@@ -101,6 +103,10 @@ impl RequestEnum {
                 let response = accept_invite_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
                 LobbyResponse::send_lobby_to_members(pool, connections.clone(), user.clone()).await.log_error();
+            }
+            RequestEnum::LaunchGame => {
+                let response = LaunchGameRequest::compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
             _ => {},
         }
