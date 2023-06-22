@@ -7,3 +7,4 @@ pub mod invite_response;
 pub mod game_response;
 pub mod friend_list_response;
 pub mod user_response;
+pub mod game_started_response;
