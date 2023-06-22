@@ -6,6 +6,7 @@ pub mod give_lobby_host_request;
 pub mod kick_user_lobby_request;
 pub mod invite_user_lobby_request;
 pub mod cancel_invite_user_lobby_request;
-pub mod accepte_invite_lobby_request;
+pub mod accept_invite_lobby_request;
 pub mod decline_invite_lobby_request;
 pub mod exit_lobby_request;
+pub mod launch_game_request;

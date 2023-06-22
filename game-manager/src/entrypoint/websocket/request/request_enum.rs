@@ -4,7 +4,7 @@ use crate::database::init::ConnectionPool;
 use crate::domain::error::LogError;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
-use crate::entrypoint::websocket::request::accepte_invite_lobby_request::AcceptInviteLobbyRequest;
+use crate::entrypoint::websocket::request::accept_invite_lobby_request::AcceptInviteLobbyRequest;
 use crate::entrypoint::websocket::request::cancel_invite_user_lobby_request::CancelInviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::create_lobby_request::CreateLobbyRequest;
 use crate::entrypoint::websocket::request::decline_invite_lobby_request::DeclineInviteLobbyRequest;
@@ -13,7 +13,9 @@ use crate::entrypoint::websocket::request::give_lobby_host_request::GiveHostRequ
 use crate::entrypoint::websocket::request::invite_user_lobby_request::InviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::join_lobby_request::JoinLobbyRequest;
 use crate::entrypoint::websocket::request::kick_user_lobby_request::KickUserRequest;
+use crate::entrypoint::websocket::request::launch_game_request::LaunchGameRequest;
 use crate::entrypoint::websocket::request::message_request::MessageRequest;
+use crate::entrypoint::websocket::request::request_enum::RequestEnum::LaunchGame;
 use crate::entrypoint::websocket::response::error_response::ErrorResponse;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::message_response::MessageResponse;
@@ -34,6 +36,7 @@ pub enum RequestEnum {
     CancelInviteUserLobby(CancelInviteUserLobbyRequest),
     AcceptInviteLobby(AcceptInviteLobbyRequest),
     DeclineInviteLobby(DeclineInviteLobbyRequest),
+    LaunchGame,
     BadMessage,
 }
 
@@ -53,7 +56,7 @@ impl RequestEnum {
             }
             RequestEnum::Message(message) => {
                 let response = MessageResponse {
-                    from_user: user.id,
+                    from_user: user,
                     message: message.message.clone(),
                 };
                 connections.send_to_vec_user_id(ResponseEnum::Message(response), vec![message.to_user]).await;
@@ -101,6 +104,10 @@ impl RequestEnum {
                 let response = accept_invite_lobby_request.compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
                 LobbyResponse::send_lobby_to_members(pool, connections.clone(), user.clone()).await.log_error();
+            }
+            RequestEnum::LaunchGame => {
+                let response = LaunchGameRequest::compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
             _ => {},
         }
