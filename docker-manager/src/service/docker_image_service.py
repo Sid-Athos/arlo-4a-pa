@@ -7,7 +7,7 @@ from env import DOCKERHUB_REPOSITORY, DOCKER_USERNAME, DOCKER_PASSWORD
 
 def build_image(language: str, tag: str) -> str:
     build_output = docker_client.images.build(path=f"{os.getcwd()}/dockerfiles/{language}",
-                                              tag=[f"{DOCKERHUB_REPOSITORY}:{tag}"])
+                                              tag=[f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"])
     for line in build_output[1]:
         if "stream" in line and "Successfully tagged" in line["stream"]:
             return f"dixennaxos/arlo-4a-pa-games:{tag}"
@@ -19,6 +19,12 @@ def push_image(tag: str) -> str:
     if "digest" in push_output:
         return "OK"
     return "Not OK"
+
+
+def pull_image(tag: str) -> bool:
+    pull_output = docker_client.images.pull(repository=f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}", tag=tag)
+    print(pull_output)
+    return True
 
 
 def delete_image_from_repository(tag: str) -> bool:
