@@ -23,8 +23,9 @@ def push_image(tag: str) -> str:
 
 def pull_image(tag: str) -> bool:
     pull_output = docker_client.images.pull(repository=f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}", tag=tag)
-    print(pull_output)
-    return True
+    if pull_output:
+        return True
+    return False
 
 
 def delete_image_from_repository(tag: str) -> bool:

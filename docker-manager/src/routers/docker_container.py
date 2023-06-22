@@ -16,6 +16,5 @@ async def head():
 
 
 @router.post("/")
-async def create_container(image_name: str):
-
-    docker_container_service.create_container(image_name)
+async def run_container(image_name: str):
+    docker_container_service.run_container(image_name)
