@@ -54,11 +54,8 @@ impl RequestEnum {
                 return true;
             }
             RequestEnum::Message(message) => {
-                let response = MessageResponse {
-                    from_user: user,
-                    message: message.message.clone(),
-                };
-                connections.send_to_vec_user_id(ResponseEnum::Message(response), vec![message.to_user]).await;
+                let response = message.compute(pool, connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user).await;
             }
             RequestEnum::BadMessage => {
                 connections.send_to_vec_user_id(ResponseEnum::BadMessage, vec![user.id]).await;
