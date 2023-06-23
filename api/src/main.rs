@@ -31,7 +31,6 @@ use crate::entrypoint::user::route::response::session_response::SessionResponse;
 use crate::entrypoint::ranking::route::response::ranking_response::RankingResponse;
 use crate::entrypoint::admin::admin_router::admin_routes;
 use crate::entrypoint::friend_list::friend_list_router::friend_list_routes;
-use crate::entrypoint::games::games_router::games_routes;
 use crate::entrypoint::user::user_router::user_routes;
 use crate::entrypoint::user::route::request::create_user_request::CreateUserRequest;
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
