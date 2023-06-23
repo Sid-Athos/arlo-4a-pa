@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use serde::{Serialize};
+
 use crate::domain::model::lobby::Lobby;
 use crate::entrypoint::lobby::route::response::game_response::GameResponse;
 use crate::entrypoint::lobby::route::response::lobby_member_response::LobbyMemberResponse;

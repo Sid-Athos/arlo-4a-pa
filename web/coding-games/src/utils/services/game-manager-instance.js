@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: 'http://localhost:7590',
+    baseURL: 'http://localhost:7589/',
     headers: {
         'Content-Type': 'application/json',
         'api-key' : 'coding_games'
@@ -16,7 +16,7 @@ const setAuthorizationHeader = (token) => {
 
 }
 
-export const AxiosInstance = {
+export const GameManagerInstance = {
     getInstance: instance,
     updateAuthorizationHeader: setAuthorizationHeader
 }

@@ -4,7 +4,7 @@ use crate::domain::error::status_code_to_string;
 use crate::domain::model::invite::Invite;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::user_response::UserResponse;
-use crate::service::game_service::GameService;
+
 use crate::service::lobby_service::LobbyService;
 use crate::service::user_service::UserService;
 

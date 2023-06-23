@@ -47,17 +47,15 @@ async fn main() {
     init_tracer();
     let pool = init_db().await.unwrap();
 
-    let cors = init_cors_layer();
+    let _cors = init_cors_layer();
 
     println!(env!("CARGO_MANIFEST_DIR"));
-
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .merge( user_routes(pool.clone()))
         .merge( admin_routes(pool.clone()))
         .merge( ranking_routes(pool.clone()))
         .merge(friend_list_routes(pool.clone()))
-        .merge(games_routes(pool.clone()))
         .layer(CorsLayer::permissive());
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
@@ -77,7 +75,6 @@ entrypoint::user::route::login::user_login,
 entrypoint::user::route::logout::user_logout,
 entrypoint::user::route::add_experience::add_experience,
 entrypoint::user::route::me::me,
-entrypoint::games::route::available_games::get_available_games,
 entrypoint::user::route::search::search_user,
 entrypoint::user::route::search::get_other_players,
 entrypoint::user::route::delete::delete_user,

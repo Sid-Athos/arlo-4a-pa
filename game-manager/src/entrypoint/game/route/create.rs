@@ -2,7 +2,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::{Extension, Json};
 use crate::database::init::ConnectionPool;
-use crate::database::repository::game_repository::GameRepository;
+
 use crate::domain::model::user::User;
 use crate::entrypoint::game::route::request::create_game_request::CreateGameRequest;
 use crate::entrypoint::game::route::response::game_response::GameResponse;

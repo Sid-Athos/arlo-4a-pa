@@ -1,7 +1,7 @@
 use crate::database::entity::games_entity::GamesEntity;
-use crate::database::entity::user_entity::UserEntity;
+
 use crate::domain::model::games::Game;
-use crate::domain::model::user::User;
+
 
 pub struct GamesEntityMapper;
 

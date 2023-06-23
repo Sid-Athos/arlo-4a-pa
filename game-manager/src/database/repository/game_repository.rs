@@ -34,7 +34,7 @@ impl GameRepository {
 
     pub async fn get_all(&self) -> Result<Vec<Game>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
-
+        tracing::info!("Init db get all");
         let rows = conn
             .query("SELECT * FROM coding_games.game", &[])
             .await

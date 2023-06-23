@@ -13,6 +13,9 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "ag-grid-community": "28.2.0",
+    "ag-grid-solid": "28.2.0",
+    "@solid-primitives/websocket": "^1.1.0",
     "@solidjs/router": "^0.8.2",
     "@stitches/core": "^1.2.8",
     "@suid/icons-material": "^0.5.11",

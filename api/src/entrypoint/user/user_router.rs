@@ -22,6 +22,7 @@ pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
     Router::new()
         .route("/user/:user_id", get(user_get).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/user", post(user_create))
+        .route("/users/available", get(get_all_logged_users))
         .route("/user/login", post(user_login))
         .route("/user/logout", post(user_logout).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/user/", delete(delete_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))

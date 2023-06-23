@@ -58,7 +58,7 @@ impl UserRepository {
             .query_one("INSERT INTO coding_games.user (pseudo, email, password) VALUES ($1, $2, $3) RETURNING *", &[&user.pseudo, &user.email, &user.password])
             .await
             .map_err(database_error_duplicate_key)?;
-
+        tracing::info!("user created {:?}", user);
         let result = UserEntity::new(row);
 
         Ok(UserEntityMapper::entity_to_domain(result))
