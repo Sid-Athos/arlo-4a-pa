@@ -26,4 +26,5 @@ async def run_container(image_name: str):
 
 @router.post("/{container_id}")
 async def exec_on_container(container_id: str, command: str):
-    print(docker_container_service.exec_on_container(container_id=container_id, command=command))
+    content: dict = docker_container_service.exec_on_container(container_id=container_id, command=command)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=content)
