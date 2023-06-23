@@ -28,7 +28,7 @@ class ApiGameManager {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.get('$baseURL/ws/connected_friends');
+      final response = await dio.get('$baseURL/friends/connected_friends');
       final data = response.data as List<dynamic>;
       return data.map((json) => UserResponseMapper.fromJson(json)).toList();
     } catch (e) {
@@ -39,7 +39,7 @@ class ApiGameManager {
 
   static Future<List<Game>> getAllGames() async {
     try {
-      final response = await dio.get('$baseURL/game/');
+      final response = await dio.get('$baseURL/games/all');
       final data = response.data as List<dynamic>;
       return data.map((json) => GameResponseMapper.fromJson(json)).toList();
     } catch (e) {

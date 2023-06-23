@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miku/view/login_view.dart';
+import 'package:miku/view/test_webrtc_view.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +32,7 @@ Future<void> main() async {
   } else {
     runApp(const AppUnLogged());
   }
+  //runApp(AppTest());
 }
 
 class AppUnLogged extends StatelessWidget {
@@ -65,3 +67,19 @@ class AppLogged extends StatelessWidget {
     );
   }
 }
+/*
+class AppTest extends StatelessWidget {
+  AppTest({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return OverlaySupport(
+      child: MaterialApp(
+        title: 'Miku',
+        home: WebRTCSession(),
+        debugShowCheckedModeBanner: false,
+      ),
+    );
+  }
+}
+*/

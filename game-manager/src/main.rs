@@ -14,6 +14,8 @@ use crate::entrypoint::game::game_router::game_routes;
 use crate::entrypoint::lobby::lobby_router::lobby_routes;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::router::ws_routes;
+use crate::entrypoint::websocket_test::connections::ConnectionsTest;
+use crate::entrypoint::websocket_test::router::ws_test_routes;
 
 #[tokio::main]
 async fn main() {
@@ -23,6 +25,7 @@ async fn main() {
     let pool = init_db().await.unwrap();
 
     let connections = Connections::new();
+    let connections_test = ConnectionsTest::new();
 
     tracing_subscriber::registry()
         .with(
@@ -36,7 +39,8 @@ async fn main() {
     let app = Router::new()
         .nest("/lobby", lobby_routes(pool.clone()))
         .nest("/game", game_routes(pool.clone()))
-        .nest("/ws", ws_routes(connections, pool.clone()));
+        .nest("/ws", ws_routes(connections, pool.clone()))
+        .nest("/rtc", ws_test_routes(connections_test, pool.clone()));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 7589));
 
