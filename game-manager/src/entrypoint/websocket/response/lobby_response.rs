@@ -1,5 +1,5 @@
 use axum::Extension;
-use axum::http::StatusCode;
+
 use serde::Serialize;
 use crate::database::init::ConnectionPool;
 use crate::domain::error::status_code_to_string;

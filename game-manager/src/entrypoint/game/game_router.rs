@@ -15,12 +15,12 @@ use crate::entrypoint::middleware::is_logged_admin::is_logged_admin;
 pub fn game_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/", get(get_all_games))
-        .route("/:game_id", get(get_by_id).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/admin/:game_id", delete(delete_by_admin).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
-        .route("/:game_id", delete(delete_by_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/:game_id", put(update_game).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/", post(create_game).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/games/all", get(get_all_games))
+        .route("/games/:game_id", get(get_by_id).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/games/admin/:game_id", delete(delete_by_admin).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
+        .route("/games/:game_id", delete(delete_by_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/games/:game_id", put(update_game).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/games", post(create_game).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .with_state(pool)
 
 }

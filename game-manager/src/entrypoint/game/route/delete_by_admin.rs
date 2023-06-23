@@ -1,8 +1,8 @@
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::{Extension, Json};
+use axum::{Json};
 use crate::database::init::ConnectionPool;
-use crate::domain::model::user::User;
+
 use crate::entrypoint::game::route::response::game_response::GameResponse;
 use crate::service::game_service::GameService;
 

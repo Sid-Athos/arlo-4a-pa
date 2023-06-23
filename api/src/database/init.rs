@@ -29,5 +29,6 @@ pub async fn init_db() -> Result<ConnectionPool, StatusCode> {
     let manager = PostgresConnectionManager::new_from_stringlike(&env::var("DB_URL").unwrap(), NoTls).map_err(internal_error)?;
     let pool = Pool::builder().build(manager).await.map_err(internal_error)?;
 
+
     Ok(pool)
 }
