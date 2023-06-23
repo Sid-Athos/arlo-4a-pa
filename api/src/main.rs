@@ -47,10 +47,9 @@ async fn main() {
     init_tracer();
     let pool = init_db().await.unwrap();
 
-    let cors = init_cors_layer();
+    let _cors = init_cors_layer();
 
     println!(env!("CARGO_MANIFEST_DIR"));
-
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .merge( user_routes(pool.clone()))

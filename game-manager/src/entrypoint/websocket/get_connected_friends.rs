@@ -1,4 +1,4 @@
-use axum::extract::{Path, State};
+use axum::extract::{State};
 use axum::http::StatusCode;
 use axum::{Extension, Json};
 use crate::database::init::ConnectionPool;

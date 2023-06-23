@@ -19,14 +19,14 @@ use crate::entrypoint::websocket::request::request_enum::RequestEnum;
 pub fn ws_routes(connections: Connections, pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/", get(ws_handler))
-        .route("/connected_friends", get(get_connected_friends))
+        .route("/ws", get(ws_handler))
+        .route("/friends/connected_friends", get(get_connected_friends))
         .layer(middleware::from_fn_with_state(pool.clone(), is_logged))
         .layer(Extension(connections.clone()))
         .with_state(pool)
 }
 
-async fn ws_handler(ws: WebSocketUpgrade, ConnectInfo(addr): ConnectInfo<SocketAddr>, State(pool): State<ConnectionPool>, connections: Extension<Connections>, Extension(user): Extension<User>) -> impl IntoResponse {
+async fn ws_handler(ws: WebSocketUpgrade, ConnectInfo(_addr): ConnectInfo<SocketAddr>, State(pool): State<ConnectionPool>, connections: Extension<Connections>, Extension(user): Extension<User>) -> impl IntoResponse {
     ws.on_upgrade(move |socket| handle_socket(pool, socket, connections, user))
 }
 

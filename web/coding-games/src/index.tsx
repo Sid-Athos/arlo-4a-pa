@@ -10,6 +10,7 @@ import {createSignal} from "solid-js";
 import LoginComponent from "./components/login.jsx";
 // @ts-ignore
 import LobbyComponent from "./components/lobby.jsx";
+import {UserProvider} from "./components/user-provider.jsx";
 const root = document.getElementById('root');
 
 // @ts-ignore
@@ -23,7 +24,10 @@ const [open, setOpen] = createSignal(false);
 
 render(
     () => (
-        <Box>
+        <UserProvider token={""}>
+
+
+        <Box sx={{backgroundColor:'#282c34', minHeight:'100vh'}}>
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="sticky" sx={{backgroundColor:'#282c34'}}>
                     <Toolbar>
@@ -61,8 +65,9 @@ render(
             <Routes>
                 {/* @ts_ignore */}
                 <Route path={"/"} component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
-                <Route path={"/lobby"} component={<LobbyComponent open={open} setOpen={setOpen}></LobbyComponent>}></Route>
+                <Route path={"/lobby"} component={<LobbyComponent ></LobbyComponent>}></Route>
             </Routes>
         </Router>
     </Box>
+        </UserProvider>
     ), root!);

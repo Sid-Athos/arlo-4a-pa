@@ -4,7 +4,7 @@ use crate::database::init::ConnectionPool;
 use crate::database::repository::invite_repository::InviteRepository;
 use crate::database::repository::lobby_member_repository::LobbyMemberRepository;
 use crate::database::repository::lobby_repository::LobbyRepository;
-use crate::domain::error::{database_error_to_response_error, database_error_to_status_code};
+use crate::domain::error::{database_error_to_status_code};
 use crate::domain::model::invite::Invite;
 
 pub struct InviteService {
