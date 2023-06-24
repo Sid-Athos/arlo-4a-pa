@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:miku/model/game_started.dart';
+import 'package:miku/provider/game_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../api/game_manager/request/message_request.dart';
 import '../model/chat_model.dart';
 import '../model/user_model.dart';
+import 'dart:developer' as developer;
 
 class GameView extends StatefulWidget {
   GameView(
@@ -21,24 +26,78 @@ class GameView extends StatefulWidget {
   User user;
 
   @override
-  _GameViewState createState() =>
-      _GameViewState(gameStarted: gameStarted, channel: channel, user: user);
+  _GameViewState createState() => _GameViewState(
+        gameStarted: gameStarted,
+        channel: channel,
+        user: user,
+      );
 }
 
 class _GameViewState extends State<GameView> {
   _GameViewState(
       {required this.gameStarted, required this.channel, required this.user});
 
+  RTCPeerConnection? _peerConnection;
+  MediaStream? _localStream;
+  MediaStream? _remoteStream;
   WebSocketChannel channel;
   GameStarted gameStarted;
   User user;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController messageController = TextEditingController();
+  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
+  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _isShowChat = false;
+  final encoder = JsonEncoder();
+
+  @override
+  void initState() {
+    super.initState();
+    initRenderers();
+  }
+
+  initRenderers() async {
+    await _remoteRenderer.initialize();
+    await _localRenderer.initialize();
+
+    if (gameStarted.getHost().id == user.id) {
+      await createSession();
+    }
+  }
+
+  createSession() async {
+    final Map<String, dynamic> configuration = {
+      'iceServers': [
+        {'url': 'stun:stun.l.google.com:19302'},
+      ],
+    };
+
+    _peerConnection = await createPeerConnection(configuration);
+
+    _localStream = await navigator.mediaDevices.getUserMedia({
+      'audio': true,
+      'video': true,
+    });
+
+    _localStream?.getTracks().forEach((track) {
+      _peerConnection?.addTrack(track, _localStream!);
+    });
+
+    final offerSdp = await _peerConnection?.createOffer();
+    await _peerConnection?.setLocalDescription(offerSdp!);
+
+    String msg = encoder.convert({
+      "SDPOffer": {
+        'sdp': offerSdp!.sdp
+      }
+    });
+    developer.log(msg);
+    channel.sink.add(msg);
+  }
 
   @override
   Widget build(BuildContext context) {
-    Chat chat = Provider.of<Chat>(context);
+    GameProvider gameProvider = Provider.of<GameProvider>(context);
 
     return WillPopScope(
       onWillPop: () async {
@@ -49,47 +108,48 @@ class _GameViewState extends State<GameView> {
         }
         return false;
       },
-      child: _isShowChat ? displayChat(chat) : Scaffold(
-        backgroundColor: const Color(0xFF21262B),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFF21262B),
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 20.0),
-              child: IconButton(
-                icon: const Icon(Icons.chat_bubble),
-                onPressed: () {
-                  setState(() {
-                    _isShowChat = true;
-                  });
-                },
+      child: _isShowChat
+          ? displayChat(gameProvider)
+          : Scaffold(
+              backgroundColor: const Color(0xFF21262B),
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: const Color(0xFF21262B),
+                actions: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: IconButton(
+                      icon: const Icon(Icons.chat_bubble),
+                      onPressed: () {
+                        setState(() {
+                          _isShowChat = true;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget displayChat(Chat chat) {
+  Widget displayChat(GameProvider gameProvider) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chat"),
-        backgroundColor: const Color(0xFF21262B),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            setState(() {
-              _isShowChat = false;
-            });
-          },
-        )
-      ),
+          title: const Text("Chat"),
+          backgroundColor: const Color(0xFF21262B),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              setState(() {
+                _isShowChat = false;
+              });
+            },
+          )),
       backgroundColor: const Color(0xFF21262B),
       body: Column(
         children: [
-          Expanded(child: buildChat(chat)),
+          Expanded(child: buildChat(gameProvider)),
           TextField(
             controller: messageController,
             style: const TextStyle(color: Colors.white),
@@ -120,13 +180,13 @@ class _GameViewState extends State<GameView> {
     _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
   }
 
-  Widget buildChat(Chat chat) {
+  Widget buildChat(GameProvider gameProvider) {
     return ListView.builder(
       controller: _scrollController,
-      itemCount: chat.messages.length,
+      itemCount: gameProvider.messages.length,
       itemBuilder: (context, index) {
         return Padding(
-          padding: (user.id == chat.messages[index].fromUser.id
+          padding: (user.id == gameProvider.messages[index].fromUser.id
               ? const EdgeInsets.only(left: 100)
               : const EdgeInsets.only(right: 100)),
           child: Card(
@@ -136,17 +196,17 @@ class _GameViewState extends State<GameView> {
             color: const Color(0xFF1A2025),
             child: Padding(
               padding:
-              const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
+                  const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   ListTile(
                     title: Text(
-                      chat.messages[index].fromUser.pseudo,
+                      gameProvider.messages[index].fromUser.pseudo,
                       style: const TextStyle(color: Colors.white38),
                     ),
                     subtitle: Text(
-                      chat.messages[index].message,
+                      gameProvider.messages[index].message,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
