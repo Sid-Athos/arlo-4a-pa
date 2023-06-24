@@ -23,6 +23,7 @@ import '../model/game_started.dart';
 import '../model/lobby_model.dart';
 import '../model/mapper/invite_response_mapper.dart';
 import '../model/user_model.dart';
+import '../provider/game_provider.dart';
 import 'lobby_view.dart';
 
 enum TabItem { friends, game, profile }
@@ -60,7 +61,11 @@ class _HomeState extends State<HomeView> {
       members: [],
       game:
           Game(id: 0, name: "", description: "", minPlayers: 0, maxPlayers: 0));
-  Chat chat = Chat(messages: []);
+  GameProvider gameProvider = GameProvider(
+    messages: [],
+    sdp: '',
+    iceCandidates: [],
+  );
 
   @override
   void initState() {
@@ -118,7 +123,8 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
-            chat.addMessage(MessageResponseWS.fromJson(json["Message"]));
+            gameProvider
+                .addMessage(MessageResponseWS.fromJson(json["Message"]));
             break;
           case "Lobby":
             lobby.update(json["Lobby"]);
@@ -129,7 +135,7 @@ class _HomeState extends State<HomeView> {
                 ?.push(
                   MaterialPageRoute(
                     builder: (BuildContext context) => ChangeNotifierProvider(
-                      create: (context) => chat,
+                      create: (context) => gameProvider,
                       builder: (context, child) => GameView(
                         gameStarted:
                             GameStartedMapper.fromJson(json["GameStarted"]),
@@ -139,7 +145,14 @@ class _HomeState extends State<HomeView> {
                     ),
                   ),
                 )
-                .then((value) => chat.messages = []);
+                .then((value) => gameProvider = GameProvider(
+                      messages: [],
+                      sdp: '',
+                      iceCandidates: [],
+                    ));
+            break;
+          case "SDPOffer":
+            gameProvider.updateSDP(json["SDPOffer"]["sdp"]);
             break;
           case "InviteReceived":
             developer.log("InviteReceived");

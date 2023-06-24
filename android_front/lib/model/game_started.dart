@@ -13,4 +13,8 @@ class GameStarted {
     required this.members,
     required this.game,
   });
+
+  LobbyMember getHost() {
+    return members.firstWhere((element) => element.isHost);
+  }
 }

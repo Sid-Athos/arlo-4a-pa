@@ -112,13 +112,16 @@ impl RequestEnum {
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
             RequestEnum::SDPOffer(sdp_offer) => {
-
+                let response = sdp_offer.compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
             RequestEnum::SDPAnswer(sdp_answer) => {
-
+                let response = sdp_answer.compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
             RequestEnum::RegisterICECandidate(register_ice_candidate) => {
-
+                let response = register_ice_candidate.compute(pool.clone(), connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
         }
         return false;
