@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:miku/api/game_manager/api_game_manager.dart';
 import 'package:miku/api/game_manager/request/exit_lobby_request.dart';
 import 'package:miku/api/game_manager/request/give_host_request.dart';
+import 'package:miku/api/game_manager/request/launch_game_request.dart';
 import 'package:miku/model/lobby_member_model.dart';
 import 'package:miku/view/invite_friend_view.dart';
 import 'package:provider/provider.dart';
@@ -125,7 +126,7 @@ class _LobbyViewState extends State<LobbyView> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ElevatedButton(
         onPressed: () async {
-
+          channel.sink.add(LaunchGameRequest.toJson());
         },
         style: ElevatedButton.styleFrom(
           primary: const Color(0xFF1A2025),
