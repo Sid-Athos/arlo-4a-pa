@@ -8,3 +8,6 @@ pub mod game_response;
 pub mod friend_list_response;
 pub mod user_response;
 pub mod game_started_response;
+pub mod ice_candidate_response;
+pub mod sdp_answer_response;
+pub mod sdp_offer_response;

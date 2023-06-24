@@ -4,7 +4,7 @@ use crate::database::init::ConnectionPool;
 use crate::domain::error::LogError;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
-use crate::entrypoint::websocket::request::accepte_invite_lobby_request::AcceptInviteLobbyRequest;
+use crate::entrypoint::websocket::request::accept_invite_lobby_request::AcceptInviteLobbyRequest;
 use crate::entrypoint::websocket::request::cancel_invite_user_lobby_request::CancelInviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::create_lobby_request::CreateLobbyRequest;
 use crate::entrypoint::websocket::request::decline_invite_lobby_request::DeclineInviteLobbyRequest;
@@ -15,6 +15,9 @@ use crate::entrypoint::websocket::request::join_lobby_request::JoinLobbyRequest;
 use crate::entrypoint::websocket::request::kick_user_lobby_request::KickUserRequest;
 use crate::entrypoint::websocket::request::launch_game_request::LaunchGameRequest;
 use crate::entrypoint::websocket::request::message_request::MessageRequest;
+use crate::entrypoint::websocket::request::register_ice_candidate_request::RegisterICECandidateRequest;
+use crate::entrypoint::websocket::request::sdp_answer_request::SDPAnswerRequest;
+use crate::entrypoint::websocket::request::sdp_offer_request::SDPOfferRequest;
 use crate::entrypoint::websocket::response::error_response::ErrorResponse;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 
@@ -35,6 +38,9 @@ pub enum RequestEnum {
     CancelInviteUserLobby(CancelInviteUserLobbyRequest),
     AcceptInviteLobby(AcceptInviteLobbyRequest),
     DeclineInviteLobby(DeclineInviteLobbyRequest),
+    SDPOffer(SDPOfferRequest),
+    SDPAnswer(SDPAnswerRequest),
+    RegisterICECandidate(RegisterICECandidateRequest),
     LaunchGame,
     BadMessage,
 }
@@ -105,7 +111,15 @@ impl RequestEnum {
                 let response = LaunchGameRequest::compute(pool.clone(), connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user.clone()).await;
             }
-            _ => {},
+            RequestEnum::SDPOffer(sdp_offer) => {
+
+            }
+            RequestEnum::SDPAnswer(sdp_answer) => {
+
+            }
+            RequestEnum::RegisterICECandidate(register_ice_candidate) => {
+
+            }
         }
         return false;
     }

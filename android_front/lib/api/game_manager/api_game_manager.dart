@@ -17,8 +17,7 @@ class ApiGameManager {
 
   static WebSocketChannel? openWebSocketConnection(String token) {
     try {
-      final headers = {'Authorization': 'Bearer $token'};
-      return IOWebSocketChannel.connect('$baseURLWS/ws', headers: headers);
+      return IOWebSocketChannel.connect('$baseURLWS/ws?token=$token');
     } catch (e) {
       return null;
     }
