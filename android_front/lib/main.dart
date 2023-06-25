@@ -15,6 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //prefs.setString("login_token", "m09TO9xebFj0VoH30CQMBCdJ1tIhRV7jBWpN0jFMrMTOoA4kVP3E8PddcDUrPrgtitR7fdWjT7UfnIYf9mhpgDUhDsvrHj4noKyYA29TZQz74CFEJ9Zhhzo9MD0ju2KRfHl8zG8d44tExhLS8aBd8Y6znRab7QuYNFmPWdghoXpi5pl7J8ITqCzrg2fyw0qWnkEQi9FeSHexeDI8fsdWOsoI4gpDsnfcQEuMZE6RgB7t2W3TGeDSILJkoicJCxim");
   if (prefs.containsKey('login_token')) {
     WebSocketChannel? channel = ApiGameManager.openWebSocketConnection(prefs.getString('login_token')!);
     if (channel == null) {

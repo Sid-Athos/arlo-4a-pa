@@ -78,7 +78,7 @@ class _HomeState extends State<HomeView> {
     super.initState();
 
     channel.stream.listen((message) {
-      developer.log(message);
+      developer.log("WS Received : $message");
 
       switch (message) {
         case "\"BadMessage\"":

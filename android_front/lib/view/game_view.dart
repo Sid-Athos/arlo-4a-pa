@@ -50,6 +50,7 @@ class _GameViewState extends State<GameView> {
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   bool _isShowChat = false;
   final encoder = JsonEncoder();
+  List<ICECandidate> iceCandidates = [];
 
   @override
   void initState() {
@@ -83,17 +84,6 @@ class _GameViewState extends State<GameView> {
     _localStream?.getTracks().forEach((track) {
       _peerConnection?.addTrack(track, _localStream!);
     });
-    setState(() {
-      _remoteRenderer.srcObject = _localStream;
-    });
-
-    final offerSdp = await _peerConnection?.createOffer();
-    await _peerConnection?.setLocalDescription(offerSdp!);
-
-    String msg = encoder.convert({
-      "SDPOffer": {'sdp': offerSdp!.sdp}
-    });
-    channel.sink.add(msg);
 
     _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
       String msg = encoder.convert({
@@ -103,8 +93,24 @@ class _GameViewState extends State<GameView> {
           "sdp_m_line_index": candidate.sdpMlineIndex
         }
       });
-      print(msg);
       channel.sink.add(msg);
+    };
+
+    RTCSessionDescription offerSdp = await _peerConnection!.createOffer();
+    await _peerConnection?.setLocalDescription(offerSdp);
+
+    String msg = encoder.convert({
+      "SDPOffer": {'sdp': offerSdp.sdp}
+    });
+    channel.sink.add(msg);
+
+    _peerConnection?.onTrack = (event) {
+      print("Track ajouté");
+      setState(() {
+        event.streams[0].getTracks().forEach((track) {
+          _remoteStream?.addTrack(track);
+        });
+      });
     };
   }
 
@@ -126,12 +132,16 @@ class _GameViewState extends State<GameView> {
       developer.log("Track ajouté");
       _peerConnection?.addTrack(track, _localStream!);
     });
-    setState(() {
-      _remoteRenderer.srcObject = _localStream;
-    });
 
     _peerConnection?.setRemoteDescription(
         RTCSessionDescription(gameProvider.offerSDP, "offer"));
+
+    final answerSdp = await _peerConnection?.createAnswer();
+    await _peerConnection?.setLocalDescription(answerSdp!);
+    String msg = encoder.convert({
+      "SDPAnswer": {'sdp': answerSdp!.sdp}
+    });
+    channel.sink.add(msg);
 
     _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
       String msg = encoder.convert({
@@ -142,31 +152,33 @@ class _GameViewState extends State<GameView> {
         }
       });
       channel.sink.add(msg);
+    };
 
-      for (ICECandidate iceCandidate in gameProvider.iceCandidates) {
-        _peerConnection?.addCandidate(RTCIceCandidate(iceCandidate.candidate,
-            iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
-      }
+    _peerConnection?.onAddStream = (stream) {
+      print("Stream ajouté");
+      setState(() {
+        _remoteStream = stream;
+        _remoteRenderer.srcObject = _remoteStream;
+      });
+    };
 
-      _peerConnection?.onAddStream = (stream) {
-        setState(() {
-          _remoteStream = stream;
-          _remoteRenderer.srcObject = _remoteStream;
+    _peerConnection?.onTrack = (event) {
+      print("Track ajouté");
+      setState(() {
+        event.streams[0].getTracks().forEach((track) {
+          _remoteStream?.addTrack(track);
         });
-      };
+      });
     };
   }
 
   setRemoteAnswer(GameProvider gameProvider) {
+    print("setRemoteAnswer");
     _peerConnection?.setRemoteDescription(
         RTCSessionDescription(gameProvider.answerSDP, "answer"));
 
-    for (ICECandidate iceCandidate in gameProvider.iceCandidates) {
-      _peerConnection?.addCandidate(RTCIceCandidate(iceCandidate.candidate,
-          iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
-    }
-
     _peerConnection?.onAddStream = (stream) {
+      print("Stream ajouté");
       setState(() {
         _remoteStream = stream;
         _remoteRenderer.srcObject = _remoteStream;
@@ -174,17 +186,38 @@ class _GameViewState extends State<GameView> {
     };
   }
 
+  addIceCandidate(GameProvider gameProvider) {
+    print("addIceCandidate");
+    bool check = false;
+    for (ICECandidate iceCandidate in gameProvider.iceCandidates) {
+      check = false;
+      for (ICECandidate savedIceCandidate in iceCandidates) {
+        if (savedIceCandidate.candidate == iceCandidate.candidate && savedIceCandidate.sdp_mid == iceCandidate.sdp_mid && savedIceCandidate.sdp_m_line_index == iceCandidate.sdp_m_line_index) {
+          check = true;
+        }
+      }
+      if (!check && iceCandidate.sdp_mid != null && iceCandidate.sdp_m_line_index != null) {
+        print("addIceCandidate TRUE");
+        _peerConnection?.addCandidate(RTCIceCandidate(iceCandidate.candidate,
+            iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
+        iceCandidates.add(iceCandidate);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
 
-    if (gameProvider.offerSDP != '') {
+    if (gameProvider.offerSDP != '' && _peerConnection?.getRemoteDescription() == null) {
       connectToSDP(gameProvider);
     }
 
-    if (gameProvider.answerSDP != '') {
+    if (gameProvider.answerSDP != '' && _peerConnection?.getRemoteDescription() == null) {
       setRemoteAnswer(gameProvider);
     }
+
+    addIceCandidate(gameProvider);
 
     return WillPopScope(
       onWillPop: () async {
