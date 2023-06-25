@@ -51,6 +51,19 @@ class _GameViewState extends State<GameView> {
   bool _isShowChat = false;
   final encoder = JsonEncoder();
   List<ICECandidate> iceCandidates = [];
+  final Map<String, dynamic> configuration = {
+    'iceServers': [
+      {'url': 'stun:stun1.l.google.com:19302'},
+      {'url': 'stun:stun2.l.google.com:19302'}
+    ],
+  };
+  final Map<String, dynamic> offerSdpConstraints = {
+    "mandatory": {
+      "OfferToReceiveAudio": true,
+      "OfferToReceiveVideo": true,
+    },
+    "optional": [],
+  };
 
   @override
   void initState() {
@@ -61,41 +74,14 @@ class _GameViewState extends State<GameView> {
   initRenderers() async {
     await _remoteRenderer.initialize();
     await _localRenderer.initialize();
+    await initPeerConnection();
 
     if (gameStarted.getHost().id == user.id) {
-      await createSession();
+      await sendOffer();
     }
   }
 
-  createSession() async {
-    final Map<String, dynamic> configuration = {
-      'iceServers': [
-        {'url': 'stun:stun.l.google.com:19302'},
-      ],
-    };
-
-    _peerConnection = await createPeerConnection(configuration);
-
-    _localStream = await navigator.mediaDevices.getUserMedia({
-      'audio': true,
-      'video': true,
-    });
-
-    _localStream?.getTracks().forEach((track) {
-      _peerConnection?.addTrack(track, _localStream!);
-    });
-
-    _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
-      String msg = encoder.convert({
-        "RegisterICECandidate": {
-          "candidate": candidate.candidate,
-          "sdp_mid": candidate.sdp_mid,
-          "sdp_m_line_index": candidate.sdpMlineIndex
-        }
-      });
-      channel.sink.add(msg);
-    };
-
+  sendOffer() async {
     RTCSessionDescription offerSdp = await _peerConnection!.createOffer();
     await _peerConnection?.setLocalDescription(offerSdp);
 
@@ -103,25 +89,11 @@ class _GameViewState extends State<GameView> {
       "SDPOffer": {'sdp': offerSdp.sdp}
     });
     channel.sink.add(msg);
-
-    _peerConnection?.onTrack = (event) {
-      print("Track ajouté");
-      setState(() {
-        event.streams[0].getTracks().forEach((track) {
-          _remoteStream?.addTrack(track);
-        });
-      });
-    };
   }
 
-  connectToSDP(GameProvider gameProvider) async {
-    final Map<String, dynamic> configuration = {
-      'iceServers': [
-        {'url': 'stun:stun.l.google.com:19302'},
-      ],
-    };
+  initPeerConnection() async {
 
-    _peerConnection = await createPeerConnection(configuration);
+    _peerConnection = await createPeerConnection(configuration, offerSdpConstraints);
 
     _localStream = await navigator.mediaDevices.getUserMedia({
       'audio': true,
@@ -132,23 +104,16 @@ class _GameViewState extends State<GameView> {
       developer.log("Track ajouté");
       _peerConnection?.addTrack(track, _localStream!);
     });
-
-    _peerConnection?.setRemoteDescription(
-        RTCSessionDescription(gameProvider.offerSDP, "offer"));
-
-    final answerSdp = await _peerConnection?.createAnswer();
-    await _peerConnection?.setLocalDescription(answerSdp!);
-    String msg = encoder.convert({
-      "SDPAnswer": {'sdp': answerSdp!.sdp}
+    setState(() {
+      _localRenderer.srcObject = _localStream;
     });
-    channel.sink.add(msg);
 
     _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
       String msg = encoder.convert({
         "RegisterICECandidate": {
           "candidate": candidate.candidate,
-          "sdp_mid": candidate.sdp_mid,
-          "sdp_m_line_index": candidate.sdpMlineIndex
+          "sdp_mid": candidate.sdpMid,
+          "sdp_m_line_index": candidate.sdpMLineIndex
         }
       });
       channel.sink.add(msg);
@@ -172,18 +137,23 @@ class _GameViewState extends State<GameView> {
     };
   }
 
+  answerSdp(GameProvider gameProvider) async {
+    _peerConnection?.setRemoteDescription(
+        RTCSessionDescription(gameProvider.offerSDP, "offer"));
+
+    final answerSdp = await _peerConnection?.createAnswer();
+    await _peerConnection?.setLocalDescription(answerSdp!);
+
+    String msg = encoder.convert({
+    "SDPAnswer": {'sdp': answerSdp!.sdp}
+    });
+    channel.sink.add(msg);
+  }
+
   setRemoteAnswer(GameProvider gameProvider) {
     print("setRemoteAnswer");
     _peerConnection?.setRemoteDescription(
         RTCSessionDescription(gameProvider.answerSDP, "answer"));
-
-    _peerConnection?.onAddStream = (stream) {
-      print("Stream ajouté");
-      setState(() {
-        _remoteStream = stream;
-        _remoteRenderer.srcObject = _remoteStream;
-      });
-    };
   }
 
   addIceCandidate(GameProvider gameProvider) {
@@ -196,9 +166,8 @@ class _GameViewState extends State<GameView> {
           check = true;
         }
       }
-      if (!check && iceCandidate.sdp_mid != null && iceCandidate.sdp_m_line_index != null) {
-        print("addIceCandidate TRUE");
-        _peerConnection?.addCandidate(RTCIceCandidate(iceCandidate.candidate,
+      if (!check) {
+        _peerConnection!.addCandidate(RTCIceCandidate(iceCandidate.candidate,
             iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
         iceCandidates.add(iceCandidate);
       }
@@ -210,7 +179,7 @@ class _GameViewState extends State<GameView> {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
 
     if (gameProvider.offerSDP != '' && _peerConnection?.getRemoteDescription() == null) {
-      connectToSDP(gameProvider);
+      answerSdp(gameProvider);
     }
 
     if (gameProvider.answerSDP != '' && _peerConnection?.getRemoteDescription() == null) {
@@ -251,6 +220,9 @@ class _GameViewState extends State<GameView> {
               ),
               body: Column(
                 children: [
+                  Expanded(
+                    child: RTCVideoView(_localRenderer, mirror: true),
+                  ),
                   Expanded(
                     child: RTCVideoView(_remoteRenderer),
                   ),
