@@ -64,6 +64,7 @@ class _GameViewState extends State<GameView> {
     },
     "optional": [],
   };
+  bool _isRemoteSet = false;
 
   @override
   void initState() {
@@ -101,7 +102,6 @@ class _GameViewState extends State<GameView> {
     });
 
     _localStream?.getTracks().forEach((track) {
-      developer.log("Track ajouté");
       _peerConnection?.addTrack(track, _localStream!);
     });
     setState(() {
@@ -130,14 +130,17 @@ class _GameViewState extends State<GameView> {
     _peerConnection?.onTrack = (event) {
       print("Track ajouté");
       setState(() {
+        _remoteStream = event.streams[0];
         event.streams[0].getTracks().forEach((track) {
           _remoteStream?.addTrack(track);
         });
+        _remoteRenderer.srcObject = _remoteStream;
       });
     };
   }
 
   answerSdp(GameProvider gameProvider) async {
+    print("answerSdp");
     _peerConnection?.setRemoteDescription(
         RTCSessionDescription(gameProvider.offerSDP, "offer"));
 
@@ -148,12 +151,14 @@ class _GameViewState extends State<GameView> {
     "SDPAnswer": {'sdp': answerSdp!.sdp}
     });
     channel.sink.add(msg);
+    _isRemoteSet = true;
   }
 
   setRemoteAnswer(GameProvider gameProvider) {
     print("setRemoteAnswer");
     _peerConnection?.setRemoteDescription(
         RTCSessionDescription(gameProvider.answerSDP, "answer"));
+    _isRemoteSet = true;
   }
 
   addIceCandidate(GameProvider gameProvider) {
@@ -178,11 +183,11 @@ class _GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
 
-    if (gameProvider.offerSDP != '' && _peerConnection?.getRemoteDescription() == null) {
+    if (gameProvider.offerSDP != '' && !_isRemoteSet) {
       answerSdp(gameProvider);
     }
 
-    if (gameProvider.answerSDP != '' && _peerConnection?.getRemoteDescription() == null) {
+    if (gameProvider.answerSDP != '' && !_isRemoteSet) {
       setRemoteAnswer(gameProvider);
     }
 
