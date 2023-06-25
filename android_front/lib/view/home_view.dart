@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:miku/api/game_manager/request/accept_invite_lobby_request.dart';
 import 'package:miku/api/game_manager/request/decline_invite_lobby_request.dart';
+import 'package:miku/model/ice_candidate_model.dart';
 import 'package:miku/model/invite_model.dart';
 import 'package:miku/model/mapper/game_started_mapper.dart';
 import 'package:miku/view/friend_list_view.dart';
@@ -60,10 +61,15 @@ class _HomeState extends State<HomeView> {
       private: false,
       members: [],
       game:
-          Game(id: 0, name: "", description: "", minPlayers: 0, maxPlayers: 0));
+      Game(id: 0,
+          name: "",
+          description: "",
+          minPlayers: 0,
+          maxPlayers: 0));
   GameProvider gameProvider = GameProvider(
     messages: [],
-    sdp: '',
+    offerSDP: '',
+    answerSDP: '',
     iceCandidates: [],
   );
 
@@ -86,26 +92,28 @@ class _HomeState extends State<HomeView> {
           navigatorKeys[1]
               .currentState
               ?.push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => ChangeNotifierProvider(
+            MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  ChangeNotifierProvider(
                     create: (context) => lobby,
                     builder: (context, child) =>
                         LobbyView(channel: channel, user: user),
                   ),
-                ),
-              )
-              .then((value) => lobby = Lobby(
+            ),
+          )
+              .then((value) =>
+          lobby = Lobby(
+              id: 0,
+              code: "",
+              gameId: 0,
+              private: false,
+              members: [],
+              game: Game(
                   id: 0,
-                  code: "",
-                  gameId: 0,
-                  private: false,
-                  members: [],
-                  game: Game(
-                      id: 0,
-                      name: "",
-                      description: "",
-                      minPlayers: 0,
-                      maxPlayers: 0)));
+                  name: "",
+                  description: "",
+                  minPlayers: 0,
+                  maxPlayers: 0)));
           return;
         case "\"LobbyExited\"":
           developer.log("LobbyExited");
@@ -133,26 +141,40 @@ class _HomeState extends State<HomeView> {
             navigatorKeys[1]
                 .currentState
                 ?.push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => ChangeNotifierProvider(
+              MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    ChangeNotifierProvider(
                       create: (context) => gameProvider,
-                      builder: (context, child) => GameView(
-                        gameStarted:
+                      builder: (context, child) =>
+                          GameView(
+                            gameStarted:
                             GameStartedMapper.fromJson(json["GameStarted"]),
-                        user: user,
-                        channel: channel,
-                      ),
+                            user: user,
+                            channel: channel,
+                          ),
                     ),
-                  ),
-                )
-                .then((value) => gameProvider = GameProvider(
-                      messages: [],
-                      sdp: '',
-                      iceCandidates: [],
-                    ));
+              ),
+            )
+                .then((value) =>
+            gameProvider = GameProvider(
+              messages: [],
+              offerSDP: '',
+              answerSDP: '',
+              iceCandidates: [],
+            ));
             break;
           case "SDPOffer":
-            gameProvider.updateSDP(json["SDPOffer"]["sdp"]);
+            gameProvider.addOffer(json["SDPOffer"]["sdp"]);
+            break;
+          case "SDPAnswer":
+            gameProvider.addAnswer(json["SDPAnswer"]["sdp"]);
+            break;
+          case "ICECandidate":
+            gameProvider.addIceCandidate(ICECandidate(
+                candidate: json["ICECandidate"]["candidate"],
+                sdp_mid: json["ICECandidate"]["sdp_mid"],
+                sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"])
+            );
             break;
           case "InviteReceived":
             developer.log("InviteReceived");
@@ -237,10 +259,11 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[1],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) => GameScreen(
-                channel: channel,
-                lobby: lobby,
-              ),
+              builder: (context) =>
+                  GameScreen(
+                    channel: channel,
+                    lobby: lobby,
+                  ),
             );
           }),
     );
@@ -267,7 +290,7 @@ class _HomeState extends State<HomeView> {
     ]);
     return WillPopScope(
       onWillPop: () async =>
-          !await navigatorKeys[currentTab].currentState!.maybePop(),
+      !await navigatorKeys[currentTab].currentState!.maybePop(),
       child: Scaffold(
         backgroundColor: const Color(0xFF21262B),
         body: Stack(children: <Widget>[

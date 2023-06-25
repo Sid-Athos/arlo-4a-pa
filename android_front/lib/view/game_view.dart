@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:miku/model/game_started.dart';
+import 'package:miku/model/ice_candidate_model.dart';
 import 'package:miku/provider/game_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -82,22 +83,108 @@ class _GameViewState extends State<GameView> {
     _localStream?.getTracks().forEach((track) {
       _peerConnection?.addTrack(track, _localStream!);
     });
+    setState(() {
+      _remoteRenderer.srcObject = _localStream;
+    });
 
     final offerSdp = await _peerConnection?.createOffer();
     await _peerConnection?.setLocalDescription(offerSdp!);
 
     String msg = encoder.convert({
-      "SDPOffer": {
-        'sdp': offerSdp!.sdp
-      }
+      "SDPOffer": {'sdp': offerSdp!.sdp}
     });
-    developer.log(msg);
     channel.sink.add(msg);
+
+    _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
+      String msg = encoder.convert({
+        "RegisterICECandidate": {
+          "candidate": candidate.candidate,
+          "sdp_mid": candidate.sdp_mid,
+          "sdp_m_line_index": candidate.sdpMlineIndex
+        }
+      });
+      print(msg);
+      channel.sink.add(msg);
+    };
+  }
+
+  connectToSDP(GameProvider gameProvider) async {
+    final Map<String, dynamic> configuration = {
+      'iceServers': [
+        {'url': 'stun:stun.l.google.com:19302'},
+      ],
+    };
+
+    _peerConnection = await createPeerConnection(configuration);
+
+    _localStream = await navigator.mediaDevices.getUserMedia({
+      'audio': true,
+      'video': true,
+    });
+
+    _localStream?.getTracks().forEach((track) {
+      developer.log("Track ajouté");
+      _peerConnection?.addTrack(track, _localStream!);
+    });
+    setState(() {
+      _remoteRenderer.srcObject = _localStream;
+    });
+
+    _peerConnection?.setRemoteDescription(
+        RTCSessionDescription(gameProvider.offerSDP, "offer"));
+
+    _peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
+      String msg = encoder.convert({
+        "RegisterICECandidate": {
+          "candidate": candidate.candidate,
+          "sdp_mid": candidate.sdp_mid,
+          "sdp_m_line_index": candidate.sdpMlineIndex
+        }
+      });
+      channel.sink.add(msg);
+
+      for (ICECandidate iceCandidate in gameProvider.iceCandidates) {
+        _peerConnection?.addCandidate(RTCIceCandidate(iceCandidate.candidate,
+            iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
+      }
+
+      _peerConnection?.onAddStream = (stream) {
+        setState(() {
+          _remoteStream = stream;
+          _remoteRenderer.srcObject = _remoteStream;
+        });
+      };
+    };
+  }
+
+  setRemoteAnswer(GameProvider gameProvider) {
+    _peerConnection?.setRemoteDescription(
+        RTCSessionDescription(gameProvider.answerSDP, "answer"));
+
+    for (ICECandidate iceCandidate in gameProvider.iceCandidates) {
+      _peerConnection?.addCandidate(RTCIceCandidate(iceCandidate.candidate,
+          iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
+    }
+
+    _peerConnection?.onAddStream = (stream) {
+      setState(() {
+        _remoteStream = stream;
+        _remoteRenderer.srcObject = _remoteStream;
+      });
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
+
+    if (gameProvider.offerSDP != '') {
+      connectToSDP(gameProvider);
+    }
+
+    if (gameProvider.answerSDP != '') {
+      setRemoteAnswer(gameProvider);
+    }
 
     return WillPopScope(
       onWillPop: () async {
@@ -126,6 +213,13 @@ class _GameViewState extends State<GameView> {
                         });
                       },
                     ),
+                  ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: RTCVideoView(_remoteRenderer),
                   ),
                 ],
               ),

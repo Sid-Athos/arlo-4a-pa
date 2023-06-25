@@ -12,8 +12,8 @@ use crate::service::lobby_service::LobbyService;
 #[derive(Deserialize, Debug)]
 pub struct RegisterICECandidateRequest {
     candidate: String,
-    sdp_mid: String,
-    sdp_m_line_index: i32,
+    sdp_mid: Option<String>,
+    sdp_m_line_index: Option<i32>,
 }
 
 impl RegisterICECandidateRequest {

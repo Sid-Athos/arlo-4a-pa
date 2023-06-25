@@ -6,12 +6,14 @@ import '../model/ice_candidate_model.dart';
 class GameProvider extends ChangeNotifier {
 
   List<MessageResponseWS> messages;
-  String sdp;
+  String offerSDP;
+  String answerSDP;
   List<ICECandidate> iceCandidates;
 
   GameProvider({
     required this.messages,
-    required this.sdp,
+    required this.offerSDP,
+    required this.answerSDP,
     required this.iceCandidates
   });
 
@@ -25,8 +27,13 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateSDP(String sdp) {
-    this.sdp = sdp;
+  void addOffer(String sdp) {
+    this.offerSDP = sdp;
+    notifyListeners();
+  }
+
+  void addAnswer(String sdp) {
+    this.answerSDP = sdp;
     notifyListeners();
   }
 }
