@@ -8,11 +8,13 @@ use crate::domain::error::database_error_to_status_code;
 use crate::domain::model::lobby::Lobby;
 use crate::domain::model::lobby_member::LobbyMember;
 use crate::service::command::create_lobby_command::CreateLobbyCommand;
+use crate::service::ws_session_service::WsSessionService;
 
 pub struct LobbyService {
     pub game_repository: GameRepository,
     pub lobby_repository: LobbyRepository,
     pub lobby_member_repository: LobbyMemberRepository,
+    pub ws_session_service: WsSessionService,
 }
 
 impl LobbyService {
@@ -22,6 +24,7 @@ impl LobbyService {
             game_repository: GameRepository::new(pool.clone()),
             lobby_repository: LobbyRepository::new(pool.clone()),
             lobby_member_repository: LobbyMemberRepository::new(pool.clone()),
+            ws_session_service: WsSessionService::new(pool.clone())
         }
     }
 
@@ -44,10 +47,12 @@ impl LobbyService {
 
     pub async fn exit_lobby(&self, user_id: i32) -> Result<Lobby, StatusCode> {
         let lobby_member = self.lobby_member_repository.delete(user_id).await.map_err(database_error_to_status_code)?;
+
         let lobby_members = self.lobby_member_repository.get_by_lobby_id(lobby_member.lobby_id).await.map_err(database_error_to_status_code)?;
 
         if lobby_members.len() == 0 {
-            return self.lobby_repository.delete_lobby(lobby_member.lobby_id).await.map_err(database_error_to_status_code)
+            self.ws_session_service.delete_for_lobby(lobby_member.lobby_id).await?;
+            return self.lobby_repository.delete_lobby(lobby_member.lobby_id).await.map_err(database_error_to_status_code);
         }
         if lobby_member.is_host {
             let new_host = lobby_members.get(0).unwrap();
@@ -92,7 +97,7 @@ impl LobbyService {
 
         let lobby = self.lobby_repository.get_by_id(lobby_id).await.map_err(database_error_to_status_code)?;
 
-        if lobby.private {
+        if lobby.private || lobby.is_launched {
             return Err(StatusCode::UNAUTHORIZED);
         }
 

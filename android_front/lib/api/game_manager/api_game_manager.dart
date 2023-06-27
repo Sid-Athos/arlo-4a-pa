@@ -23,6 +23,19 @@ class ApiGameManager {
     }
   }
 
+  static Future<List<User>> joinRtcSession() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.post('$baseURL/rtc/join_rtc', data: "");
+      final data = response.data as List<dynamic>;
+      return data.map((json) => UserResponseMapper.fromJson(json)).toList();
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
+    }
+  }
+
   static Future<List<User>> getConnectedFriends() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

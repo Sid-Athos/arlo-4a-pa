@@ -8,7 +8,7 @@ use crate::entrypoint::lobby::route::get_public_lobby_for_game::get_public_lobby
 pub fn lobby_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/get_public/:game_id", get(get_public_lobby_for_game))
+        .route("/lobby/get_public/:game_id", get(get_public_lobby_for_game))
         .with_state(pool)
 
 }

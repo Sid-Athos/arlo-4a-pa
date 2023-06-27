@@ -36,7 +36,7 @@ async fn main() {
 
     let app = Router::new()
         .merge(lobby_routes(pool.clone()))
-        .merge( game_routes(pool.clone()))
+        .merge(game_routes(pool.clone()))
         .merge(ws_routes(connections, pool.clone()))
         .layer(CorsLayer::permissive());
 

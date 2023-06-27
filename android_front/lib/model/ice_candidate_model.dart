@@ -1,7 +1,7 @@
 class ICECandidate {
   String candidate;
-  String sdp_mid;
-  int sdp_m_line_index;
+  String? sdp_mid;
+  int? sdp_m_line_index;
 
 
   ICECandidate({
