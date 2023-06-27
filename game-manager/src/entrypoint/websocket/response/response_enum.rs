@@ -27,6 +27,7 @@ pub enum ResponseEnum {
     InviteLobbyDeclined(InviteResponse),
     InviteReceived(InviteResponse),
     StartedGame,
+    CannotStartGame,
     BadMessage,
     GameStarted(GameStartedResponse),
     ICECandidate(ICECandidateResponse),

@@ -26,7 +26,12 @@ impl LaunchGameRequest {
             members_user_id.push(member.id);
         }
 
-        connections.send_to_vec_user_id(ResponseEnum::GameStarted(game_started_response), members_user_id).await;
+        if (lobby_response.members.len() as i32) >= lobby_response.game.min_players &&
+            (lobby_response.members.len() as i32) <= lobby_response.game.max_players {
+            connections.send_to_vec_user_id(ResponseEnum::GameStarted(game_started_response), members_user_id).await;
+        } else {
+            connections.send_to_vec_user_id(ResponseEnum::CannotStartGame, vec![user.id]).await;
+        }
 
         Ok(())
     }

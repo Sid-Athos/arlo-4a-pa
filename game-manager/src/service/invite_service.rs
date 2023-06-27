@@ -26,6 +26,9 @@ impl InviteService {
     pub async fn create_invite(&self, from_user_id: i32, to_user_id: i32) -> Result<Invite, StatusCode> {
         let lobby_member = self.lobby_member_repository.get_by_user_id(from_user_id).await.map_err(database_error_to_status_code)?;
         let lobby = self.lobby_repository.get_by_id(lobby_member.lobby_id).await.map_err(database_error_to_status_code)?;
+        if lobby.is_launched {
+            return Err(StatusCode::UNAUTHORIZED);
+        }
         let invite = self.invite_repository.get_by_users_id_and_lobby_id(from_user_id, to_user_id, lobby.id).await;
         match invite {
             Ok(i) => Ok(i),
@@ -50,6 +53,9 @@ impl InviteService {
     pub async fn accept_invite(&self, from_user_id: i32, to_user_id: i32) -> Result<Invite, StatusCode> {
         let lobby_member = self.lobby_member_repository.get_by_user_id(from_user_id).await.map_err(database_error_to_status_code)?;
         let lobby = self.lobby_repository.get_by_id(lobby_member.lobby_id).await.map_err(database_error_to_status_code)?;
+        if lobby.is_launched {
+            return Err(StatusCode::UNAUTHORIZED);
+        }
         let invite = self.invite_repository.get_by_users_id_and_lobby_id(from_user_id, to_user_id, lobby.id).await.map_err(database_error_to_status_code)?;
         self.invite_repository.delete_by_id(invite.id).await.map_err(database_error_to_status_code)?;
         self.lobby_member_repository.create(to_user_id, lobby.id, false).await.map_err(database_error_to_status_code)?;

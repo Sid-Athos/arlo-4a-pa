@@ -5,3 +5,4 @@ pub mod lobby_member;
 pub mod game;
 pub mod invite;
 pub mod friend_list;
+pub mod ws_session;
