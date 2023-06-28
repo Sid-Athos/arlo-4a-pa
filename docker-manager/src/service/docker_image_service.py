@@ -8,12 +8,13 @@ from env import DOCKERHUB_REPOSITORY, DOCKER_USERNAME, DOCKER_PASSWORD
 
 
 def build_image(language: str, tag: str, game_file_name: str) -> str:
-    print("GAME_PATH : " + f"{os.getcwd()}/games/{game_file_name}")
-    build_output: list = docker_client.images.build(path=f"{os.getcwd()}",
+    cwd = os.getcwd()
+    build_output: list = docker_client.images.build(path=f"{cwd}/dockerfiles/",
                                                     dockerfile=f"Dockerfile.{language}",
+                                                    custom_context=False,
                                                     tag=[f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"],
                                                     buildargs={
-                                                        "GAME_PATH": f"./games/{game_file_name}"})
+                                                        "GAME_NAME": game_file_name})
     for line in build_output[1]:
         if "stream" in line and "Successfully tagged" in line["stream"]:
             return f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"
