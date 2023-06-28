@@ -2,3 +2,4 @@ target
 env.py
 .idea
 venv
+**/__pycache__/

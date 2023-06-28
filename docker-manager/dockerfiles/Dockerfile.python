@@ -1,0 +1,3 @@
+ARG GAME_PATH
+FROM python:3.10-slim-bullseye
+COPY ${GAME_PATH} /main.py

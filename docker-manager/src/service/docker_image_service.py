@@ -1,4 +1,3 @@
-import json
 import os
 import requests
 from docker.models.images import Image
@@ -8,11 +7,13 @@ from ..dependencies.docker import docker_client
 from env import DOCKERHUB_REPOSITORY, DOCKER_USERNAME, DOCKER_PASSWORD
 
 
-def build_image(language: str, tag: str) -> str:
-    build_output: list = docker_client.images.build(path=f"{os.getcwd()}/dockerfiles/{language}",
+def build_image(language: str, tag: str, game_file_name: str) -> str:
+    print("GAME_PATH : " + f"{os.getcwd()}/games/{game_file_name}")
+    build_output: list = docker_client.images.build(path=f"{os.getcwd()}",
+                                                    dockerfile=f"Dockerfile.{language}",
                                                     tag=[f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"],
                                                     buildargs={
-                                                        "FILE_PATH": f"{os.getcwd()}/dockerfiles/{language}/Dockerfile"})
+                                                        "GAME_PATH": f"./games/{game_file_name}"})
     for line in build_output[1]:
         if "stream" in line and "Successfully tagged" in line["stream"]:
             return f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"

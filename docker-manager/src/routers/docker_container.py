@@ -25,8 +25,12 @@ async def run_container(image_name: str):
 
 
 @router.post("/{container_id}")
-async def exec_on_container(container_id: str, command: str):
-    content: dict | bool = docker_container_service.exec_on_container(container_id=container_id, command=command)
+async def exec_on_container(container_id: str, commands: list[str] | str):
+    if commands is list:
+        for command in commands:
+            content: dict | bool = docker_container_service.exec_on_container(container_id=container_id, command=command)
+    else:
+        content: dict | bool = docker_container_service.exec_on_container(container_id=container_id, command=commands)
     if content:
         return JSONResponse(status_code=status.HTTP_200_OK, content=content)
     return Response(status_code=status.HTTP_400_BAD_REQUEST)
