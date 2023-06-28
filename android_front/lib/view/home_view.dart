@@ -18,9 +18,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
 import '../api/game_manager/response/message_response_ws.dart';
-import '../model/chat_model.dart';
 import '../model/game_model.dart';
-import '../model/game_started.dart';
 import '../model/lobby_model.dart';
 import '../model/mapper/invite_response_mapper.dart';
 import '../model/user_model.dart';
@@ -71,6 +69,7 @@ class _HomeState extends State<HomeView> {
     offerSDP: '',
     answerSDP: '',
     iceCandidates: [],
+    isShowChat: false,
   );
 
   @override
@@ -125,6 +124,8 @@ class _HomeState extends State<HomeView> {
         case "\"UserInvited\"":
           developer.log("UserInvited");
           return;
+        case "\"CannotStartGame\"":
+          return;
       }
 
       Map<String, dynamic> json = jsonDecode(message);
@@ -161,6 +162,7 @@ class _HomeState extends State<HomeView> {
               offerSDP: '',
               answerSDP: '',
               iceCandidates: [],
+              isShowChat: false,
             ));
             break;
           case "SDPOffer":

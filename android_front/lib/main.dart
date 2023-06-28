@@ -24,7 +24,6 @@ Future<void> main() async {
     } else {
       User? user = await ApiUser.me(prefs.getString('login_token')!);
       if (user == null) {
-        prefs.remove('login_token');
         runApp(const AppUnLogged());
       } else {
         runApp(AppLogged(channel: channel, user: user));
@@ -33,7 +32,6 @@ Future<void> main() async {
   } else {
     runApp(const AppUnLogged());
   }
-  //runApp(AppTest());
 }
 
 class AppUnLogged extends StatelessWidget {
@@ -68,19 +66,3 @@ class AppLogged extends StatelessWidget {
     );
   }
 }
-/*
-class AppTest extends StatelessWidget {
-  AppTest({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return OverlaySupport(
-      child: MaterialApp(
-        title: 'Miku',
-        home: WebRTCSession(),
-        debugShowCheckedModeBanner: false,
-      ),
-    );
-  }
-}
-*/

@@ -7,6 +7,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:miku/model/game_started.dart';
 import 'package:miku/model/ice_candidate_model.dart';
 import 'package:miku/provider/game_provider.dart';
+import 'package:miku/view/chat_view.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -44,11 +45,8 @@ class _GameViewState extends State<GameView> {
   WebSocketChannel channel;
   GameStarted gameStarted;
   User user;
-  final ScrollController _scrollController = ScrollController();
-  final TextEditingController messageController = TextEditingController();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  bool _isShowChat = false;
   final encoder = JsonEncoder();
   List<ICECandidate> iceCandidates = [];
   final Map<String, dynamic> configuration = {
@@ -69,7 +67,7 @@ class _GameViewState extends State<GameView> {
   @override
   void initState() {
     super.initState();
-    initRenderers();
+    //initRenderers();
   }
 
   initRenderers() async {
@@ -93,8 +91,8 @@ class _GameViewState extends State<GameView> {
   }
 
   initPeerConnection() async {
-
-    _peerConnection = await createPeerConnection(configuration, offerSdpConstraints);
+    _peerConnection =
+        await createPeerConnection(configuration, offerSdpConstraints);
 
     _localStream = await navigator.mediaDevices.getUserMedia({
       'audio': true,
@@ -148,7 +146,7 @@ class _GameViewState extends State<GameView> {
     await _peerConnection?.setLocalDescription(answerSdp!);
 
     String msg = encoder.convert({
-    "SDPAnswer": {'sdp': answerSdp!.sdp}
+      "SDPAnswer": {'sdp': answerSdp!.sdp}
     });
     channel.sink.add(msg);
     _isRemoteSet = true;
@@ -167,7 +165,10 @@ class _GameViewState extends State<GameView> {
     for (ICECandidate iceCandidate in gameProvider.iceCandidates) {
       check = false;
       for (ICECandidate savedIceCandidate in iceCandidates) {
-        if (savedIceCandidate.candidate == iceCandidate.candidate && savedIceCandidate.sdp_mid == iceCandidate.sdp_mid && savedIceCandidate.sdp_m_line_index == iceCandidate.sdp_m_line_index) {
+        if (savedIceCandidate.candidate == iceCandidate.candidate &&
+            savedIceCandidate.sdp_mid == iceCandidate.sdp_mid &&
+            savedIceCandidate.sdp_m_line_index ==
+                iceCandidate.sdp_m_line_index) {
           check = true;
         }
       }
@@ -183,6 +184,7 @@ class _GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
 
+/*
     if (gameProvider.offerSDP != '' && !_isRemoteSet) {
       answerSdp(gameProvider);
     }
@@ -192,134 +194,57 @@ class _GameViewState extends State<GameView> {
     }
 
     addIceCandidate(gameProvider);
-
-    return WillPopScope(
-      onWillPop: () async {
-        if (_isShowChat) {
+*/
+    if (gameProvider.isShowChat) {
+      return WillPopScope(
+        onWillPop: () async {
           setState(() {
-            _isShowChat = false;
+            gameProvider.isShowChat = false;
           });
-        }
-        return false;
-      },
-      child: _isShowChat
-          ? displayChat(gameProvider)
-          : Scaffold(
-              backgroundColor: const Color(0xFF21262B),
-              appBar: AppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: const Color(0xFF21262B),
-                actions: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20.0),
-                    child: IconButton(
-                      icon: const Icon(Icons.chat_bubble),
-                      onPressed: () {
-                        setState(() {
-                          _isShowChat = true;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              body: Column(
-                children: [
-                  Expanded(
-                    child: RTCVideoView(_localRenderer, mirror: true),
-                  ),
-                  Expanded(
-                    child: RTCVideoView(_remoteRenderer),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget displayChat(GameProvider gameProvider) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const Text("Chat"),
+          return false;
+        },
+        child: ChatView(
+          messages: gameProvider.messages,
+          channel: channel,
+          user: user,
+        ),
+      );
+    } else {
+      return WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
           backgroundColor: const Color(0xFF21262B),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              setState(() {
-                _isShowChat = false;
-              });
-            },
-          )),
-      backgroundColor: const Color(0xFF21262B),
-      body: Column(
-        children: [
-          Expanded(child: buildChat(gameProvider)),
-          TextField(
-            controller: messageController,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              suffixIcon: IconButton(
-                icon: const Icon(
-                  Icons.send,
-                  color: Colors.white,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color(0xFF21262B),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0),
+                child: IconButton(
+                  icon: const Icon(Icons.chat_bubble),
+                  onPressed: () {
+                    setState(() {
+                      gameProvider.toggleChat(true);
+                    });
+                  },
                 ),
-                onPressed: () {
-                  send();
-                },
               ),
-              border: const OutlineInputBorder(),
-            ),
-            onSubmitted: (String value) {
-              channel.sink.add(MessageRequest.toJson(value));
-            },
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  void send() {
-    channel.sink.add(MessageRequest.toJson(messageController.text));
-    messageController.clear();
-    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-  }
-
-  Widget buildChat(GameProvider gameProvider) {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: gameProvider.messages.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: (user.id == gameProvider.messages[index].fromUser.id
-              ? const EdgeInsets.only(left: 100)
-              : const EdgeInsets.only(right: 100)),
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            color: const Color(0xFF1A2025),
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(bottom: 16.0, right: 32.0, left: 16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  ListTile(
-                    title: Text(
-                      gameProvider.messages[index].fromUser.pseudo,
-                      style: const TextStyle(color: Colors.white38),
-                    ),
-                    subtitle: Text(
-                      gameProvider.messages[index].message,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+          body: Column(
+            children: [
+              Expanded(
+                child: RTCVideoView(_localRenderer, mirror: true),
               ),
-            ),
+              Expanded(
+                child: RTCVideoView(_remoteRenderer),
+              ),
+            ],
           ),
-        );
-      },
-    );
+        ),
+      );
+    }
   }
 }
