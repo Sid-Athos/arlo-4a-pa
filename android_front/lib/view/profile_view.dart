@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
+import 'package:miku/view/dialog/change_password_dialog.dart';
+import 'package:miku/view/dialog/change_pseudo_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
@@ -111,7 +113,9 @@ class _ProfileViewState extends State<ProfileView> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showChangePseudoDialog(context);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF626af7),
                   ),
@@ -123,7 +127,29 @@ class _ProfileViewState extends State<ProfileView> {
                         color: Colors.white,
                         size: 24,
                       ),
-                      Text("Edit Profile"),
+                      Text("Change Pseudo"),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    showChangePasswordDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF626af7),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const <Widget>[
+                      Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      Text("Change Password"),
                     ],
                   ),
                 ),
@@ -151,6 +177,27 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ],
           ),
-        ));
+        ),
+    );
+  }
+
+  showChangePasswordDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return const ChangePasswordDialog();
+      },
+    );
+  }
+
+  showChangePseudoDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return const ChangePseudoDialog();
+      },
+    );
   }
 }
