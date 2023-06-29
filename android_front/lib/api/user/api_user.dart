@@ -103,7 +103,7 @@ class ApiUser {
     try {
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer $token";
-      final response = await dio.put('$baseURL/user/', data: updateUserRequest.toJson());
+      final response = await dio.put('$baseURL/user', data: updateUserRequest.toJson());
       return UserResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());

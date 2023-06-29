@@ -18,9 +18,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
 import '../api/game_manager/response/message_response_ws.dart';
-import '../model/chat_model.dart';
 import '../model/game_model.dart';
-import '../model/game_started.dart';
 import '../model/lobby_model.dart';
 import '../model/mapper/invite_response_mapper.dart';
 import '../model/user_model.dart';
@@ -68,9 +66,10 @@ class _HomeState extends State<HomeView> {
           maxPlayers: 0));
   GameProvider gameProvider = GameProvider(
     messages: [],
-    offerSDP: '',
-    answerSDP: '',
+    offerSDP: [],
+    answerSDP: [],
     iceCandidates: [],
+    isShowChat: false,
   );
 
   @override
@@ -125,6 +124,8 @@ class _HomeState extends State<HomeView> {
         case "\"UserInvited\"":
           developer.log("UserInvited");
           return;
+        case "\"CannotStartGame\"":
+          return;
       }
 
       Map<String, dynamic> json = jsonDecode(message);
@@ -158,22 +159,24 @@ class _HomeState extends State<HomeView> {
                 .then((value) =>
             gameProvider = GameProvider(
               messages: [],
-              offerSDP: '',
-              answerSDP: '',
+              offerSDP: [],
+              answerSDP: [],
               iceCandidates: [],
+              isShowChat: false,
             ));
             break;
           case "SDPOffer":
-            gameProvider.addOffer(json["SDPOffer"]["sdp"]);
+            gameProvider.addOffer(json["SDPOffer"]["sdp"], json["SDPOffer"]["from_user_id"]);
             break;
           case "SDPAnswer":
-            gameProvider.addAnswer(json["SDPAnswer"]["sdp"]);
+            gameProvider.addAnswer(json["SDPAnswer"]["sdp"], json["SDPAnswer"]["from_user_id"]);
             break;
           case "ICECandidate":
             gameProvider.addIceCandidate(ICECandidate(
                 candidate: json["ICECandidate"]["candidate"],
                 sdp_mid: json["ICECandidate"]["sdp_mid"],
-                sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"])
+                sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"]),
+                json["ICECandidate"]["from_user_id"]
             );
             break;
           case "InviteReceived":

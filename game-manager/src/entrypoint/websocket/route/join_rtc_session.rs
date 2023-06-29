@@ -24,5 +24,7 @@ pub async fn join_rtc_session(State(pool): State<ConnectionPool>, connections: E
         result.push(UserResponse::from_domain(user_service.get_user_by_id(member.user_id).await?))
     }
 
+    ws_service.create(user.id).await?;
+
     Ok(Json(result))
 }
