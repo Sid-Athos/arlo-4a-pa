@@ -24,9 +24,9 @@ import '../provider/user_sdp_provided.dart';
 class GameView extends StatefulWidget {
   GameView(
       {super.key,
-      required this.gameStarted,
-      required this.channel,
-      required this.user});
+        required this.gameStarted,
+        required this.channel,
+        required this.user});
 
   WebSocketChannel channel;
   GameStarted gameStarted;
@@ -34,10 +34,10 @@ class GameView extends StatefulWidget {
 
   @override
   _GameViewState createState() => _GameViewState(
-        gameStarted: gameStarted,
-        channel: channel,
-        user: user,
-      );
+    gameStarted: gameStarted,
+    channel: channel,
+    user: user,
+  );
 }
 
 class _GameViewState extends State<GameView> {
@@ -48,88 +48,9 @@ class _GameViewState extends State<GameView> {
   GameStarted gameStarted;
   User user;
 
-  MediaStream? localStream;
-  RTCVideoRenderer localRenderer = RTCVideoRenderer();
-  List<RtcSession> rtcSessions = [];
-
-  initLocalStream() async {
-    await localRenderer.initialize();
-
-    localStream = await navigator.mediaDevices.getUserMedia({
-      'audio': true,
-      'video': true,
-    });
-
-    setState(() {
-      localRenderer.srcObject = localStream;
-    });
-  }
-  
-  void answerSdpOffer(UserSdp userSdp) async {
-    RtcSession rtcSession = RtcSession(userSdp.userId);
-    
-    rtcSession.initPeerConnection(localStream!, channel);
-
-    await rtcSession.answerSdp(userSdp.sdp, channel);
-
-    rtcSessions.add(rtcSession);
-  }
-
-  void setRemoteAnswer(UserSdp userSdp) async {
-    for (RtcSession rtcSession in rtcSessions) {
-      if (rtcSession.userId == userSdp.userId) {
-        rtcSession.setRemoteAnswer(userSdp.sdp);
-      }
-    }
-  }
-
-  void addIceCandidate(UserIceCandidate userIceCandidate) async {
-    for (RtcSession rtcSession in rtcSessions) {
-      if (rtcSession.userId == userIceCandidate.userId) {
-        rtcSession.addIceCandidate(userIceCandidate.iceCandidates);
-      }
-    }
-  }
-
-  void joinCall() async {
-    await initLocalStream();
-
-    List<User> usersInCall = await ApiGameManager.joinRtcSession();
-
-    for (User userInCall in usersInCall) {
-      RtcSession rtcSession = RtcSession(userInCall.id);
-
-      rtcSession.initPeerConnection(localStream!, channel);
-      await rtcSession.sendOffer(channel);
-
-      rtcSessions.add(rtcSession);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
-
-    for (UserSdp userSdp in gameProvider.offerSDP) {
-      if (!userSdp.computed) {
-        userSdp.computed = true;
-        answerSdpOffer(userSdp);
-      }
-    }
-
-    for (UserSdp userSdp in gameProvider.answerSDP) {
-      if (!userSdp.computed) {
-        userSdp.computed = true;
-        answerSdpOffer(userSdp);
-      }
-    }
-
-    for (UserIceCandidate userIceCandidate in gameProvider.iceCandidates) {
-      if (!userIceCandidate.computed) {
-        userIceCandidate.computed = true;
-        addIceCandidate(userIceCandidate);
-      }
-    }
 
     if (gameProvider.isShowChat) {
       return WillPopScope(
@@ -158,7 +79,7 @@ class _GameViewState extends State<GameView> {
                 padding: const EdgeInsets.only(right: 20.0),
                 child: IconButton(
                   icon: const Icon(Icons.call),
-                  onPressed: joinCall,
+                  onPressed: gameProvider.joinCall,
                 ),
               ),
               Padding(
@@ -175,8 +96,12 @@ class _GameViewState extends State<GameView> {
           body: Column(
             children: [
               Expanded(
-                child: RTCVideoView(localRenderer, mirror: true),
+                child: RTCVideoView(gameProvider.localRenderer, mirror: true),
               ),
+              for (RtcSession rtcSession in gameProvider.rtcSessions)
+                Expanded(
+                  child: RTCVideoView(rtcSession.remoteRenderer),
+                ),
             ],
           ),
         ),
