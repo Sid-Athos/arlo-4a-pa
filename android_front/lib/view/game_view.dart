@@ -14,6 +14,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../model/rtc_session.dart';
 import '../model/user_model.dart';
+import 'call_view.dart';
 
 class GameView extends StatefulWidget {
   GameView(
@@ -58,6 +59,17 @@ class _GameViewState extends State<GameView> {
           user: user,
         ),
       );
+    } else if (gameProvider.isShowCall) {
+      return WillPopScope(
+        onWillPop: () async {
+          gameProvider.toggleCall(false);
+          return false;
+        },
+        child: CallView(
+          channel: channel,
+          user: user,
+        ),
+      );
     } else {
       return WillPopScope(
         onWillPop: () async {
@@ -73,7 +85,9 @@ class _GameViewState extends State<GameView> {
                 padding: const EdgeInsets.only(right: 20.0),
                 child: IconButton(
                   icon: const Icon(Icons.call),
-                  onPressed: gameProvider.joinCall,
+                  onPressed: () {
+                    gameProvider.toggleCall(true);
+                  },
                 ),
               ),
               Padding(

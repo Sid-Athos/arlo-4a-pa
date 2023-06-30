@@ -17,6 +17,7 @@ class GameProvider extends ChangeNotifier {
   List<UserSdp> answerSDP;
   List<UserIceCandidate> iceCandidates;
   bool isShowChat = false;
+  bool isShowCall = false;
   WebSocketChannel? channel;
   List<RtcSession> rtcSessions = [];
   MediaStream? localStream;
@@ -95,6 +96,11 @@ class GameProvider extends ChangeNotifier {
 
   void toggleChat(bool isShowChat) {
     this.isShowChat = isShowChat;
+    notifyListeners();
+  }
+
+  void toggleCall(bool isShowCall) {
+    this.isShowCall = isShowCall;
     notifyListeners();
   }
 }
