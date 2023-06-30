@@ -12,14 +12,8 @@ import 'package:miku/view/chat_view.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../api/game_manager/api_game_manager.dart';
-import '../api/game_manager/request/message_request.dart';
-import '../model/chat_model.dart';
 import '../model/rtc_session.dart';
 import '../model/user_model.dart';
-import 'dart:developer' as developer;
-
-import '../provider/user_sdp_provided.dart';
 
 class GameView extends StatefulWidget {
   GameView(
