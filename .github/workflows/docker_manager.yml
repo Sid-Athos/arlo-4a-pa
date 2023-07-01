@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main", "test", "dev" ]
     paths:
-     - docker-manager
+     - 'game-manager/**'
 
 env:
   BRANCH_NAME: ${{github.ref_name}}

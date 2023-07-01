@@ -1,3 +1,3 @@
 # App setting
 
-Later ..
+Later .
