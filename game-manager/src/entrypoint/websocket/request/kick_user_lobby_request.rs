@@ -1,6 +1,7 @@
 use axum::Extension;
 use serde::Deserialize;
 use crate::database::init::ConnectionPool;
+use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
@@ -19,15 +20,15 @@ impl KickUserRequest {
 
         let user_service = UserService::new(pool);
 
-        let user_to_kick = user_service.get_user_by_id(self.user_id).await?;
+        let user_to_kick = user_service.get_user_by_id(self.user_id).await.map_err(status_code_to_string)?;
 
         if user_to_kick.id == user.id {
             return Err("You can't kick yourself".to_string());
         }
 
-        let lobby_member = lobby_service.get_lobby_member_by_user_id(user.id).await?;
+        let lobby_member = lobby_service.get_lobby_member_by_user_id(user.id).await.map_err(status_code_to_string)?;
 
-        let lobby_member = lobby_service.kick( lobby_member.lobby_id, self.user_id).await?;
+        lobby_service.kick( lobby_member.lobby_id, self.user_id).await.map_err(status_code_to_string)?;
 
         connections.send_to_vec_user_id(ResponseEnum::UserKicked, vec![user.id]).await;
         connections.send_to_vec_user_id(ResponseEnum::Kicked, vec![self.user_id]).await;

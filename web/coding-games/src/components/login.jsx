@@ -8,9 +8,11 @@ import {
 import {createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import UnloggedScreen from "../render/unlogged/unlogged-screen";
-import {AxiosInstance} from "../utils/services/axios-instance";
+import {ApiInstance} from "../utils/services/api-instance";
+import {GameManagerInstance} from "../utils/services/game-manager-instance";
 import {UserService} from "../utils/services/user-service";
 import {useNavigate} from "@solidjs/router";
+import {useUserProvider} from "./user-provider";
 
 export default function LoginComponent ({open, setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
@@ -22,6 +24,7 @@ export default function LoginComponent ({open, setOpen})  {
     const [userSignUpError, setUserSignUpError] = createSignal(false);
     const [userIsSignedIn, setUserIsSignedIn] = createSignal(false);
     const navigate = useNavigate();
+    const [userToken, { updateToken }] = useUserProvider();
     // @ts-ignore
     async function signIn() {
         if(userSignIn().nickname.length >= 5 && userSignIn().password.length >= 8){
@@ -31,10 +34,10 @@ export default function LoginComponent ({open, setOpen})  {
                     setClientData(res);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
-                    navigate("/lobby")
+                    navigate("/lobby",{token: res.data.token})
+                    handleClose();
                 }
             } catch (error) {
-                console.log(error)
                 setUserSignInError(true)
                 setUserSignInErrorMessage("An error occured while connecting")
             }
@@ -47,8 +50,9 @@ export default function LoginComponent ({open, setOpen})  {
         let userInfo = {...user}
         userInfo.nickname = userSignIn().nickname
         userInfo.token = "Bearer " + response.data.token
-        AxiosInstance.updateAuthorizationHeader(userInfo.token)
-        setUser(userInfo);
+        ApiInstance.updateAuthorizationHeader(userInfo.token );
+        GameManagerInstance.updateAuthorizationHeader(userInfo.token);
+        updateToken(userInfo.token)
     }
 
 
@@ -61,6 +65,8 @@ export default function LoginComponent ({open, setOpen})  {
                     setClientData(userCreated);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
+                    navigate("/lobby")
+                    handleClose();
                 }
             } catch (error) {
                 setUserSignUpError(!userSignUpError())
@@ -93,10 +99,9 @@ export default function LoginComponent ({open, setOpen})  {
                 <img src={logo} className={styles.logo} alt="logo" />
             </header>
             <UnloggedScreen open={open} handleClose={handleClose} userSignIn={userSignIn} userSignUp={userSignUp} userSignInError={userSignInError} userSignUpError={userSignUpError} signIn={signIn}
-            userSignUpErrorMessage={userSignUpErrorMessage} submitSignInFormOnPressEnter={submitSignInFormOnPressEnter} submitSignUpFormOnPressEnter={submitSignUpFormOnPressEnter}
-            userSignInErrorMessage={userSignInErrorMessage} setUserSignInError={setUserSignInError} setUserSignIn={setUserSignIn} setUserSignUp={setUserSignUp}
-            setUserSignUpError={setUserSignUpError} signUp={signUp} userIsSignedIn={userIsSignedIn} setUserIsSignedIn={setUserIsSignedIn}></UnloggedScreen>
+                            userSignUpErrorMessage={userSignUpErrorMessage} submitSignInFormOnPressEnter={submitSignInFormOnPressEnter} submitSignUpFormOnPressEnter={submitSignUpFormOnPressEnter}
+                            userSignInErrorMessage={userSignInErrorMessage} setUserSignInError={setUserSignInError} setUserSignIn={setUserSignIn} setUserSignUp={setUserSignUp}
+                            setUserSignUpError={setUserSignUpError} signUp={signUp} userIsSignedIn={userIsSignedIn} setUserIsSignedIn={setUserIsSignedIn}></UnloggedScreen>
         </Box>
     );
 };
-

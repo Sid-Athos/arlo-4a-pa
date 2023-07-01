@@ -9,7 +9,7 @@ pub async fn get_all_games(State(pool): State<ConnectionPool>) -> Result<Json<Ve
 
     let game_service = GameService::new(pool);
 
-    let games = game_service.get_all_games().await.unwrap();
+    let games = game_service.get_all_games().await?;
 
     Ok(Json(GameResponse::from_vec_domain(games)))
 }

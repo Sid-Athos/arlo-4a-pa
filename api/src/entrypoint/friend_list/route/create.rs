@@ -36,8 +36,8 @@ pub async fn friend_list_create(State(pool): State<ConnectionPool>, Extension(us
     );
 
     let friend_list = friend_list_service.create_friend_request(friend_list.recipient_id,user.id).await?;
-    let applicant = UserResponse::from_domain(user_service.get_user_by_id(friend_list.recipient_id).await?);
-    let recipient = UserResponse::from_domain(user_service.get_user_by_id(friend_list.applicant_id).await?);
+    let recipient = UserResponse::from_domain(user_service.get_user_by_id(friend_list.recipient_id).await?);
+    let applicant = UserResponse::from_domain(user_service.get_user_by_id(friend_list.applicant_id).await?);
 
     Ok(Json(FriendListResponse::from_domain(friend_list, applicant, recipient)))
 }

@@ -18,6 +18,16 @@ impl Connections {
         }
     }
 
+    pub async fn get_list_connected(&self) -> Vec<i32> {
+        let mut list = Vec::new();
+
+        for (i, _) in self.clients.lock().await.iter_mut() {
+            list.push(*i);
+        }
+
+        list
+    }
+
     pub async fn send_to_vec_user_id(&self, response: ResponseEnum, users_id: Vec<i32>) {
         let mut disconnected_clients = Vec::new();
 

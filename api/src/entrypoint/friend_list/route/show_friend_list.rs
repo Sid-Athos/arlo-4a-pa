@@ -39,8 +39,8 @@ pub async fn show_friend_list(State(pool): State<ConnectionPool>, Extension(user
 
     let mut responses = Vec::new();
     for friend in &result {
-        let applicant = UserResponse::from_domain(user_service.get_user_by_id(friend.recipient_id).await?);
-        let recipient = UserResponse::from_domain(user_service.get_user_by_id(friend.applicant_id).await?);
+        let recipient = UserResponse::from_domain(user_service.get_user_by_id(friend.recipient_id).await?);
+        let applicant = UserResponse::from_domain(user_service.get_user_by_id(friend.applicant_id).await?);
         responses.push(FriendListResponse::from_domain(friend.clone(), applicant, recipient))
     }
 

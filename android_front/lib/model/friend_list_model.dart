@@ -6,15 +6,15 @@ class FriendList {
   int applicantId;
   int recipientId;
   bool accepted;
-  User? applicant;
-  User? recipient;
+  User applicant;
+  User recipient;
 
   FriendList({
     required this.id,
     required this.applicantId,
     required this.recipientId,
     required this.accepted,
-    this.applicant,
-    this.recipient,
+    required this.applicant,
+    required this.recipient,
   });
 }

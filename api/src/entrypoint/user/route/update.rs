@@ -32,7 +32,6 @@ pub async fn update_user(State(pool): State<ConnectionPool>, Extension(user): Ex
     );
 
     let command = UpdateUserCommand::new(user.id, Some(update_request.pseudo), None, None);
-
     let user = user_service.update_user(command).await?;
 
     Ok(Json(UserResponse::from_domain(user)))

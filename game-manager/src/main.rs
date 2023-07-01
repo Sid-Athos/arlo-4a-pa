@@ -14,6 +14,7 @@ use crate::entrypoint::game::game_router::game_routes;
 use crate::entrypoint::lobby::lobby_router::lobby_routes;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::router::ws_routes;
+use tower_http::cors::CorsLayer;
 
 #[tokio::main]
 async fn main() {
@@ -34,9 +35,10 @@ async fn main() {
 
 
     let app = Router::new()
-        .nest("/lobby", lobby_routes(pool.clone()))
-        .nest("/game", game_routes(pool.clone()))
-        .nest("/ws", ws_routes(connections, pool.clone()));
+        .merge(lobby_routes(pool.clone()))
+        .merge(game_routes(pool.clone()))
+        .merge(ws_routes(connections, pool.clone()))
+        .layer(CorsLayer::permissive());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 7589));
 

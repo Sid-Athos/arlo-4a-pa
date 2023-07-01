@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/api/user/api_user.dart';
+import 'package:miku/view/dialog/change_password_dialog.dart';
+import 'package:miku/view/dialog/change_pseudo_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import '../model/user_model.dart';
 
@@ -52,6 +55,40 @@ class _ProfileViewState extends State<ProfileView> {
                 ],
               ),
               Padding(
+                padding: const EdgeInsets.only(top: 32),
+                child: Text(
+                  "Level ${user.level}",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    LinearPercentIndicator(
+                      width: 250.0,
+                      animation: true,
+                      animationDuration: 1000,
+                      lineHeight: 20.0,
+                      percent: user.experience / (user.level * 10),
+                      center: Text(
+                        "${user.experience} / ${user.level * 10}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      linearStrokeCap: LinearStrokeCap.butt,
+                      progressColor: Colors.blueAccent,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.only(top: 32, bottom: 32),
                 child: Row(
                   children: [
@@ -76,7 +113,9 @@ class _ProfileViewState extends State<ProfileView> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showChangePseudoDialog(context);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF626af7),
                   ),
@@ -88,7 +127,29 @@ class _ProfileViewState extends State<ProfileView> {
                         color: Colors.white,
                         size: 24,
                       ),
-                      Text("Edit Profile"),
+                      Text("Change Pseudo"),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    showChangePasswordDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF626af7),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const <Widget>[
+                      Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      Text("Change Password"),
                     ],
                   ),
                 ),
@@ -116,6 +177,27 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ],
           ),
-        ));
+        ),
+    );
+  }
+
+  showChangePasswordDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return const ChangePasswordDialog();
+      },
+    );
+  }
+
+  showChangePseudoDialog(BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return const ChangePseudoDialog();
+      },
+    );
   }
 }
