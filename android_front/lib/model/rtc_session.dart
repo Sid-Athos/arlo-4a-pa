@@ -13,11 +13,17 @@ class RtcSession {
     ],
   };
   static const encoder = JsonEncoder();
+  static const Map<String, dynamic> offerSdpConstraints = {
+    "mandatory": {
+      "OfferToReceiveAudio": true,
+      "OfferToReceiveVideo": true,
+    },
+    "optional": [],
+  };
 
   RTCPeerConnection? peerConnection;
   MediaStream? remoteStream;
   RTCVideoRenderer remoteRenderer = RTCVideoRenderer();
-  List<ICECandidate> iceCandidates = [];
   bool isRemoteSet = false;
   int userId;
 
@@ -25,12 +31,11 @@ class RtcSession {
     remoteRenderer.initialize();
   }
 
-  void initPeerConnection(
-      MediaStream localStream, WebSocketChannel channel) async {
-    peerConnection = await createPeerConnection(configuration);
+  initPeerConnection(MediaStream localStream, WebSocketChannel channel) async {
+    peerConnection = await createPeerConnection(configuration, offerSdpConstraints);
 
-    localStream.getTracks().forEach((track) {
-      peerConnection?.addTrack(track, localStream);
+    localStream.getTracks().forEach((track) async {
+      await peerConnection?.addTrack(track, localStream);
     });
 
     peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
@@ -53,7 +58,7 @@ class RtcSession {
     peerConnection?.onTrack = (event) {
       remoteStream = event.streams[0];
       event.streams[0].getTracks().forEach((track) {
-        remoteStream?.addTrack(track);
+        remoteStream!.addTrack(track);
       });
       remoteRenderer.srcObject = remoteStream;
     };
@@ -70,11 +75,11 @@ class RtcSession {
   }
 
   answerSdp(String sdpOffer, WebSocketChannel channel) async {
-    RTCSessionDescription answerSdp = await peerConnection!.createAnswer();
-    await peerConnection?.setLocalDescription(answerSdp);
-
     peerConnection
         ?.setRemoteDescription(RTCSessionDescription(sdpOffer, "offer"));
+
+    RTCSessionDescription answerSdp = await peerConnection!.createAnswer();
+    await peerConnection?.setLocalDescription(answerSdp);
 
     String msg = encoder.convert({
       "SDPAnswer": {'sdp': answerSdp.sdp, "to_user_id": userId}
@@ -93,6 +98,5 @@ class RtcSession {
   addIceCandidate(ICECandidate iceCandidate) {
     peerConnection!.addCandidate(RTCIceCandidate(iceCandidate.candidate,
         iceCandidate.sdp_mid, iceCandidate.sdp_m_line_index));
-    iceCandidates.add(iceCandidate);
   }
 }

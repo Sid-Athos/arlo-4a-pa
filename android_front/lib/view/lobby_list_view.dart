@@ -52,17 +52,6 @@ class _LobbyListViewState extends State<LobbyListView> {
                   size: 32.0,
                 ),
               )),
-          Padding(
-              padding: const EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
-                  showConfirmationDialog(context);
-                },
-                child: const Icon(
-                  Icons.search,
-                  size: 32.0,
-                ),
-              )),
         ],
       ),
       backgroundColor: const Color(0xFF21262B),

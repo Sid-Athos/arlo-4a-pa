@@ -6,6 +6,7 @@ use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::message_response::MessageResponse;
 use crate::entrypoint::websocket::response::sdp_answer_response::SDPAnswerResponse;
 use crate::entrypoint::websocket::response::sdp_offer_response::SDPOfferResponse;
+use crate::entrypoint::websocket::response::user_left_rtc_session::UserLeftRtcSessionResponse;
 
 #[derive(Serialize, Debug)]
 pub enum ResponseEnum {
@@ -34,5 +35,6 @@ pub enum ResponseEnum {
     SDPAnswer(SDPAnswerResponse),
     SDPOffer(SDPOfferResponse),
     Lobby(LobbyResponse),
+    UserLeftRtcSession(UserLeftRtcSessionResponse),
     Error(String),
 }

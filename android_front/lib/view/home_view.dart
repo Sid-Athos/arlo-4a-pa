@@ -65,15 +65,14 @@ class _HomeState extends State<HomeView> {
           minPlayers: 0,
           maxPlayers: 0));
   GameProvider gameProvider = GameProvider(
-    messages: [],
-    offerSDP: [],
-    answerSDP: [],
-    iceCandidates: [],
-    isShowChat: false,
+      messages: [],
+      isShowChat: false,
+      channel: null
   );
 
   @override
   void initState() {
+    gameProvider.channel = channel;
     super.initState();
 
     channel.stream.listen((message) {
@@ -158,18 +157,16 @@ class _HomeState extends State<HomeView> {
             )
                 .then((value) =>
             gameProvider = GameProvider(
-              messages: [],
-              offerSDP: [],
-              answerSDP: [],
-              iceCandidates: [],
-              isShowChat: false,
+                messages: [],
+                isShowChat: false,
+                channel: channel
             ));
             break;
           case "SDPOffer":
-            gameProvider.addOffer(json["SDPOffer"]["sdp"], json["SDPOffer"]["from_user_id"]);
+            gameProvider.answerSdpOffer(json["SDPOffer"]["sdp"], json["SDPOffer"]["from_user_id"]);
             break;
           case "SDPAnswer":
-            gameProvider.addAnswer(json["SDPAnswer"]["sdp"], json["SDPAnswer"]["from_user_id"]);
+            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"], json["SDPAnswer"]["from_user_id"]);
             break;
           case "ICECandidate":
             gameProvider.addIceCandidate(ICECandidate(
