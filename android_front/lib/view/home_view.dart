@@ -66,9 +66,6 @@ class _HomeState extends State<HomeView> {
           maxPlayers: 0));
   GameProvider gameProvider = GameProvider(
       messages: [],
-      offerSDP: [],
-      answerSDP: [],
-      iceCandidates: [],
       isShowChat: false,
       channel: null
   );
@@ -161,9 +158,6 @@ class _HomeState extends State<HomeView> {
                 .then((value) =>
             gameProvider = GameProvider(
                 messages: [],
-                offerSDP: [],
-                answerSDP: [],
-                iceCandidates: [],
                 isShowChat: false,
                 channel: channel
             ));

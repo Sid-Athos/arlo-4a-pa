@@ -13,11 +13,9 @@ import '../model/user_model.dart';
 class GameProvider extends ChangeNotifier {
 
   List<MessageResponseWS> messages;
-  List<UserSdp> offerSDP;
-  List<UserSdp> answerSDP;
-  List<UserIceCandidate> iceCandidates;
   bool isShowChat = false;
   bool isShowCall = false;
+  bool inCall = false;
   WebSocketChannel? channel;
   List<RtcSession> rtcSessions = [];
   MediaStream? localStream;
@@ -25,9 +23,6 @@ class GameProvider extends ChangeNotifier {
 
   GameProvider({
     required this.messages,
-    required this.offerSDP,
-    required this.answerSDP,
-    required this.iceCandidates,
     required this.isShowChat,
     required this.channel,
   });
@@ -85,8 +80,10 @@ class GameProvider extends ChangeNotifier {
       await rtcSession.sendOffer(channel!);
 
       rtcSessions.add(rtcSession);
-      notifyListeners();
     }
+
+    inCall = true;
+    notifyListeners();
   }
 
   void addMessage(MessageResponseWS message) {
@@ -101,6 +98,26 @@ class GameProvider extends ChangeNotifier {
 
   void toggleCall(bool isShowCall) {
     this.isShowCall = isShowCall;
+    notifyListeners();
+  }
+
+  void toggleLocalAudio(bool enabled) {
+    localStream!.getAudioTracks()[0].enabled = enabled;
+    notifyListeners();
+  }
+
+  void toggleLocalVideo(bool enabled) {
+    localStream!.getVideoTracks()[0].enabled = enabled;
+    notifyListeners();
+  }
+
+  void leaveCall() {
+    for (RtcSession rtcSession in rtcSessions) {
+      rtcSession.peerConnection?.close();
+    }
+    rtcSessions = [];
+    localStream?.dispose();
+    inCall = false;
     notifyListeners();
   }
 }

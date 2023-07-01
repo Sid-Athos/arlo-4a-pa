@@ -101,17 +101,6 @@ class _GameViewState extends State<GameView> {
               ),
             ],
           ),
-          body: Column(
-            children: [
-              Expanded(
-                child: RTCVideoView(gameProvider.localRenderer, mirror: true),
-              ),
-              for (RtcSession rtcSession in gameProvider.rtcSessions)
-                Expanded(
-                  child: RTCVideoView(rtcSession.remoteRenderer),
-                ),
-            ],
-          ),
         ),
       );
     }
