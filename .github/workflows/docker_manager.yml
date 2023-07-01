@@ -9,7 +9,6 @@ env:
 
 jobs:
   build:
-    needs: tests
     name: Build docker image
     runs-on: self-hosted
     steps:
