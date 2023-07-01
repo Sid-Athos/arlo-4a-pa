@@ -1,0 +1,5 @@
+ARG GAME_FILE_NAME
+FROM python:3.10-slim-bullseye
+ARG GAME_FILE_NAME
+COPY ./games/"${GAME_FILE_NAME}" /main.py
+ENTRYPOINT ["python3", "main.py"]
