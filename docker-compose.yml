@@ -28,7 +28,7 @@ services:
     restart: "always"
     tty: true
     volumes:
-      - "./docker-manager/.env.py:/code/.env.py"
+      - "./docker-manager/env.py:/code/env.py"
       - "./docker-manager/dockerfiles:/code/dockerfiles"
       - "./game-manager/resources/games:/code/dockerfiles/games"
   front:
