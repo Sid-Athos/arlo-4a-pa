@@ -1,6 +1,7 @@
 use axum::Extension;
 use serde::Deserialize;
 use crate::database::init::ConnectionPool;
+use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::invite_response::InviteResponse;
@@ -16,11 +17,11 @@ impl CancelInviteUserLobbyRequest {
 
     pub async fn compute(&self, pool: ConnectionPool, connections: Extension<Connections>, user: User) -> Result<(), String> {
 
-        let invite_service = InviteService::new(pool);
+        let invite_service = InviteService::new(pool.clone());
 
-        let invite = invite_service.cancel_invite(user.id, self.user_id).await?;
+        let invite = invite_service.cancel_invite(user.id, self.user_id).await.map_err(status_code_to_string)?;
 
-        let invite_response = InviteResponse::from_domain(invite);
+        let invite_response = InviteResponse::from_domain(invite, pool).await?;
 
         connections.send_to_vec_user_id(ResponseEnum::InviteLobbyCancelled(invite_response), vec![self.user_id, user.id]).await;
 

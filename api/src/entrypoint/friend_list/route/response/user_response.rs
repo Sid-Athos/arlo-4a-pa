@@ -8,6 +8,8 @@ pub struct UserResponse {
     pub pseudo: String,
     pub email: String,
     pub admin: bool,
+    pub experience : i32,
+    pub level : i32
 }
 
 impl UserResponse {
@@ -17,6 +19,8 @@ impl UserResponse {
             pseudo: user.pseudo,
             email: user.email,
             admin: user.admin,
+            experience : user.experience,
+            level : user.level
         }
     }
 

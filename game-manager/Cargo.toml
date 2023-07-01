@@ -1,6 +1,6 @@
 [package]
 name = "game-manager"
-version = "0.1.13"
+version = "0.1.29"
 edition = "2021"
 publish = false
 
@@ -8,7 +8,7 @@ publish = false
 
 [dependencies]
 async-trait = "0.1.68"
-axum = {version = "0.6.12", features = ["ws", "headers"]}
+axum = {version = "0.6.18", features = ["ws", "headers", "multipart"]}
 chrono = "0.4.24"
 futures = "0.3"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
@@ -20,7 +20,7 @@ tokio = { version = "1.0", features = ["full"] }
 tokio-tungstenite = "0.18.0"
 tokio-postgres = "0.7.2"
 tower = { version = "0.4", features = ["util"] }
-tower-http = { version = "0.4.0", features = ["fs", "trace"] }
+tower-http = { version = "0.4.0", features = ["fs", "trace","cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 bb8 = "0.8.0"

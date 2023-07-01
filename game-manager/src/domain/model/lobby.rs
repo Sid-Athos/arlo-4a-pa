@@ -6,4 +6,5 @@ pub struct Lobby {
     pub code: String,
     pub game_id: i32,
     pub private: bool,
+    pub is_launched: bool
 }
