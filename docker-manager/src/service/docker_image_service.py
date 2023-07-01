@@ -14,7 +14,7 @@ def build_image(language: str, tag: str, game_file_name: str) -> str:
                                                     custom_context=False,
                                                     tag=[f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"],
                                                     buildargs={
-                                                        "GAME_NAME": game_file_name})
+                                                        "GAME_FILE_NAME": game_file_name})
     for line in build_output[1]:
         if "stream" in line and "Successfully tagged" in line["stream"]:
             return f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}"

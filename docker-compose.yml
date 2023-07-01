@@ -28,8 +28,9 @@ services:
     restart: "always"
     tty: true
     volumes:
-      - "./docker-manager/.env:/.env"
-      - "./docker-manager/logs:/logs"
+      - "./docker-manager/.env.py:/code/.env.py"
+      - "./docker-manager/dockerfiles:/code/dockerfiles"
+      - "./game-manager/resources/games:/code/dockerfiles/games"
   front:
     container_name: "front"
     image: dixennaxos/pa-4al2-gr5:front-${ENV}-latest

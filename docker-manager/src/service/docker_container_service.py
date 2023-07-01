@@ -24,7 +24,15 @@ def exec_on_container(container_id: str, command: str) -> dict | bool:
         container: Container = docker_client.containers.get(container_id=container_id)
     except (docker.errors.NotFound, docker.errors.APIError):
         return False
-    result: ExecResult = container.exec_run(cmd=command, stdout=True)
+    result: ExecResult = container.exec_run(cmd=json.dumps(command), stdout=True)
     json_obj: dict = json.loads(result.output)
     return json_obj
 
+
+def close_container(container_id: str) -> bool:
+    try:
+        container: Container = docker_client.containers.get(container_id=container_id)
+    except (docker.errors.NotFound, docker.errors.APIError):
+        return False
+    container.stop()
+    return True
