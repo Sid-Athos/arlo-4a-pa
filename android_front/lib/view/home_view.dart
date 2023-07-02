@@ -176,6 +176,9 @@ class _HomeState extends State<HomeView> {
                 json["ICECandidate"]["from_user_id"]
             );
             break;
+          case "UserLeftRtcSession":
+            gameProvider.userLeftCall(json["UserLeftRtcSession"]["user_id"]);
+            break;
           case "InviteReceived":
             developer.log("InviteReceived");
             showNotificationInvitedInLobby(

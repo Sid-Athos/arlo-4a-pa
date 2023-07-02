@@ -111,7 +111,8 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void leaveCall() {
+  void leaveCall() async {
+    await ApiGameManager.leaveRtcSession();
     for (RtcSession rtcSession in rtcSessions) {
       rtcSession.peerConnection?.close();
     }
@@ -119,5 +120,15 @@ class GameProvider extends ChangeNotifier {
     localStream?.dispose();
     inCall = false;
     notifyListeners();
+  }
+
+  void userLeftCall(int userId) {
+    for (int i = 0; i < rtcSessions.length; i++) {
+      if (rtcSessions[i].userId == userId) {
+        rtcSessions[i].peerConnection?.close();
+        rtcSessions.remove(rtcSessions[i]);
+        notifyListeners();
+      }
+    }
   }
 }
