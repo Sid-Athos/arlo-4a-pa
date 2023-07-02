@@ -1,17 +1,18 @@
 use serde::Serialize;
+use crate::entrypoint::websocket::response::user_response::UserResponse;
 
 #[derive(Serialize, Debug)]
 pub struct SDPOfferResponse {
     sdp: String,
-    from_user_id: i32,
+    form_user: UserResponse,
 }
 
 impl SDPOfferResponse {
 
-    pub fn new(sdp: String, from_user_id: i32) -> Self {
+    pub fn new(sdp: String, form_user: UserResponse) -> Self {
         SDPOfferResponse {
             sdp,
-            from_user_id
+            form_user
         }
     }
 }
