@@ -8,6 +8,7 @@ use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::ice_candidate_response::ICECandidateResponse;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
+use crate::entrypoint::websocket::response::user_response::UserResponse;
 use crate::service::lobby_service::LobbyService;
 use crate::service::ws_session_service::WsSessionService;
 
@@ -29,7 +30,7 @@ impl RegisterICECandidateRequest {
             return Err(StatusCode::UNAUTHORIZED.to_string());
         }
 
-        let response = ICECandidateResponse::new(self.candidate.clone(), self.sdp_mid.clone(), self.sdp_m_line_index, user.id);
+        let response = ICECandidateResponse::new(self.candidate.clone(), self.sdp_mid.clone(), self.sdp_m_line_index, UserResponse::from_domain(user));
 
         connections.send_to_vec_user_id(ResponseEnum::ICECandidate(response), vec![self.to_user_id]).await;
 

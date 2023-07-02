@@ -8,6 +8,7 @@ use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
 use crate::entrypoint::websocket::response::sdp_offer_response::SDPOfferResponse;
+use crate::entrypoint::websocket::response::user_response::UserResponse;
 use crate::service::lobby_service::LobbyService;
 use crate::service::ws_session_service::WsSessionService;
 
@@ -27,7 +28,7 @@ impl SDPOfferRequest {
             return Err(StatusCode::UNAUTHORIZED.to_string());
         }
 
-        let response = SDPOfferResponse::new(self.sdp.clone(), user.id);
+        let response = SDPOfferResponse::new(self.sdp.clone(), UserResponse::from_domain(user));
 
         connections.send_to_vec_user_id(ResponseEnum::SDPOffer(response), vec![self.to_user_id]).await;
 

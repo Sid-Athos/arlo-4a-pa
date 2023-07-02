@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:miku/model/user_model.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'ice_candidate_model.dart';
@@ -25,9 +26,9 @@ class RtcSession {
   MediaStream? remoteStream;
   RTCVideoRenderer remoteRenderer = RTCVideoRenderer();
   bool isRemoteSet = false;
-  int userId;
+  User user;
 
-  RtcSession(this.userId) {
+  RtcSession(this.user) {
     remoteRenderer.initialize();
   }
 
@@ -44,7 +45,7 @@ class RtcSession {
           "candidate": candidate.candidate,
           "sdp_mid": candidate.sdpMid,
           "sdp_m_line_index": candidate.sdpMLineIndex,
-          "to_user_id": userId,
+          "to_user_id": user.id,
         }
       });
       channel.sink.add(msg);
@@ -69,7 +70,7 @@ class RtcSession {
     await peerConnection?.setLocalDescription(offerSdp);
 
     String msg = encoder.convert({
-      "SDPOffer": {'sdp': offerSdp.sdp, "to_user_id": userId}
+      "SDPOffer": {'sdp': offerSdp.sdp, "to_user_id": user.id}
     });
     channel.sink.add(msg);
   }
@@ -82,7 +83,7 @@ class RtcSession {
     await peerConnection?.setLocalDescription(answerSdp);
 
     String msg = encoder.convert({
-      "SDPAnswer": {'sdp': answerSdp.sdp, "to_user_id": userId}
+      "SDPAnswer": {'sdp': answerSdp.sdp, "to_user_id": user.id}
     });
     channel.sink.add(msg);
 

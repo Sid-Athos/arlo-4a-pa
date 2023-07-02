@@ -39,8 +39,8 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void answerSdpOffer(String sdp, int userId) async {
-    RtcSession rtcSession = RtcSession(userId);
+  void answerSdpOffer(String sdp, User user) async {
+    RtcSession rtcSession = RtcSession(user);
 
     await rtcSession.initPeerConnection(localStream!, channel!);
 
@@ -50,18 +50,18 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setRemoteAnswer(String sdp, int userId) async {
+  void setRemoteAnswer(String sdp, User user) async {
     for (RtcSession rtcSession in rtcSessions) {
-      if (rtcSession.userId == userId) {
+      if (rtcSession.user.id == user.id) {
         rtcSession.setRemoteAnswer(sdp);
         notifyListeners();
       }
     }
   }
 
-  void addIceCandidate(ICECandidate iceCandidate, int userId) async {
+  void addIceCandidate(ICECandidate iceCandidate, User user) async {
     for (RtcSession rtcSession in rtcSessions) {
-      if (rtcSession.userId == userId) {
+      if (rtcSession.user.id == user.id) {
         rtcSession.addIceCandidate(iceCandidate);
         notifyListeners();
       }
@@ -74,7 +74,7 @@ class GameProvider extends ChangeNotifier {
     List<User> usersInCall = await ApiGameManager.joinRtcSession();
 
     for (User userInCall in usersInCall) {
-      RtcSession rtcSession = RtcSession(userInCall.id);
+      RtcSession rtcSession = RtcSession(userInCall);
 
       await rtcSession.initPeerConnection(localStream!, channel!);
       await rtcSession.sendOffer(channel!);
@@ -122,9 +122,9 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void userLeftCall(int userId) {
+  void userLeftCall(User user) {
     for (int i = 0; i < rtcSessions.length; i++) {
-      if (rtcSessions[i].userId == userId) {
+      if (rtcSessions[i].user.id == user.id) {
         rtcSessions[i].peerConnection?.close();
         rtcSessions.remove(rtcSessions[i]);
         notifyListeners();
