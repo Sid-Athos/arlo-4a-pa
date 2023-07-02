@@ -167,14 +167,14 @@ class _HomeState extends State<HomeView> {
             gameProvider.answerSdpOffer(json["SDPOffer"]["sdp"], UserResponseMapper.fromJson(json["SDPOffer"]["from_user"]));
             break;
           case "SDPAnswer":
-            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"], UserResponseMapper.fromJson(json["SDPOffer"]["from_user"]));
+            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"], UserResponseMapper.fromJson(json["SDPAnswer"]["from_user"]));
             break;
           case "ICECandidate":
             gameProvider.addIceCandidate(ICECandidate(
                 candidate: json["ICECandidate"]["candidate"],
                 sdp_mid: json["ICECandidate"]["sdp_mid"],
                 sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"]),
-                UserResponseMapper.fromJson(json["SDPOffer"]["from_user"])
+                UserResponseMapper.fromJson(json["ICECandidate"]["from_user"])
             );
             break;
           case "UserLeftRtcSession":
