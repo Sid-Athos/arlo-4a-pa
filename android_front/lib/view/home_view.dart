@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
+import '../api/game_manager/response/emote_response_ws.dart';
 import '../api/game_manager/response/message_response_ws.dart';
 import '../model/game_model.dart';
 import '../model/lobby_model.dart';
@@ -132,8 +133,10 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
-            gameProvider
-                .addMessage(MessageResponseWS.fromJson(json["Message"]));
+            gameProvider.addMessage(MessageResponseWS.fromJson(json["Message"]));
+            break;
+          case "Emote":
+            gameProvider.addEmote(EmoteResponseWS.fromJson(json["Emote"]));
             break;
           case "Lobby":
             lobby.update(json["Lobby"]);
