@@ -122,9 +122,9 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void userLeftCall(User user) {
+  void userLeftCall(int userId) {
     for (int i = 0; i < rtcSessions.length; i++) {
-      if (rtcSessions[i].user.id == user.id) {
+      if (rtcSessions[i].user.id == userId) {
         rtcSessions[i].peerConnection?.close();
         rtcSessions.remove(rtcSessions[i]);
         notifyListeners();
