@@ -39,8 +39,16 @@ class _ChatViewState extends State<ChatView> {
   bool emoteDisplayed = false;
   List<String> emote = [
     "assets/img/emote/Clean_Emote.webp",
+    "assets/img/emote/Despair_Emote.webp",
+    "assets/img/emote/Dislike_Emote.webp",
+    "assets/img/emote/Everything_is_Okay_Emote.webp",
+    "assets/img/emote/Fired_Up_Emote.webp",
+    "assets/img/emote/Gonna_Be_A_Blast_Emote.webp",
     "assets/img/emote/Goodbye_Friend_Emote.webp",
+    "assets/img/emote/Let_s_Do_This_Emote.webp",
     "assets/img/emote/Scout-Approved_Emote.webp",
+    "assets/img/emote/Star_Guardian_Towa_Emote.webp",
+    "assets/img/emote/Unbenched_Emote.webp",
     "assets/img/emote/Was_that_Me_Emote.webp"
   ];
 
