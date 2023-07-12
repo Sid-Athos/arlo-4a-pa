@@ -67,6 +67,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/img/background.png
+    - assets/img/emote/Clean_Emote.webp
+    - assets/img/emote/Goodbye_Friend_Emote.webp
+    - assets/img/emote/Scout-Approved_Emote.webp
+    - assets/img/emote/Was_that_Me_Emote.webp
     - assets/fonts/google_sans_bold.ttf
     - assets/fonts/google_sans_bold_italic.ttf
     - assets/fonts/google_sans_italic.ttf

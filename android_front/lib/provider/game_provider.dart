@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:miku/model/chat_messsage.dart';
 import 'package:miku/provider/user_ice_candidate_provided.dart';
 import 'package:miku/provider/user_sdp_provided.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../api/game_manager/api_game_manager.dart';
+import '../api/game_manager/response/emote_response_ws.dart';
 import '../api/game_manager/response/message_response_ws.dart';
 import '../model/ice_candidate_model.dart';
 import '../model/rtc_session.dart';
@@ -12,7 +14,7 @@ import '../model/user_model.dart';
 
 class GameProvider extends ChangeNotifier {
 
-  List<MessageResponseWS> messages;
+  List<ChatMessage> messages;
   bool isShowChat = false;
   bool isShowCall = false;
   bool inCall = false;
@@ -87,7 +89,12 @@ class GameProvider extends ChangeNotifier {
   }
 
   void addMessage(MessageResponseWS message) {
-    messages.add(message);
+    messages.add(ChatMessage(message: message.message, fromUser: message.fromUser, isEmote: false));
+    notifyListeners();
+  }
+
+  void addEmote(EmoteResponseWS emote) {
+    messages.add(ChatMessage(message: emote.emote, fromUser: emote.fromUser, isEmote: true));
     notifyListeners();
   }
 
@@ -122,9 +129,9 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void userLeftCall(User user) {
+  void userLeftCall(int userId) {
     for (int i = 0; i < rtcSessions.length; i++) {
-      if (rtcSessions[i].user.id == user.id) {
+      if (rtcSessions[i].user.id == userId) {
         rtcSessions[i].peerConnection?.close();
         rtcSessions.remove(rtcSessions[i]);
         notifyListeners();
