@@ -233,6 +233,21 @@ class ApiUser {
     }
   }
 
+  static Future<List<Ranking>> getRankingFriendsForGame(int gameId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.get('$baseURL/ranking/friend/$gameId');
+      final data = response.data as List<dynamic>;
+      List<Ranking> rankings =  data.map((json) => RankingResponseMapper.fromJson(json)).toList();
+      return rankings;
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
+    }
+  }
+
   static Future<List<Ranking>> getRankingForUser(int userId) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
