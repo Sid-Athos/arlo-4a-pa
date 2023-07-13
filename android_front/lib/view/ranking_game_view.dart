@@ -61,13 +61,13 @@ class _RankingGameViewState extends State<RankingGameView> {
                     Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Icon(
-                        Icons.search_off,
+                        Icons.emoji_events_outlined,
                         color: Colors.white,
                         size: 48,
                       ),
                     ),
                     Text(
-                      "Nobody has played",
+                      "Nobody is ranked",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
