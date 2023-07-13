@@ -32,5 +32,5 @@ pub async fn init_ranking(State(pool): State<ConnectionPool>, Json(ranking): Jso
 
     let ranking = ranking_service.init_ranking(ranking.user_id,ranking.game_id).await?;
 
-    Ok(Json(RankingResponse::from_domain(ranking)))
+    Ok(Json(RankingResponse::from_domain(ranking, pool).await))
 }

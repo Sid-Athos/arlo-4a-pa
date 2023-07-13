@@ -12,7 +12,11 @@ impl GamesEntityMapper {
             id: games_entity.id,
             min_players: games_entity.min_players,
             max_players: games_entity.max_players,
+            language: games_entity.language,
+            code: games_entity.code,
             description: games_entity.description,
+            name: games_entity.name,
+            user_id: games_entity.user_id,
         }
     }
 }

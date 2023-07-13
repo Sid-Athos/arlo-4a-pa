@@ -36,5 +36,5 @@ pub async fn get_ranking_by_friend(State(pool): State<ConnectionPool>,Extension(
 
     let result = ranking_service.get_ranking_by_friends(user.id,game_id).await?;
 
-    Ok(Json(RankingResponse::from_vec_domain(result)))
+    Ok(Json(RankingResponse::from_vec_domain(result, pool).await))
 }
