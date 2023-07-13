@@ -1,14 +1,12 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:miku/model/ranking_model.dart';
 
 class RankingCardWidget extends StatelessWidget {
-  RankingCardWidget(
-      {super.key,
-        required this.ranking});
+  RankingCardWidget({super.key, required this.ranking, required this.top});
 
   Ranking ranking;
+  int top;
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +18,18 @@ class RankingCardWidget extends StatelessWidget {
         ),
         color: const Color(0xFF1A2025),
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, right: 16.0, left: 16.0),
+          padding: const EdgeInsets.only(
+              bottom: 8.0, right: 16.0, left: 16.0, top: 8.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Row(
                 children: [
+                  Text(
+                    "${top + 1}",
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
+                  ),
                   Flexible(
                     child: ListTile(
                       title: Text(

@@ -49,7 +49,7 @@ class _RankingGameViewState extends State<RankingGameView> {
                 return ListView.builder(
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
-                    return RankingCardWidget(ranking: snapshot.data![index]);
+                    return RankingCardWidget(ranking: snapshot.data![index], top: index);
                   },
                 );
               } else if (snapshot.hasError) {
