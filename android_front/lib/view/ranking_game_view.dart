@@ -146,55 +146,56 @@ class _RankingGameViewState extends State<RankingGameView> {
                   ),
                 )
               : Expanded(
-            child: Center(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  setState(() {
-                    rankingFriends = ApiUser.getRankingFriendsForGame(game.id);
-                  });
-                },
-                child: FutureBuilder<List<Ranking>>(
-                  future: rankingFriends,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data!.length > 0) {
-                      return ListView.builder(
-                        itemCount: snapshot.data?.length,
-                        itemBuilder: (context, index) {
-                          return RankingCardWidget(
-                              ranking: snapshot.data![index], top: index);
+                  child: Center(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        setState(() {
+                          rankingFriends =
+                              ApiUser.getRankingFriendsForGame(game.id);
+                        });
+                      },
+                      child: FutureBuilder<List<Ranking>>(
+                        future: rankingFriends,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData && snapshot.data!.length > 0) {
+                            return ListView.builder(
+                              itemCount: snapshot.data?.length,
+                              itemBuilder: (context, index) {
+                                return RankingCardWidget(
+                                    ranking: snapshot.data![index], top: index);
+                              },
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          } else if (snapshot.hasData &&
+                              snapshot.data!.length == 0) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Icon(
+                                    Icons.emoji_events_outlined,
+                                    color: Colors.white,
+                                    size: 48,
+                                  ),
+                                ),
+                                Text(
+                                  "No friends is ranked",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                          return CircularProgressIndicator();
                         },
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text("${snapshot.error}");
-                    } else if (snapshot.hasData &&
-                        snapshot.data!.length == 0) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const <Widget>[
-                          Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Icon(
-                              Icons.emoji_events_outlined,
-                              color: Colors.white,
-                              size: 48,
-                            ),
-                          ),
-                          Text(
-                            "No friends is ranked",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                    return CircularProgressIndicator();
-                  },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         ],
       ),
     );
