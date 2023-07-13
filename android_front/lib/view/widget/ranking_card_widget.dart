@@ -34,7 +34,7 @@ class RankingCardWidget extends StatelessWidget {
                         style: const TextStyle(color: Colors.white),
                       ),
                       subtitle: Text(
-                        "${ranking.rank} lp | ${ranking.nbGames} games",
+                        "${ranking.rank} LP | ${ranking.nbGames} Games",
                         style: const TextStyle(color: Colors.white38),
                       ),
                     ),
