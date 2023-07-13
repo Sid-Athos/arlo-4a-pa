@@ -31,5 +31,5 @@ pub async fn delete_by_game(State(pool): State<ConnectionPool>, Path(game_id) : 
 
     let result = ranking_service.delete_ranking_by_game(game_id).await?;
 
-    Ok(Json(RankingResponse::from_vec_domain(result)))
+    Ok(Json(RankingResponse::from_vec_domain(result, pool).await))
 }

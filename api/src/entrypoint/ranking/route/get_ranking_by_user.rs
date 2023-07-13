@@ -36,5 +36,5 @@ pub async fn get_ranking_by_user_id(State(pool): State<ConnectionPool>, Path(use
 
     let result = ranking_service.get_ranking_by_user(user_id).await?;
 
-    Ok(Json(RankingResponse::from_vec_domain(result)))
+    Ok(Json(RankingResponse::from_vec_domain(result, pool).await))
 }

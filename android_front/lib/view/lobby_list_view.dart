@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:miku/api/game_manager/request/join_lobby_request.dart';
 import 'package:miku/model/game_model.dart';
 import 'package:miku/model/lobby_model.dart';
+import 'package:miku/view/ranking_game_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../api/game_manager/api_game_manager.dart';
 import 'dialog/create_lobby_dialog.dart';
 
 class LobbyListView extends StatefulWidget {
-  LobbyListView({super.key, required this.game, required this.channel, required this.lobby});
+  LobbyListView(
+      {super.key,
+      required this.game,
+      required this.channel,
+      required this.lobby});
 
   Game game;
   WebSocketChannel channel;
@@ -21,7 +26,8 @@ class LobbyListView extends StatefulWidget {
 }
 
 class _LobbyListViewState extends State<LobbyListView> {
-  _LobbyListViewState({required this.game, required this.channel, required this.lobby});
+  _LobbyListViewState(
+      {required this.game, required this.channel, required this.lobby});
 
   late Future<List<Lobby>> lobbies;
   Game game;
@@ -41,13 +47,33 @@ class _LobbyListViewState extends State<LobbyListView> {
         title: Text(game.name),
         backgroundColor: const Color(0xFF21262B),
         actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RankingGameView(game: game)),
+              );
+            },
+            icon: const Icon(
+              Icons.emoji_events,
+              size: 32.0,
+            ),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.article_outlined,
+              size: 32.0,
+            ),
+          ),
           Padding(
               padding: const EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
+              child: IconButton(
+                onPressed: () {
                   showConfirmationDialog(context);
                 },
-                child: const Icon(
+                icon: const Icon(
                   Icons.add,
                   size: 32.0,
                 ),
@@ -72,8 +98,7 @@ class _LobbyListViewState extends State<LobbyListView> {
                     return LobbyCardWidget(
                         lobby: snapshot.data![index],
                         game: game,
-                        channel: channel
-                    );
+                        channel: channel);
                   },
                 );
               } else if (snapshot.hasError) {
@@ -90,7 +115,6 @@ class _LobbyListViewState extends State<LobbyListView> {
                         size: 48,
                       ),
                     ),
-
                     Text(
                       "No lobbies found",
                       style: TextStyle(
