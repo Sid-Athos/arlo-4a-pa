@@ -7,6 +7,7 @@ import 'package:miku/api/game_manager/request/decline_invite_lobby_request.dart'
 import 'package:miku/model/ice_candidate_model.dart';
 import 'package:miku/model/invite_model.dart';
 import 'package:miku/model/mapper/game_started_mapper.dart';
+import 'package:miku/model/mapper/game_svg_info_response_mapper.dart';
 import 'package:miku/model/mapper/user_response_mapper.dart';
 import 'package:miku/view/friend_list_view.dart';
 
@@ -72,6 +73,8 @@ class _HomeState extends State<HomeView> {
       channel: null
   );
 
+  String tmpSvgDisplayData = '{"width": "300","height": "300","content": [{"tag": "style","content": "line{stroke:black;stroke-width:4;}"},{"tag": "line","x1": "0","y1": "100","x2": "300","y2": "100"},{"tag": "line","x1": "100","y1": "0","x2": "100","y2": "300"},{"tag": "line","x1": "0","y1": "200","x2": "300","y2": "200"},{"tag": "line","x1": "200","y1": "0","x2": "200","y2": "300"},{"tag": "circle","cx": "50","cy": "50","r": "33","fill": "blue"}],"player": 2}';
+
   @override
   void initState() {
     gameProvider.channel = channel;
@@ -133,6 +136,7 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
+            gameProvider.setSvgDisplay(GameSvgInfoResponseMapper.fromJson(jsonDecode(tmpSvgDisplayData)));
             gameProvider.addMessage(MessageResponseWS.fromJson(json["Message"]));
             break;
           case "Emote":

@@ -8,6 +8,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../api/game_manager/api_game_manager.dart';
 import '../api/game_manager/response/emote_response_ws.dart';
 import '../api/game_manager/response/message_response_ws.dart';
+import '../model/game_svg_info_model.dart';
 import '../model/ice_candidate_model.dart';
 import '../model/rtc_session.dart';
 import '../model/user_model.dart';
@@ -22,6 +23,7 @@ class GameProvider extends ChangeNotifier {
   List<RtcSession> rtcSessions = [];
   MediaStream? localStream;
   RTCVideoRenderer localRenderer = RTCVideoRenderer();
+  GameSvgInfo? gameSvgInfo;
 
   GameProvider({
     required this.messages,
@@ -137,5 +139,10 @@ class GameProvider extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  void setSvgDisplay(GameSvgInfo gameSvgInfo) {
+    this.gameSvgInfo = gameSvgInfo;
+    notifyListeners();
   }
 }

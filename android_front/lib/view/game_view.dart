@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:miku/model/game_started.dart';
 import 'package:miku/model/ice_candidate_model.dart';
@@ -46,6 +47,8 @@ class _GameViewState extends State<GameView> {
   @override
   Widget build(BuildContext context) {
     GameProvider gameProvider = Provider.of<GameProvider>(context);
+
+    if (gameProvider.gameSvgInfo != null) print(gameProvider.gameSvgInfo!.createSVG());
 
     if (gameProvider.isShowChat) {
       return WillPopScope(
@@ -100,6 +103,9 @@ class _GameViewState extends State<GameView> {
                 ),
               ),
             ],
+          ),
+          body: Container(
+            child: (gameProvider.gameSvgInfo != null) ? SvgPicture.string(gameProvider.gameSvgInfo!.createSVG()) : Container(),
           ),
         ),
       );
