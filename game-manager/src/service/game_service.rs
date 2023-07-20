@@ -23,8 +23,8 @@ impl GameService {
         self.game_repository.get_all().await.map_err(database_error_to_status_code)
     }
 
-    pub async fn get_my_games(&self) -> Result<Vec<Game>, StatusCode> {
-        self.game_repository.get_all().await.map_err(database_error_to_status_code)
+    pub async fn get_my_games(&self, game_id: i32) -> Result<Vec<Game>, StatusCode> {
+        self.game_repository.get_my_games(game_id).await.map_err(database_error_to_status_code)
     }
 
     pub async fn get_by_id(&self, game_id: i32) -> Result<Game, StatusCode> {
