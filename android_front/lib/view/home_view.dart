@@ -7,6 +7,7 @@ import 'package:miku/api/game_manager/request/decline_invite_lobby_request.dart'
 import 'package:miku/model/ice_candidate_model.dart';
 import 'package:miku/model/invite_model.dart';
 import 'package:miku/model/mapper/game_started_mapper.dart';
+import 'package:miku/model/mapper/user_response_mapper.dart';
 import 'package:miku/view/friend_list_view.dart';
 
 import 'package:miku/view/game_list_view.dart';
@@ -17,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
+import '../api/game_manager/response/emote_response_ws.dart';
 import '../api/game_manager/response/message_response_ws.dart';
 import '../model/game_model.dart';
 import '../model/lobby_model.dart';
@@ -131,8 +133,10 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
-            gameProvider
-                .addMessage(MessageResponseWS.fromJson(json["Message"]));
+            gameProvider.addMessage(MessageResponseWS.fromJson(json["Message"]));
+            break;
+          case "Emote":
+            gameProvider.addEmote(EmoteResponseWS.fromJson(json["Emote"]));
             break;
           case "Lobby":
             lobby.update(json["Lobby"]);
@@ -163,18 +167,21 @@ class _HomeState extends State<HomeView> {
             ));
             break;
           case "SDPOffer":
-            gameProvider.answerSdpOffer(json["SDPOffer"]["sdp"], json["SDPOffer"]["from_user_id"]);
+            gameProvider.answerSdpOffer(json["SDPOffer"]["sdp"], UserResponseMapper.fromJson(json["SDPOffer"]["from_user"]));
             break;
           case "SDPAnswer":
-            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"], json["SDPAnswer"]["from_user_id"]);
+            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"], UserResponseMapper.fromJson(json["SDPAnswer"]["from_user"]));
             break;
           case "ICECandidate":
             gameProvider.addIceCandidate(ICECandidate(
                 candidate: json["ICECandidate"]["candidate"],
                 sdp_mid: json["ICECandidate"]["sdp_mid"],
                 sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"]),
-                json["ICECandidate"]["from_user_id"]
+                UserResponseMapper.fromJson(json["ICECandidate"]["from_user"])
             );
+            break;
+          case "UserLeftRtcSession":
+            gameProvider.userLeftCall(json["UserLeftRtcSession"]["user_id"]);
             break;
           case "InviteReceived":
             developer.log("InviteReceived");

@@ -6,11 +6,13 @@ import 'package:miku/api/user/request/send_friend_request_request.dart';
 import 'package:miku/api/user/request/update_user_request.dart';
 import 'package:miku/model/friend_list_model.dart';
 import 'package:miku/model/mapper/friend_list_response_mapper.dart';
+import 'package:miku/model/mapper/ranking_response_mapper.dart';
 import 'package:miku/model/mapper/user_response_mapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
 import '../../model/mapper/session_response_mapper.dart';
+import '../../model/ranking_model.dart';
 import '../../model/session_model.dart';
 import '../../model/user_model.dart';
 
@@ -213,6 +215,21 @@ class ApiUser {
     } catch (e) {
       developer.log(e.toString());
       return null;
+    }
+  }
+
+  static Future<List<Ranking>> getRankingForGame(int gameId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["api-key"] = "coding_games";
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      final response = await dio.get('$baseURL/ranking/game/$gameId');
+      final data = response.data as List<dynamic>;
+      List<Ranking> rankings =  data.map((json) => RankingResponseMapper.fromJson(json)).toList();
+      return rankings;
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
     }
   }
 

@@ -45,65 +45,78 @@ class _CallViewState extends State<CallView> {
         ),
       ),
       backgroundColor: const Color(0xFF21262B),
-      body: (gameProvider.inCall) ? Column(
-        children: [
-          Expanded(
-            child: RTCVideoView(gameProvider.localRenderer, mirror: true),
-          ),
-          for (RtcSession rtcSession in gameProvider.rtcSessions)
-            Expanded(
-              child: RTCVideoView(rtcSession.remoteRenderer),
+      body: (gameProvider.inCall)
+          ? GridView.count(
+              crossAxisCount: 2,
+              children: [
+                Container(
+                  child: RTCVideoView(gameProvider.localRenderer),
+                  decoration: BoxDecoration(color: Colors.black54),
+                ),
+                for (int i = 0; i < gameProvider.rtcSessions.length; i++)
+                  Container(
+                    child: RTCVideoView(gameProvider.rtcSessions[i].remoteRenderer),
+                    decoration: BoxDecoration(color: Colors.black54),
+                  ),
+              ],
+            )
+          : Container(),
+      floatingActionButton: (!gameProvider.inCall)
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 25.0),
+              child: FloatingActionButton(
+                onPressed: gameProvider.joinCall,
+                child: Icon(Icons.phone),
+                backgroundColor: Colors.green,
+              ),
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 25.0, right: 25.0),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      if (cameraCondition(gameProvider)) {
+                        gameProvider.toggleLocalVideo(false);
+                      } else {
+                        gameProvider.toggleLocalVideo(true);
+                      }
+                    },
+                    child: Icon(Icons.video_camera_front_rounded),
+                    backgroundColor: (cameraCondition(gameProvider))
+                        ? Colors.green
+                        : Colors.red,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 25.0),
+                  child: FloatingActionButton(
+                    onPressed: gameProvider.leaveCall,
+                    child: Icon(Icons.phone_disabled),
+                    backgroundColor: Colors.red,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 25.0, left: 25.0),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      if (audioCondition(gameProvider)) {
+                        gameProvider.toggleLocalAudio(false);
+                      } else {
+                        gameProvider.toggleLocalAudio(true);
+                      }
+                    },
+                    child: (audioCondition(gameProvider))
+                        ? Icon(Icons.mic)
+                        : Icon(Icons.mic_off),
+                    backgroundColor: (audioCondition(gameProvider))
+                        ? Colors.green
+                        : Colors.red,
+                  ),
+                ),
+              ],
             ),
-        ],
-      ) : Container(),
-      floatingActionButton: (!gameProvider.inCall) ? Padding(
-        padding: const EdgeInsets.only(bottom: 25.0),
-        child: FloatingActionButton(
-          onPressed: gameProvider.joinCall,
-          child: Icon(Icons.phone),
-          backgroundColor: Colors.green,
-        ),
-      ) : Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 25.0, right: 25.0),
-            child: FloatingActionButton(
-              onPressed: () {
-                if (cameraCondition(gameProvider)) {
-                  gameProvider.toggleLocalVideo(false);
-                } else {
-                  gameProvider.toggleLocalVideo(true);
-                }
-              },
-              child: Icon(Icons.video_camera_front_rounded),
-              backgroundColor: (cameraCondition(gameProvider)) ? Colors.green : Colors.red,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 25.0),
-            child: FloatingActionButton(
-              onPressed: gameProvider.leaveCall,
-              child: Icon(Icons.phone_disabled),
-              backgroundColor: Colors.red,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 25.0, left: 25.0),
-            child: FloatingActionButton(
-              onPressed: () {
-                if (audioCondition(gameProvider)) {
-                  gameProvider.toggleLocalAudio(false);
-                } else {
-                  gameProvider.toggleLocalAudio(true);
-                }
-              },
-              child: (audioCondition(gameProvider)) ? Icon(Icons.mic) : Icon(Icons.mic_off),
-              backgroundColor: (audioCondition(gameProvider)) ? Colors.green : Colors.red,
-            ),
-          ),
-        ],
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }

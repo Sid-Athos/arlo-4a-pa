@@ -36,6 +36,16 @@ class ApiGameManager {
     }
   }
 
+  static Future<void> leaveRtcSession() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
+      await dio.post('$baseURL/rtc/leave_rtc', data: "");
+    } catch (e) {
+      developer.log(e.toString());
+    }
+  }
+
   static Future<List<User>> getConnectedFriends() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

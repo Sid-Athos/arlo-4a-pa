@@ -12,3 +12,4 @@ pub mod ice_candidate_response;
 pub mod sdp_answer_response;
 pub mod sdp_offer_response;
 pub mod user_left_rtc_session;
+pub mod emote_response;

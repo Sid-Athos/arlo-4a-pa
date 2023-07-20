@@ -8,6 +8,7 @@ use crate::entrypoint::websocket::request::accept_invite_lobby_request::AcceptIn
 use crate::entrypoint::websocket::request::cancel_invite_user_lobby_request::CancelInviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::create_lobby_request::CreateLobbyRequest;
 use crate::entrypoint::websocket::request::decline_invite_lobby_request::DeclineInviteLobbyRequest;
+use crate::entrypoint::websocket::request::emote_request::EmoteRequest;
 use crate::entrypoint::websocket::request::exit_lobby_request::ExitLobbyRequest;
 use crate::entrypoint::websocket::request::give_lobby_host_request::GiveHostRequest;
 use crate::entrypoint::websocket::request::invite_user_lobby_request::InviteUserLobbyRequest;
@@ -29,6 +30,7 @@ pub enum RequestEnum {
     Ping,
     Exit,
     Message(MessageRequest),
+    Emote(EmoteRequest),
     CreateLobby(CreateLobbyRequest),
     JoinLobby(JoinLobbyRequest),
     ExitLobby,
@@ -60,6 +62,10 @@ impl RequestEnum {
                 return true;
             }
             RequestEnum::Message(message) => {
+                let response = message.compute(pool, connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(response, connections.clone(), user).await;
+            }
+            RequestEnum::Emote(message) => {
                 let response = message.compute(pool, connections.clone(), user.clone()).await;
                 ErrorResponse::send_error(response, connections.clone(), user).await;
             }
