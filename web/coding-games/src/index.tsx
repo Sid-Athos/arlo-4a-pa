@@ -9,7 +9,11 @@ import {createSignal} from "solid-js";
 // @ts-ignore
 import LoginComponent from "./components/login.jsx";
 // @ts-ignore
+import GameEditorComponent from "./components/game-editor.jsx";
+// @ts-ignore
 import LobbyComponent from "./components/lobby.jsx";
+
+// @ts-ignore
 import {UserProvider} from "./components/user-provider.jsx";
 const root = document.getElementById('root');
 
@@ -66,6 +70,7 @@ render(
                 {/* @ts_ignore */}
                 <Route path={"/"} component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
                 <Route path={"/lobby"} component={<LobbyComponent ></LobbyComponent>}></Route>
+                <Route path={"/code-editor"} component={<GameEditorComponent></GameEditorComponent>}></Route>
             </Routes>
         </Router>
     </Box>

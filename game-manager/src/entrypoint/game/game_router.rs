@@ -16,6 +16,7 @@ pub fn game_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
         .route("/games/all", get(get_all_games))
+        .route("/games/mine", get(get_my_games)/**.route_layer(middleware::from_fn_with_state(pool.clone(), is_logged))*/)
         .route("/games/:game_id", get(get_by_id).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/games/admin/:game_id", delete(delete_by_admin).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged_admin)))
         .route("/games/:game_id", delete(delete_by_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))

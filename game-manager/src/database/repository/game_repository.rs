@@ -32,6 +32,20 @@ impl GameRepository {
         Ok(GameEntityMapper::entity_to_domain(result))
     }
 
+    pub async fn get_my_games(&self, id: i32) -> Result<Game, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT id,name,min_players,max_players,description,language,code,user_id FROM coding_games.game WHERE user_id = $1", &[&id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        print!("{:?}", row);
+        let result = GameEntity::new(row);
+
+        Ok(GameEntityMapper::entity_to_domain(result))
+    }
+
     pub async fn get_all(&self) -> Result<Vec<Game>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
         tracing::info!("Init db get all");
