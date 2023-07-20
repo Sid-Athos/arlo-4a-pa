@@ -5,3 +5,5 @@
 **/info.*
 **/warnings.*
 certbot
+game-manager/resources/games
+docker-manager/dockerfiles/games
