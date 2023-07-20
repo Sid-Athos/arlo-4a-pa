@@ -104,11 +104,18 @@ class _GameViewState extends State<GameView> {
               ),
             ],
           ),
-          body: Container(
-            child: (gameProvider.gameSvgInfo != null) ? SvgPicture.string(gameProvider.gameSvgInfo!.createSVG()) : Container(),
+          body: Center(
+            child: GestureDetector(
+              onTapUp: onTapUp,
+              child: (gameProvider.gameSvgInfo != null) ? SvgPicture.string(gameProvider.gameSvgInfo!.createSVG()) : Container(),
+            ),
           ),
         ),
       );
     }
+  }
+
+  void onTapUp(TapUpDetails tapUpDetails) {
+    print(tapUpDetails.localPosition);
   }
 }

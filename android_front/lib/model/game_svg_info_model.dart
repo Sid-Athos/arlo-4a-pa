@@ -12,12 +12,27 @@ class GameSvgInfo {
 
     String r = "<svg width=\"$width\" height=\"$height\">";
 
+    Map<String, String> parsedStyle = getParsedStyle();
+
     svgContent.forEach((element) {
-      r += element.createSVG();
+      r += element.createSVG(parsedStyle);
     });
 
     r += "</svg>";
     return r;
+  }
+
+  Map<String, String> getParsedStyle() {
+
+    Map<String, String> parsed = {};
+
+    svgContent.forEach((element) {
+      if (element.data.containsKey("tag") && element.data["tag"] == "style") {
+        parsed = element.parseStyle();
+      }
+    });
+
+    return parsed;
   }
 
 }
