@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:miku/model/game_model.dart';
-import 'package:miku/model/lobby_model.dart';
-import 'package:miku/model/mapper/game_response_mapper.dart';
-import 'package:miku/model/mapper/lobby_response_mapper.dart';
-import 'package:miku/model/mapper/user_response_mapper.dart';
-import 'package:miku/model/user_model.dart';
+import 'package:miku/model/game/game_model.dart';
+import 'package:miku/model/lobby/lobby_model.dart';
+import 'package:miku/mapper/game/game_response_mapper.dart';
+import 'package:miku/mapper/lobby/lobby_response_mapper.dart';
+import 'package:miku/mapper/user/user_response_mapper.dart';
+import 'package:miku/model/user/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';

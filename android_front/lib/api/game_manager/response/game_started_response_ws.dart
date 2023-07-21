@@ -1,11 +1,9 @@
-import 'dart:developer' as developer;
+import 'package:miku/model/game/game_started.dart';
 
-import 'package:miku/model/game_started.dart';
-
-import '../../../model/game_model.dart';
-import '../../../model/lobby_member_model.dart';
-import '../../../model/mapper/game_response_mapper.dart';
-import '../../../model/mapper/lobby_member_response_mapper.dart';
+import '../../../model/game/game_model.dart';
+import '../../../model/lobby/lobby_member_model.dart';
+import '../../../mapper/game/game_response_mapper.dart';
+import '../../../mapper/lobby/lobby_member_response_mapper.dart';
 
 class GameStartedResponseWS {
   final int id;

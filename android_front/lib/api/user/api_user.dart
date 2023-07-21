@@ -4,17 +4,17 @@ import 'package:miku/api/user/request/create_user_request.dart';
 import 'package:miku/api/user/request/login_request.dart';
 import 'package:miku/api/user/request/send_friend_request_request.dart';
 import 'package:miku/api/user/request/update_user_request.dart';
-import 'package:miku/model/friend_list_model.dart';
-import 'package:miku/model/mapper/friend_list_response_mapper.dart';
-import 'package:miku/model/mapper/ranking_response_mapper.dart';
-import 'package:miku/model/mapper/user_response_mapper.dart';
+import 'package:miku/model/friend/friend_list_model.dart';
+import 'package:miku/mapper/friend/friend_list_response_mapper.dart';
+import 'package:miku/mapper/ranking/ranking_response_mapper.dart';
+import 'package:miku/mapper/user/user_response_mapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
 
-import '../../model/mapper/session_response_mapper.dart';
-import '../../model/ranking_model.dart';
-import '../../model/session_model.dart';
-import '../../model/user_model.dart';
+import '../../mapper/user/session_response_mapper.dart';
+import '../../model/ranking/ranking_model.dart';
+import '../../model/user/session_model.dart';
+import '../../model/user/user_model.dart';
 
 class ApiUser {
   static const String baseURL = "https://dev.mikusupremacy.fr/api";
