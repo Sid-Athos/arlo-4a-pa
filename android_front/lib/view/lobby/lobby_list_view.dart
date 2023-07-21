@@ -7,6 +7,7 @@ import 'package:miku/view/ranking/ranking_game_view.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../api/game_manager/api_game_manager.dart';
+import '../hisotry/history_game_view.dart';
 import 'create_lobby_dialog.dart';
 
 class LobbyListView extends StatefulWidget {
@@ -61,7 +62,12 @@ class _LobbyListViewState extends State<LobbyListView> {
             ),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryGameView(game: game, channel: channel,))
+              );
+            },
             icon: const Icon(
               Icons.article_outlined,
               size: 32.0,

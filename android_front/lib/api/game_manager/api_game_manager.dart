@@ -10,6 +10,11 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:developer' as developer;
 
+import '../../mapper/hisotry/game_history_response_mapper.dart';
+import '../../mapper/hisotry/game_move_history_mapper.dart';
+import '../../model/history/game_history_model.dart';
+import '../../model/history/game_move_history_model.dart';
+
 class ApiGameManager {
   static const String baseURLWS = "ws://dev.mikusupremacy.fr:7589";
   static const String baseURL = "https://dev.mikusupremacy.fr/gamemanager";
@@ -75,6 +80,28 @@ class ApiGameManager {
       final response = await dio.get('$baseURL/lobby/get_public/$gameId');
       final data = response.data as List<dynamic>;
       return data.map((json) => LobbyResponseMapper.fromJson(json)).toList();
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
+    }
+  }
+
+  static Future<List<GameHistory>> getGameHistory(int gameId) async {
+    try {
+      final response = await dio.get('$baseURL/game_played/history/$gameId');
+      final data = response.data as List<dynamic>;
+      return data.map((json) => GameHistoryResponseMapper.fromJson(json)).toList();
+    } catch (e) {
+      developer.log(e.toString());
+      return [];
+    }
+  }
+
+  static Future<List<GameMoveHistory>> getGameMoveHistory(int gameHistoryId) async {
+    try {
+      final response = await dio.get('$baseURL/game_played/history/moves/$gameHistoryId');
+      final data = response.data as List<dynamic>;
+      return data.map((json) => GameMoveHistoryResponseMapper.fromJson(json)).toList();
     } catch (e) {
       developer.log(e.toString());
       return [];
