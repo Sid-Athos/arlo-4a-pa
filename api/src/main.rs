@@ -7,15 +7,21 @@ mod middlewares;
 use std::env;
 use axum::{ Router};
 use std::net::SocketAddr;
-use axum::http::{HeaderMap, StatusCode};
+
+
+
 use dotenv::dotenv;
-use utoipa::{Modify, OpenApi};
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, Http, HttpAuthScheme, HttpBuilder, SecurityScheme};
+use tower_http::cors::CorsLayer;
+
+
+use utoipa::{ OpenApi};
+
+
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::middlewares::{tracing::init_tracer, cors_layer::init_cors_layer};
 use crate::database::init::init_db;
-
+use crate::swagger_security::SecurityAddon;
 
 use crate::entrypoint::ranking::ranking_router::ranking_routes;
 use crate::entrypoint::user::route::response::user_response::UserResponse;
@@ -30,28 +36,30 @@ use crate::entrypoint::user::route::request::create_user_request::CreateUserRequ
 use crate::entrypoint::user::route::request::update_user_request::UpdateUserRequest;
 use crate::entrypoint::user::route::request::change_password_request::ChangePasswordRequest;
 use crate::entrypoint::user::route::request::login_request::LoginRequest;
+use crate::middlewares::swagger_security;
+
 
 #[tokio::main]
 async fn main() {
 
     dotenv().ok();
     init_tracer();
-
     let pool = init_db().await.unwrap();
 
-    let cors = init_cors_layer();
+    let _cors = init_cors_layer();
 
+    println!(env!("CARGO_MANIFEST_DIR"));
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
-        .nest("/user", user_routes(pool.clone()))
-        .nest("/admin", admin_routes(pool.clone()))
-        .nest("/ranking", ranking_routes(pool.clone()))
-        .nest("/friend_list", friend_list_routes(pool.clone()))
-        .layer(cors);
+        .merge( user_routes(pool.clone()))
+        .merge( admin_routes(pool.clone()))
+        .merge( ranking_routes(pool.clone()))
+        .merge(friend_list_routes(pool.clone()))
+        .layer(CorsLayer::permissive());
 
     let addr : SocketAddr = (&env::var("SERVER").unwrap()).parse().expect("Not a socket address");
 
-    println!("{} : listening on {}", "START", addr);
+    tracing::info!("listening on {:?}", addr);
 
     axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap();
 }
@@ -66,7 +74,8 @@ entrypoint::user::route::login::user_login,
 entrypoint::user::route::logout::user_logout,
 entrypoint::user::route::add_experience::add_experience,
 entrypoint::user::route::me::me,
-entrypoint::user::route::search::search,
+entrypoint::user::route::search::search_user,
+entrypoint::user::route::search::get_other_players,
 entrypoint::user::route::delete::delete_user,
 entrypoint::user::route::update::update_user,
 entrypoint::user::route::change_password::change_password,
@@ -85,6 +94,8 @@ entrypoint::ranking::route::update_ranking::update_ranking,
 entrypoint::ranking::route::get_ranking_by_friend::get_ranking_by_friend,
 entrypoint::ranking::route::get_ranking_by_game::get_ranking_by_game_id,
 entrypoint::ranking::route::get_ranking_by_user::get_ranking_by_user_id,
+entrypoint::ranking::route::delete_by_game::delete_by_game,
+entrypoint::ranking::route::delete_by_user::delete_by_user
 ),
 modifiers(&SecurityAddon),
 components(
@@ -99,44 +110,4 @@ schemas(UpdateUserRequest),
 )]
 struct ApiDoc;
 
-struct SecurityAddon;
 
-impl Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        if let Some(components) = openapi.components.as_mut() {
-            components.add_security_scheme(
-                "api_key",
-                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("api-key"))),
-            );
-            components.add_security_scheme(
-                "bearer",
-                SecurityScheme::Http(HttpBuilder::new().scheme(HttpAuthScheme::Bearer).build())
-            )
-        }
-    }
-}
-fn check_api_key(
-    headers: &HeaderMap
-) -> Result<(), (StatusCode, String)> {
-    println!("Headers {:?}", headers);
-    match headers.get("api-key") {
-        Some(header) if header != &env::var("API_KEY").unwrap() => {
-            tracing::error_span!("Invalid api key");
-            Err((
-                StatusCode::UNAUTHORIZED,
-                "Incorrect or missing Api Key".to_string(),
-            ))
-        },
-        None => {
-            tracing::error_span!("Missing api key");
-            Err((
-                StatusCode::UNAUTHORIZED,
-                "Incorrect or missing Api Key".to_string(),
-            ))
-        },
-        _ => {
-            tracing::info!("Valid api-key provided");
-            Ok(())
-        },
-    }
-}

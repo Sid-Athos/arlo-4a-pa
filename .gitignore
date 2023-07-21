@@ -1,2 +1,9 @@
 .idea
+.idea/*.iml
 **/.env
+**/.idea
+**/info.*
+**/warnings.*
+certbot
+game-manager/resources/games
+docker-manager/dockerfiles/games

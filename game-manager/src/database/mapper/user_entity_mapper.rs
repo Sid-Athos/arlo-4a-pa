@@ -11,7 +11,9 @@ impl UserEntityMapper {
             pseudo: user_entity.pseudo,
             email: user_entity.email,
             password: user_entity.password,
-            admin: user_entity.admin
+            admin: user_entity.admin,
+            experience : user_entity.experience,
+            level : user_entity.level
         }
     }
 }

@@ -9,17 +9,15 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     get,
-    path = "/admin/get_all",
-    params(
-        ("user_id" = String,),
-    ),
+    path = "/admin/",
     responses(
         (status = 200, description = "List of Users", body = Vec<UserResponse>,),
         (status = 401, description = "Invalid token",),
     ),
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ),
+security(
+("api-key" = []),
+("bearer" = [])
+),
     tag = "admin"
 )]
 pub async fn get_all(State(pool): State<ConnectionPool>) -> Result<Json<Vec<UserResponse>>, StatusCode> {

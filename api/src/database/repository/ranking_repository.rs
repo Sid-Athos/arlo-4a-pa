@@ -112,7 +112,7 @@ impl RankingRepository {
                         FROM coding_games.friend_list fl
                         WHERE fl.applicant_id = $1 OR fl.recipient_id = $1 AND fl.accepted = true
                         )
-                      AND g.id = $2", &[&user_id,&game_id])
+                      AND g.id = $2 ORDER BY r.rank DESC", &[&user_id,&game_id])
             .await
             .map_err(database_error_not_found)?;
 
@@ -130,7 +130,7 @@ impl RankingRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let rows = conn
-            .query("SELECT r.* FROM coding_games.ranking r WHERE game_id = $1", &[&game_id])
+            .query("SELECT r.* FROM coding_games.ranking r WHERE game_id = $1 ORDER BY rank DESC", &[&game_id])
             .await
             .map_err(database_error_not_found)?;
 
@@ -148,7 +148,7 @@ impl RankingRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let rows = conn
-            .query("SELECT r.* FROM coding_games.ranking r WHERE user_id = $1", &[&user_id])
+            .query("SELECT r.* FROM coding_games.ranking r WHERE user_id = $1 ORDER BY rank DESC", &[&user_id])
             .await
             .map_err(database_error_not_found)?;
 

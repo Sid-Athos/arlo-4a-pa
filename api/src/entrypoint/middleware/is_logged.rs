@@ -1,7 +1,7 @@
 use axum::{middleware:: Next, response::Response, http::Request, http};
 use axum::extract::State;
 use axum::http::StatusCode;
-use crate::check_api_key;
+
 use crate::database::init::ConnectionPool;
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
@@ -9,8 +9,6 @@ use crate::domain::model::session::Session;
 use crate::service::session_service::SessionService;
 
 pub async fn is_logged<B>(State(pool): State<ConnectionPool>, mut req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
-    println!("lol");
-    check_api_key(req.headers()).expect_err("Invalid or missing Api Key");
     let auth_header = req.headers()
         .get(http::header::AUTHORIZATION)
         .and_then(|header| header.to_str().ok());

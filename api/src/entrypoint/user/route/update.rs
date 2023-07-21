@@ -12,16 +12,17 @@ use crate::service::user_service::UserService;
 
 #[utoipa::path(
     put,
-    path = "/user/update",
+    path = "/user/",
     responses(
         (status = 200, description = "User found", body = UserResponse),
         (status = 401, description = "Invalid token",),
         (status = 409, description = "Pseudo already used",),
     ),
-    request_body = UpdateUserRequest,
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        ("api-key" = []),
+        ("bearer" = [])
     ),
+    request_body = UpdateUserRequest,
     tag = "user"
 )]
 pub async fn update_user(State(pool): State<ConnectionPool>, Extension(user): Extension<User>, Json(update_request): Json<UpdateUserRequest>) -> Result<Json<UserResponse>, StatusCode> {
@@ -31,7 +32,6 @@ pub async fn update_user(State(pool): State<ConnectionPool>, Extension(user): Ex
     );
 
     let command = UpdateUserCommand::new(user.id, Some(update_request.pseudo), None, None);
-
     let user = user_service.update_user(command).await?;
 
     Ok(Json(UserResponse::from_domain(user)))

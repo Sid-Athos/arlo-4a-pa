@@ -23,6 +23,10 @@ use crate::service::ranking_service::RankingService;
         (status = 200, description = "Rankings found", body = RankingResponse,),
         (status = 404, description = "Game not found",),
     ),
+security(
+("api-key" = []),
+("bearer" = [])
+),
     tag="ranking"
 )]
 pub async fn get_ranking_by_friend(State(pool): State<ConnectionPool>,Extension(user): Extension<User>, Path(game_id): Path<i32>) -> Result<Json<Vec<RankingResponse>>, StatusCode> {
@@ -32,5 +36,5 @@ pub async fn get_ranking_by_friend(State(pool): State<ConnectionPool>,Extension(
 
     let result = ranking_service.get_ranking_by_friends(user.id,game_id).await?;
 
-    Ok(Json(RankingResponse::from_vec_domain(result)))
+    Ok(Json(RankingResponse::from_vec_domain(result, pool).await))
 }

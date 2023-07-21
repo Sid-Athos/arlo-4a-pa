@@ -22,7 +22,8 @@ use crate::service::ranking_service::RankingService;
         (status = 200, description = "Ranking updated", body = RankingResponse,),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+    ("api-key" = []),
+    ("bearer" = [])
     ),
     tag="ranking"
 )]
@@ -33,5 +34,5 @@ pub async fn update_ranking(State(pool): State<ConnectionPool>, Json(ranking): J
 
     let rankings = ranking_service.update_ranking2(ranking.game_id,ranking.p1_id,ranking.p2_id,ranking.tie,ranking.winner_id).await?;
 
-    Ok(Json(RankingResponse::from_vec_domain(rankings)))
+    Ok(Json(RankingResponse::from_vec_domain(rankings, pool).await))
 }

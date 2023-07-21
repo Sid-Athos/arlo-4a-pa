@@ -11,7 +11,8 @@ use crate::entrypoint::user::route::response::user_response::UserResponse;
         (status = 401, description = "Invalid token",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+        ("api-key" = []),
+        ("bearer" = [])
     ),
     tag = "user"
 )]
