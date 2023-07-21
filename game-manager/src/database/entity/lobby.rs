@@ -5,6 +5,7 @@ pub struct LobbyEntity {
     pub code: String,
     pub game_id: i32,
     pub private: bool,
+    pub is_launched: bool,
 }
 
 impl LobbyEntity {
@@ -14,6 +15,7 @@ impl LobbyEntity {
             code: row.get("code"),
             game_id: row.get("game_id"),
             private: row.get("private"),
+            is_launched: row.get("is_launched"),
         }
     }
 }

@@ -11,15 +11,18 @@ use crate::entrypoint::friend_list::route::show_friend_request::show_friend_requ
 
 
 use crate::entrypoint::middleware::is_logged::{is_logged};
+use crate::middlewares::swagger_security::check_api_key;
 
 pub fn friend_list_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
 
     Router::new()
-        .route("/create", post(friend_list_create).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/:friend_list_id", delete(delete_friend).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/:friend_list_id", put(accept_friend_request).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/", get(show_friend_list).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/requests", get(show_friend_request).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
+        .route("/friend_list", post(friend_list_create))
+        .route("/friend_list/:friend_list_id", delete(delete_friend))
+        .route("/friend_list/:friend_list_id", put(accept_friend_request))
+        .route("/friend_list", get(show_friend_list))
+        .route("/friend_list/requests", get(show_friend_request))
+        .layer(middleware::from_fn(check_api_key))
+        .layer(middleware::from_fn_with_state(pool.clone(), is_logged))
         .with_state(pool)
 
 }

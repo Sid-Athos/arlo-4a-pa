@@ -31,7 +31,13 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flutter_webrtc: ^0.9.34
+  percent_indicator: ^4.0.1
+  provider: ^6.0.0
   dio: ^5.0.1
+  shared_preferences: ^2.1.0
+  web_socket_channel: ^2.1.0
+  overlay_support: ^1.0.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -59,9 +65,42 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/img/background.png
+    - assets/img/emote/Clean_Emote.webp
+    - assets/img/emote/Despair_Emote.webp
+    - assets/img/emote/Dislike_Emote.webp
+    - assets/img/emote/Everything_is_Okay_Emote.webp
+    - assets/img/emote/Fired_Up_Emote.webp
+    - assets/img/emote/Gonna_Be_A_Blast_Emote.webp
+    - assets/img/emote/Goodbye_Friend_Emote.webp
+    - assets/img/emote/Let_s_Do_This_Emote.webp
+    - assets/img/emote/Scout-Approved_Emote.webp
+    - assets/img/emote/Star_Guardian_Towa_Emote.webp
+    - assets/img/emote/Unbenched_Emote.webp
+    - assets/img/emote/Was_that_Me_Emote.webp
+    - assets/fonts/google_sans_bold.ttf
+    - assets/fonts/google_sans_bold_italic.ttf
+    - assets/fonts/google_sans_italic.ttf
+    - assets/fonts/google_sans_medium.ttf
+    - assets/fonts/google_sans_medium_italic.ttf
+    - assets/fonts/google_sans_regular.ttf
+    - assets/fonts/proxima_nova_font.otf
+
+  fonts:
+    - family: GoogleSans
+      fonts:
+        - asset: assets/fonts/google_sans_bold.ttf
+        - asset: assets/fonts/google_sans_bold_italic.ttf
+        - asset: assets/fonts/google_sans_italic.ttf
+        - asset: assets/fonts/google_sans_medium.ttf
+        - asset: assets/fonts/google_sans_medium_italic.ttf
+        - asset: assets/fonts/google_sans_regular.ttf
+          weight: 700
+    - family: Proxima
+      fonts:
+        - asset: assets/fonts/proxima_nova_font.otf
+          weight: 700
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

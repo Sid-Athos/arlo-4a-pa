@@ -3,7 +3,7 @@ use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_not_found, DatabaseError};
 use crate::database::entity::lobby_member::LobbyMemberEntity;
-use crate::database::mapper::lobby_member_repository::LobbyMemberEntityMapper;
+use crate::database::mapper::lobby_member_mapper::LobbyMemberEntityMapper;
 use crate::domain::model::lobby_member::LobbyMember;
 
 pub struct LobbyMemberRepository {

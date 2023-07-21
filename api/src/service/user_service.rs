@@ -3,7 +3,7 @@ use axum::http::StatusCode;
 
 use rand::distributions::Alphanumeric;
 use rand::{Rng, thread_rng};
-use regex::Regex;
+use regex::{Regex, RegexSet};
 
 use crate::database::repository::session_repository::SessionRepository;
 use crate::database::repository::user_repository::UserRepository;
@@ -33,20 +33,20 @@ impl UserService {
         self.user_repository.get_user_by_id(user_id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn create_user(&self, mut user: CreateUserCommand) -> Result<User, StatusCode> {
 
-        let password_regex_upper = Regex::new(r"^[A-Z]$").unwrap();
-        let password_regex_lower = Regex::new(r"^[a-z]$").unwrap();
-        let password_regex_number = Regex::new(r"^\d$").unwrap();
-        let password_regex_special = Regex::new(r"^[^a-zA-Z0-9]$").unwrap();
+
+    pub async fn create_user(&self, mut user: CreateUserCommand) -> Result<User, StatusCode> {
+        let password_regex_set = RegexSet::new(&[
+            r"[A-Z]",
+            r"[a-z]",
+            r"\d",
+            r"[a-zA-Z0-9]"
+        ]).unwrap();
+
+        let password_matches : Vec<_> = password_regex_set.matches(user.password.as_str()).into_iter().collect();
 
         let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
-
-        if  !password_regex_upper.is_match(&*user.password) &&
-            !password_regex_lower.is_match(&*user.password) &&
-            !password_regex_number.is_match(&*user.password) &&
-            !password_regex_special.is_match(&*user.password) &&
-            user.password.len() < 8
+        if password_matches.len() != 4 && user.password.len() < 8
         {
             return Err(StatusCode::BAD_REQUEST);
         }
@@ -61,7 +61,7 @@ impl UserService {
     }
 
     pub async fn login_user(&self, user: LoginCommand) -> Result<Session, StatusCode> {
-        let user_bdd = self.user_repository.get_user_by_email(user.email).await.map_err(database_error_to_status_code)?;
+        let user_bdd = self.user_repository.get_user_by_pseudo(user.pseudo).await.map_err(database_error_to_status_code)?;
 
         if verify(user.password, &user_bdd.password).map_err(internal_error)? {
 
@@ -101,6 +101,10 @@ impl UserService {
         self.user_repository.get_all_users().await.map_err(database_error_to_status_code)
     }
 
+    pub async fn get_everyone_but_me(&self, user_id: i32) -> Result<Vec<User>, StatusCode> {
+        self.user_repository.get_everyone_but_me(user_id).await.map_err(database_error_to_status_code)
+    }
+
     pub async fn give_admin_role(&self, user_id: i32) -> Result<User, StatusCode> {
         self.user_repository.give_admin_role(user_id).await.map_err(database_error_to_status_code)
     }
@@ -137,4 +141,25 @@ impl UserService {
         }
         self.user_repository.add_experience(user_id,user.experience,user.level).await.map_err(database_error_to_status_code)
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_regex() {
+        let regex_set = RegexSet::new(&[
+            r"[A-Z]",
+            r"[a-z]",
+            r"\d",
+            r"[a-zA-Z0-9]"
+        ]).unwrap();
+        let lol : Vec<_> = regex_set.matches("dqsdq").into_iter().collect();
+        assert_eq!(lol.len(), 2);
+        let lal : Vec<_> = regex_set.matches("1ascbfjsU").into_iter().collect();
+        assert_eq!(lal.len(), 4)
+    }
+
+
 }

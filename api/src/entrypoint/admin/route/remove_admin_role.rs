@@ -18,9 +18,11 @@ use crate::service::user_service::UserService;
         (status = 401, description = "Invalid token",),
         (status = 404, description = "User not found",),
     ),
-    security(
-        ("BearerAuth" = ["read:items", "edit:items"])
-    ), tag = "admin"
+security(
+("api-key" = []),
+("bearer" = [])
+),
+     tag = "admin"
 )]
 pub async fn remove_admin_role(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>) -> Result<Json<UserResponse>, StatusCode> {
     let user_service = UserService::new(

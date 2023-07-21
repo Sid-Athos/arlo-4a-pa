@@ -13,14 +13,15 @@ use crate::service::ranking_service::RankingService;
 
 #[utoipa::path(
     post,
-    path = "/ranking/init",
+    path = "/ranking/",
     request_body = RankingRequest,
     responses(
         (status = 200, description = "Ranking initialised", body = RankingResponse,),
         (status = 409, description = "Ranking already init",),
     ),
     security(
-        ("BearerAuth" = ["read:items", "edit:items"])
+    ("api-key" = []),
+    ("bearer" = [])
     ),
     tag="ranking"
 )]
@@ -31,5 +32,5 @@ pub async fn init_ranking(State(pool): State<ConnectionPool>, Json(ranking): Jso
 
     let ranking = ranking_service.init_ranking(ranking.user_id,ranking.game_id).await?;
 
-    Ok(Json(RankingResponse::from_domain(ranking)))
+    Ok(Json(RankingResponse::from_domain(ranking, pool).await))
 }
