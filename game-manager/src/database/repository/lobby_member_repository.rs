@@ -103,4 +103,18 @@ impl LobbyMemberRepository {
 
         Ok(LobbyMemberEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn set_player(&self, id: i32, player: i32) -> Result<LobbyMember, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("UPDATE coding_games.lobby_member SET player = $1 WHERE id = $2 RETURNING *", &[&player, &id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyMemberEntity::new(row);
+
+        Ok(LobbyMemberEntityMapper::entity_to_domain(result))
+    }
 }
