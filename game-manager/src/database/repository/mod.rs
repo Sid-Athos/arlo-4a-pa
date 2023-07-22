@@ -6,3 +6,6 @@ pub mod game_repository;
 pub mod invite_repository;
 pub mod friend_list_repository;
 pub mod ws_session_repository;
+pub mod game_history_repository;
+pub mod game_members_history_repository;
+pub mod game_move_history_repository;

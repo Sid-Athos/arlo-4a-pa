@@ -6,3 +6,6 @@ pub mod game;
 pub mod invite;
 pub mod friend_list;
 pub mod ws_session;
+pub mod game_history;
+pub mod game_members_history;
+pub mod game_move_history;

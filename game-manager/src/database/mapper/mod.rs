@@ -6,3 +6,6 @@ pub mod game_entity_mapper;
 pub mod invite_entity_mapper;
 pub mod friend_list_entity_mapper;
 pub mod ws_session_entity_mapper;
+pub mod game_history_mapper;
+pub mod game_move_history_mapper;
+pub mod game_members_history_mapper;
