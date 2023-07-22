@@ -23,7 +23,7 @@ impl GameRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("SELECT id,name,min_players,max_players,description,language,user_id FROM coding_games.game WHERE id = $1", &[&id])
+            .query_one("SELECT id,name,min_players,max_players,description,language,user_id,tag FROM coding_games.game WHERE id = $1", &[&id])
             .await
             .map_err(database_error_not_found)?;
 
