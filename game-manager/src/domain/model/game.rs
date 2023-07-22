@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Game {
     pub id: i32,
     pub name: String,
@@ -9,5 +9,6 @@ pub struct Game {
     pub max_players: i32,
     pub language: String,
     pub code : Option<String>,
-    pub user_id : i32
+    pub user_id : i32,
+    pub tag : String
 }

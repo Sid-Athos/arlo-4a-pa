@@ -1,9 +1,8 @@
-use chrono::{DateTime, Utc};
 use tokio_postgres::Row;
 
 pub struct GameHistoryEntity {
     pub id: i32,
-    pub date_time : DateTime<Utc>,
+    pub date_time : String,
     pub nb_players : i32,
     pub game_id : i32
 }

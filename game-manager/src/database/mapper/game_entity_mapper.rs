@@ -14,7 +14,8 @@ impl GameEntityMapper {
             max_players: game_entity.max_players,
             language : game_entity.language,
             code : game_entity.code,
-            user_id : game_entity.user_id
+            user_id : game_entity.user_id,
+            tag : game_entity.tag
         }
     }
 }
