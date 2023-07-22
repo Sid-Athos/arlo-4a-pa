@@ -1,3 +1,4 @@
+use std::time::SystemTime;
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -9,7 +10,7 @@ use crate::service::game_service::GameService;
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 pub struct GameHistoryResponse {
     pub id: i32,
-    pub date_time: String,
+    pub date_time: SystemTime,
     pub nb_players: i32,
     pub game: GameResponse,
 }
