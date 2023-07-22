@@ -8,8 +8,13 @@ const getMyGames = async () => {
     return (await GameManagerInstance.getInstance.get("games/mine/1"));
 }
 
+const updateGame = async (game) => {
+    return (await GameManagerInstance.getInstance.put("games/1", game));
+}
+
 
 export const GamesService = {
     findPlayers: getConnectedFriends,
-    findMyGames: getMyGames
+    findMyGames: getMyGames,
+    saveUpdatedGame: updateGame
 }

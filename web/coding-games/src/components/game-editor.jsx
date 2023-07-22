@@ -15,16 +15,16 @@ import {
 } from "@suid/material";
 import { oneDark } from "@codemirror/theme-one-dark";
 import {createResource, createSignal, lazy, onMount, Show, Suspense} from "solid-js";
-import {createMutable} from "solid-js/store";
+
 import {DeleteOutlineOutlined, SaveAltOutlined, VideogameAssetOutlined} from "@suid/icons-material";
 import {GamesService} from "../utils/services/game-manager-service";
 
 
 export default function Editor(){
     const [codes, setCodes] = createSignal( [])
+    const [currentCode, setCurrentCode] = createSignal({})
     onMount(async () => {
       let res = await GamesService.findMyGames();
-      console.log(res)
         setCodes(res.data)
     });
     const [drawerState,setDrawerState] = createSignal(false);
@@ -71,7 +71,7 @@ export default function Editor(){
             <Divider />
             <Typography sx={{textAlign:'center'}}>Game list</Typography>
             <List>
-                {["Morpion", "Puissance 4"].map((text, index) => (
+                {codes().map(game => game.name).map((text, index) => (
                     <ListItem disablePadding>
                         <ListItemButton onclick={() => clickDrawerGameItem(text)}>
                             <ListItemIcon sx={{color:'white'}}>
@@ -85,10 +85,13 @@ export default function Editor(){
         </Box>
     );
     const clickDrawerItem = (e) => {
-        //console.log(e)
+        console.log(e)
     }
     const clickDrawerGameItem = (e) => {
-       // console.log(e)
+        let currentGame = codes().find(item => item.name === e)
+        setCurrentCode(codes().find(item => item.name === e))
+        setMaxPlayers(currentGame.max_players)
+        setMinPlayers(currentGame.min_players)
     }
     const swapLanguage = (language) => {
         switch (language) {
@@ -110,9 +113,11 @@ export default function Editor(){
         }
         setMaxPlayers(e.target.value)
     }
-    const saveOnCtrlS = (e) => {
-        if(e.ctrlKey && e.key === "s"){
+    const saveOnCtrlS = async (e) => {
+        if (e.ctrlKey && e.key === "s") {
             e.preventDefault()
+            let res = await GamesService.saveUpdatedGame(currentCode())
+            console.log(res)
         }
     }
     return (
@@ -133,15 +138,26 @@ export default function Editor(){
                 {list("right")}
                     </Drawer>
             <Container maxWidth="sm" sx={{paddingTop: '50px'}}>
+            <Button onClick={toggleDrawer("right", true)} >{"Contextual menu"}</Button>
+            <Show when={currentCode().code}>
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={6} md={8}>
-                        <Show when={codes().length > 0}>
-                            <CodeMirror value={codes()[0].code} extensions={[basicSetup, java()]} theme={oneDark} onKeyDown={saveOnCtrlS} />
-                        </Show>
+                            <CodeMirror value={currentCode().code} extensions={[basicSetup, java()]} theme={oneDark} onKeyDown={saveOnCtrlS} />
+
                     </Grid>
                     <Grid item xs={6} md={4}>
-                    <Button onClick={toggleDrawer("right", true)} >{"Contextual menu"}</Button>
+
+                        <Divider></Divider>
+                        <FormControl>
+                            <TextField
+                                required
+                                id="outlined-required"
+                                label="Game name"
+                                value={currentCode().name}
+                                defaultValue={"Game name"}
+                            />
+                        </FormControl>
                         <FormControl
                             sx={{
                                 m: 1,
@@ -210,7 +226,7 @@ export default function Editor(){
                                 label="Game Description"
                                 multiline
                                 maxRows={4}
-                                value={description()}
+                                value={currentCode().description}
                                 variant="filled"
                                 onChange={(e) => setDescription(e.target.value)}
                             />
@@ -218,6 +234,7 @@ export default function Editor(){
                     </Grid>
                 </Grid>
             </Box>
+                    </Show>
             </Container>
 
         </>
