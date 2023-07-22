@@ -11,6 +11,7 @@ impl LobbyMemberEntityMapper {
             lobby_id: lobby_member_entity.lobby_id,
             user_id: lobby_member_entity.user_id,
             is_host: lobby_member_entity.is_host,
+            player : lobby_member_entity.player
         }
     }
 }

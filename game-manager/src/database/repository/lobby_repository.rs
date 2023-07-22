@@ -118,4 +118,17 @@ impl LobbyRepository {
 
         Ok(LobbyEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn set_game_history_id(&self, lobby_id: i32, game_history_id : i32) -> Result<Lobby, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("UPDATE coding_games.lobby SET game_history_id = $2 WHERE id = $1 RETURNING *", &[&lobby_id, &game_history_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyEntity::new(row);
+
+        Ok(LobbyEntityMapper::entity_to_domain(result))
+    }
 }

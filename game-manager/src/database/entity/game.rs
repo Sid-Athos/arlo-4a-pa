@@ -8,6 +8,7 @@ pub struct GameEntity {
     pub max_players: i32,
     pub language : String,
     pub code : Option<String>,
+    pub tag : uuid,
     pub user_id : i32
 }
 
@@ -21,7 +22,8 @@ impl GameEntity {
             max_players: row.get("max_players"),
             language: row.get("language"),
             code : row.get("code"),
-            user_id : row.get("user_id")
+            user_id : row.get("user_id"),
+            tag : row.get("tag")
         }
     }
     pub fn new_without_code(row : Row) -> Self {
@@ -33,7 +35,8 @@ impl GameEntity {
             max_players: row.get("max_players"),
             language: row.get("language"),
             code : None,
-            user_id : row.get("user_id")
+            user_id : row.get("user_id"),
+            tag : row.get("tag")
         }
     }
 }

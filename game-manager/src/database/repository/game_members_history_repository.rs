@@ -12,14 +12,14 @@ use crate::domain::model::game::Game;
 use crate::domain::model::game_history::GameMembersHistory;
 use crate::domain::model::game_members_history::GameMembersHistory;
 
-pub struct GameHistoryRepository {
+pub struct GameMembersHistoryRepository {
     pub connection: Pool<PostgresConnectionManager<NoTls>>,
 }
 
-impl GameHistoryRepository {
+impl GameMembersHistoryRepository {
 
     pub fn new(connection: Pool<PostgresConnectionManager<NoTls>>) -> Self {
-        GameHistoryRepository {
+        GameMembersHistoryRepository {
             connection
         }
     }
