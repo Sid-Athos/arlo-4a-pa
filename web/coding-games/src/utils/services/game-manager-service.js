@@ -1,7 +1,12 @@
 import {GameManagerInstance} from "./game-manager-instance";
+import {ApiInstance} from "./api-instance";
 
 const getConnectedFriends = async () => {
     return (await GameManagerInstance.getInstance.get("friends/connected_friends"));
+}
+
+const getRankByGames = async () => {
+    return (await ApiInstance.getInstance.get("ranking/games"));
 }
 
 const getMyGames = async (idUser) => {
@@ -26,5 +31,6 @@ export const GamesService = {
     findMyGames: getMyGames,
     updateGame: updateGame,
     newGame: createGame,
-    remove: deleteGame
+    remove: deleteGame,
+    allGamesRanking: getRankByGames
 }

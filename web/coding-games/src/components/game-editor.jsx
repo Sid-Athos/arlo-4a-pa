@@ -15,13 +15,11 @@ import {
 } from "@suid/material";
 import {oneDark} from "@codemirror/theme-one-dark";
 import {createSignal, onMount} from "solid-js";
-
 import {DeleteOutlineOutlined, SaveAltOutlined, VideogameAssetOutlined} from "@suid/icons-material";
 import {GamesService} from "../utils/services/game-manager-service";
 import {indentWithTab} from "@codemirror/commands";
 import {keymap} from "@codemirror/view";
 import {UserStore} from "../utils/user-store";
-
 
 export default function Editor() {
     const [codes, setCodes] = createSignal([])
@@ -40,6 +38,7 @@ export default function Editor() {
         let res = await GamesService.findMyGames(UserStore.get().id);
         setCodes(res.data)
     });
+
     const [drawerState, setDrawerState] = createSignal(false);
     const [language, setLanguage] = createSignal(python())
     const [languageString, setLanguageString] = createSignal("python")

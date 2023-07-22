@@ -14,7 +14,11 @@ import GameEditorComponent from "./components/game-editor.jsx";
 import LobbyComponent from "./components/lobby.jsx";
 
 // @ts-ignore
+import RankingComponent from "./components/rankings.jsx";
+
+// @ts-ignore
 import {UserProvider} from "./components/user-provider.jsx";
+
 const root = document.getElementById('root');
 
 // @ts-ignore
@@ -28,6 +32,8 @@ const [open, setOpen] = createSignal(false);
 
 render(
     () => (
+
+
         <UserProvider token={""}>
 
 
@@ -71,8 +77,10 @@ render(
                 <Route path={"/"} component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
                 <Route path={"/lobby"} component={<LobbyComponent ></LobbyComponent>}></Route>
                 <Route path={"/code-editor"} component={<GameEditorComponent></GameEditorComponent>}></Route>
+                <Route path={"/ranking"} component={<RankingComponent></RankingComponent>}></Route>
             </Routes>
         </Router>
     </Box>
         </UserProvider>
+
     ), root!);
