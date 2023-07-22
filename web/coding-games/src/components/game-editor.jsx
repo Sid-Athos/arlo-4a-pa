@@ -5,7 +5,7 @@ import {python} from "@codemirror/lang-python";
 import {
     Box, Button,
     Container,
-    Divider, Drawer, FormControl, FormHelperText,
+    Divider, Drawer, FormControl, FormGroup, FormHelperText,
     Grid, InputLabel,
     List,
     ListItem,
@@ -18,11 +18,20 @@ import {createResource, createSignal, lazy, onMount, Show, Suspense} from "solid
 
 import {DeleteOutlineOutlined, SaveAltOutlined, VideogameAssetOutlined} from "@suid/icons-material";
 import {GamesService} from "../utils/services/game-manager-service";
+import {indentWithTab} from "@codemirror/commands";
+import {keymap} from "@codemirror/view";
 
 
 export default function Editor(){
     const [codes, setCodes] = createSignal( [])
-    const [currentCode, setCurrentCode] = createSignal({})
+    const [currentCode, setCurrentCode] = createSignal({
+        name: "",
+        code:"",
+        description:"",
+        min_players: 2,
+        max_players: 2,
+        id: null
+    })
     onMount(async () => {
       let res = await GamesService.findMyGames();
         setCodes(res.data)
@@ -111,14 +120,23 @@ export default function Editor(){
         if(e.target.value < minPlayers()){
            return alert("tu te fous de ma gueule")
         }
+        let current = currentCode()
+        current.max_players = e.target.value
+        setCurrentCode(current)
         setMaxPlayers(e.target.value)
     }
     const saveOnCtrlS = async (e) => {
         if (e.ctrlKey && e.key === "s") {
             e.preventDefault()
-            let res = await GamesService.saveUpdatedGame(currentCode())
-            console.log(res)
+            console.log(currentCode())
+            await GamesService.saveUpdatedGame(currentCode())
         }
+    }
+
+    const updateCode = (value) => {
+        let current = currentCode()
+        current.code = value
+        setCurrentCode(current)
     }
     return (
         <>
@@ -139,16 +157,17 @@ export default function Editor(){
                     </Drawer>
             <Container maxWidth="sm" sx={{paddingTop: '50px'}}>
             <Button onClick={toggleDrawer("right", true)} >{"Contextual menu"}</Button>
-            <Show when={currentCode().code}>
+
             <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={2}>
+                <Grid container spacing={3}>
                     <Grid item xs={6} md={8}>
-                            <CodeMirror value={currentCode().code} extensions={[basicSetup, java()]} theme={oneDark} onKeyDown={saveOnCtrlS} />
-
+                            <CodeMirror value={currentCode().code} onValueChange={updateCode} extensions={[basicSetup, language(),keymap.of([indentWithTab]) ]} theme={oneDark} onKeyDown={saveOnCtrlS}
+                            />
                     </Grid>
+                    <Divider></Divider>
                     <Grid item xs={6} md={4}>
+                    <FormGroup>
 
-                        <Divider></Divider>
                         <FormControl>
                             <TextField
                                 required
@@ -156,6 +175,7 @@ export default function Editor(){
                                 label="Game name"
                                 value={currentCode().name}
                                 defaultValue={"Game name"}
+                                inputProps={{ style: { color: "white", justifyContent:"center" } }}
                             />
                         </FormControl>
                         <FormControl
@@ -171,6 +191,7 @@ export default function Editor(){
                                 value={languageString()}
                                 onChange={(e) => swapLanguage(e.target.value)}
                                 label="Language"
+                                sx={{color: "white", justifyContent:"center" } }
                             >
                                 <MenuItem value={'python'}>python</MenuItem>
                                 <MenuItem value={'java'}>java</MenuItem>
@@ -187,8 +208,14 @@ export default function Editor(){
                                 labelId="demo-simple-select-disabled-label"
                                 id="demo-simple-select-disabled"
                                 value={minPlayers()}
-                                onChange={(e) => setMinPlayers(e.target.value)}
+                                onChange={(e) => {
+                                    let current = currentCode()
+                                    current.min_players = e.target.value
+                                    setCurrentCode(current)
+                                    setMinPlayers(e.target.value)
+                                }}
                                 label="Minimum players"
+                                sx={{color: "white", justifyContent:"center" } }
                             >
                                 <MenuItem value={2}>2</MenuItem>
                                 <MenuItem value={3}>3</MenuItem>
@@ -209,6 +236,7 @@ export default function Editor(){
                                 id="demo-simple-select-disabled"
                                 value={maxPlayers()}
                                 label="Minimum players"
+                                sx={{color: "white", justifyContent:"center" } }
                                 onChange={checkPlayersAmount}
                             >
                                 <MenuItem value={2}>2</MenuItem>
@@ -229,12 +257,14 @@ export default function Editor(){
                                 value={currentCode().description}
                                 variant="filled"
                                 onChange={(e) => setDescription(e.target.value)}
+                                inputProps={{ style: { color: "white", justifyContent:"center" } }}
                             />
                         </FormControl>
+                    </FormGroup>
                     </Grid>
                 </Grid>
             </Box>
-                    </Show>
+
             </Container>
 
         </>
