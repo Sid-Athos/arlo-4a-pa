@@ -10,3 +10,4 @@ pub mod docker_manager_service;
 pub mod dto;
 pub mod game_history_service;
 pub mod game_move_history_service;
+pub mod game_members_history_service;

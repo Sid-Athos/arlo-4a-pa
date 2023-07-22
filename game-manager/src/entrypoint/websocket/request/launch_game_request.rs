@@ -5,8 +5,9 @@ use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::game_started_response::GameStartedResponse;
-use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
+use crate::service::game_history_service::GameHistoryService;
+use crate::service::game_members_history_service::GameMembersHistoryService;
 use crate::service::lobby_service::LobbyService;
 
 
@@ -16,14 +17,19 @@ impl LaunchGameRequest {
 
     pub async fn compute(pool: ConnectionPool, connections: Extension<Connections>, user: User) -> Result<(), String> {
         let lobby_service = LobbyService::new(pool.clone());
+        let game_history_service = GameHistoryService::new(pool.clone());
+        let game_members_history_service = GameMembersHistoryService::new(pool.clone());
+
         let lobby = lobby_service.get_by_user_id(user.id).await.map_err(status_code_to_string)?;
         let lobby_started = lobby_service.start_game(lobby.id).await.map_err(status_code_to_string)?;
         let lobby_members = lobby_service.get_lobby_member(lobby.id).await.map_err(status_code_to_string)?;
+        let game_history = game_history_service.create(lobby.id).await.map_err(status_code_to_string)?;
 
         let game_started_response = GameStartedResponse::from_domain(lobby_started, pool.clone()).await?;
 
         let mut members_user_id = Vec::new();
         for member in &lobby_members {
+            game_members_history_service.create(member.user_id, game_history.id, member.player).await.map_err(status_code_to_string)?;
             members_user_id.push(member.user_id);
         }
 
