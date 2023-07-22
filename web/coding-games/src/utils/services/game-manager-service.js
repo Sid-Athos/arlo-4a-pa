@@ -4,7 +4,12 @@ const getConnectedFriends = async () => {
     return (await GameManagerInstance.getInstance.get("friends/connected_friends"));
 }
 
+const getMyGames = async () => {
+    return (await GameManagerInstance.getInstance.get("games/mine/1"));
+}
+
 
 export const GamesService = {
-    findPlayers: getConnectedFriends
+    findPlayers: getConnectedFriends,
+    findMyGames: getMyGames
 }
