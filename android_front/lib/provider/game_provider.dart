@@ -1,16 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:miku/model/chat_messsage.dart';
-import 'package:miku/provider/user_ice_candidate_provided.dart';
-import 'package:miku/provider/user_sdp_provided.dart';
+import 'package:miku/model/game/chat_messsage.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../api/game_manager/api_game_manager.dart';
 import '../api/game_manager/response/emote_response_ws.dart';
 import '../api/game_manager/response/message_response_ws.dart';
-import '../model/ice_candidate_model.dart';
-import '../model/rtc_session.dart';
-import '../model/user_model.dart';
+import '../model/game/game_action_model.dart';
+import '../model/game/game_svg_info_model.dart';
+import '../model/webrtc/ice_candidate_model.dart';
+import '../model/webrtc/rtc_session.dart';
+import '../model/user/user_model.dart';
 
 class GameProvider extends ChangeNotifier {
 
@@ -22,6 +22,8 @@ class GameProvider extends ChangeNotifier {
   List<RtcSession> rtcSessions = [];
   MediaStream? localStream;
   RTCVideoRenderer localRenderer = RTCVideoRenderer();
+  GameSvgInfo? gameSvgInfo;
+  GameAction? gameAction;
 
   GameProvider({
     required this.messages,
@@ -137,5 +139,15 @@ class GameProvider extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  void setSvgDisplay(GameSvgInfo gameSvgInfo) {
+    this.gameSvgInfo = gameSvgInfo;
+    notifyListeners();
+  }
+
+  void setAction(GameAction gameAction) {
+    this.gameAction = gameAction;
+    notifyListeners();
   }
 }

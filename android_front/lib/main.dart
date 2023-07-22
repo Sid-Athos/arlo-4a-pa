@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:miku/view/login_view.dart';
-import 'package:miku/view/test_webrtc_view.dart';
+import 'package:miku/view/login/login_view.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +8,7 @@ import 'package:web_socket_channel/src/channel.dart';
 
 import 'api/game_manager/api_game_manager.dart';
 import 'api/user/api_user.dart';
-import 'model/user_model.dart';
+import 'model/user/user_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
