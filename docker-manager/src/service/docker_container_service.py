@@ -4,14 +4,13 @@ import docker
 from docker.models.containers import Container
 
 from env import DOCKER_USERNAME, DOCKERHUB_REPOSITORY
-from .docker_image_service import pull_image
 from ..dependencies.docker import docker_client
 from .docker_image_service import pull_image
 
 import subprocess
 
 languages_commands = {"python3": ["python3", "main.py"], "c": ["./game"], "rust": ["./game"],
-                      "java": ["java -jar game.jar"]}
+                      "java": ["java", "game"]}
 
 
 def run_container(tag: str) -> str:
