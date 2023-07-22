@@ -1,5 +1,3 @@
-import json
-import threading
 import time
 
 import docker
@@ -8,8 +6,12 @@ from docker.models.containers import Container
 from env import DOCKER_USERNAME, DOCKERHUB_REPOSITORY
 from .docker_image_service import pull_image
 from ..dependencies.docker import docker_client
+from .docker_image_service import pull_image
 
 import subprocess
+
+languages_commands = {"python3": ["python3", "main.py"], "c": ["./game"], "rust": ["./game"],
+                      "java": ["java -jar game.jar"]}
 
 
 def run_container(tag: str) -> str:
@@ -26,8 +28,10 @@ def run_container(tag: str) -> str:
 
 
 def exec_on_container(tag: str, language: str, commands: list[str]) -> str or bool:
+    pull_image(tag=tag)
     process = subprocess.Popen(
-        ["docker", "run", "-i", "--rm", f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}", f"{language}", "main.py"],
+        ["docker", "run", "-i", "--rm", f"{DOCKER_USERNAME}/{DOCKERHUB_REPOSITORY}:{tag}",
+         *languages_commands[f'{language}']],
         stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
     res = ""
@@ -45,7 +49,10 @@ def exec_on_container(tag: str, language: str, commands: list[str]) -> str or bo
                 brackets["closing"] += 1
             res += o
             if brackets["opening"] == brackets["closing"]:
+                if brackets["opening"] == 0:
+                    return False
                 break
+    process.kill()
     res = res.replace(" ", "")
     return res.replace("\n", "")
 
