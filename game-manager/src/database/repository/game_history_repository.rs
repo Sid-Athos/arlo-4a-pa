@@ -2,9 +2,7 @@ use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_not_found, DatabaseError};
-use crate::database::entity::game::GameHistoryEntity;
 use crate::database::entity::game_history::GameHistoryEntity;
-use crate::database::mapper::game_entity_mapper::GameHistoryEntityMapper;
 use crate::database::mapper::game_history_mapper::GameHistoryEntityMapper;
 use crate::domain::model::game::Game;
 use crate::domain::model::game_history::GameHistory;
@@ -23,12 +21,33 @@ impl GameHistoryRepository {
 
     pub async fn get_all_by_user_id(&self, user_id : i32) -> Result<Vec<GameHistory>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
-        tracing::info!("Init db get all");
+
         let rows = conn
             .query("SELECT gh.*
             FROM coding_games.game_history gh
             INNER JOIN coding_games.game_members_history gmh ON gh.id = gmh.game_history_id
             WHERE gmh.user_id = $1", &[&user_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(GameHistoryEntityMapper::entity_to_domain(GameHistoryEntity::new(row)));
+        }
+
+        Ok(result)
+    }
+
+    pub async fn get_all_by_user_id_and_game_id(&self, user_id: i32, game_id: i32) -> Result<Vec<GameHistory>, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn
+            .query("SELECT gh.*
+            FROM coding_games.game_history gh
+            INNER JOIN coding_games.game_members_history gmh ON gh.id = gmh.game_history_id
+            WHERE gmh.user_id = $1 AND gh.game_id = $2", &[&user_id, &game_id])
             .await
             .map_err(database_error_not_found)?;
 

@@ -2,14 +2,9 @@ use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_not_found, DatabaseError};
-use crate::database::entity::game::GameMembersHistoryEntity;
-use crate::database::entity::game_history::GameMembersHistoryEntity;
 use crate::database::entity::game_members_history::GameMembersHistoryEntity;
-use crate::database::mapper::game_entity_mapper::GameMembersHistoryEntityMapper;
-use crate::database::mapper::game_history_mapper::GameMembersHistoryEntityMapper;
 use crate::database::mapper::game_members_history_mapper::GameMembersHistoryEntityMapper;
 use crate::domain::model::game::Game;
-use crate::domain::model::game_history::GameMembersHistory;
 use crate::domain::model::game_members_history::GameMembersHistory;
 
 pub struct GameMembersHistoryRepository {
@@ -37,7 +32,7 @@ impl GameMembersHistoryRepository {
         let mut result = Vec::new();
 
         for row in rows {
-            result.push(GamMemberseHistoryEntityMapper::entity_to_domain(GameMembersHistoryEntity::new(row)));
+            result.push(GameMembersHistoryEntityMapper::entity_to_domain(GameMembersHistoryEntity::new(row)));
         }
 
         Ok(result)

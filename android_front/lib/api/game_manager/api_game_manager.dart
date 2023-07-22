@@ -88,7 +88,7 @@ class ApiGameManager {
 
   static Future<List<GameHistory>> getGameHistory(int gameId) async {
     try {
-      final response = await dio.get('$baseURL/game_played/history/$gameId');
+      final response = await dio.get('$baseURL/history/games/$gameId');
       final data = response.data as List<dynamic>;
       return data.map((json) => GameHistoryResponseMapper.fromJson(json)).toList();
     } catch (e) {
@@ -99,7 +99,7 @@ class ApiGameManager {
 
   static Future<List<GameMoveHistory>> getGameMoveHistory(int gameHistoryId) async {
     try {
-      final response = await dio.get('$baseURL/game_played/history/moves/$gameHistoryId');
+      final response = await dio.get('$baseURL/history/moves/$gameHistoryId');
       final data = response.data as List<dynamic>;
       return data.map((json) => GameMoveHistoryResponseMapper.fromJson(json)).toList();
     } catch (e) {

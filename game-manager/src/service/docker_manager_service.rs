@@ -27,7 +27,7 @@ impl DockerManagerService {
             lobby_repository : LobbyRepository::new(pool.clone())
         }
     }
-
+/*
     pub async fn cockmmunicate_with_arnaud_mom(&self, user_id : i32, user_move : String){
         let mut current_lobby = self.lobby_service.get_by_user_id(user_id).await.map_err(database_error_to_status_code)?;
 
@@ -60,6 +60,6 @@ impl DockerManagerService {
         let add_move = self.game_move_history_repository.create()*/
 
     }
-
+*/
 
 }

@@ -67,7 +67,7 @@ impl GameRepository {
 
         let uuid = Uuid::new_v4();
         let row = conn
-            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &uuid])
+            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &uuid.to_string()])
             .await
             .map_err(database_error_not_found)?;
 

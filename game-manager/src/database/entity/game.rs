@@ -1,4 +1,5 @@
 use tokio_postgres::Row;
+use uuid::Uuid;
 
 pub struct GameEntity {
     pub id: i32,
@@ -8,7 +9,7 @@ pub struct GameEntity {
     pub max_players: i32,
     pub language : String,
     pub code : Option<String>,
-    pub tag : uuid,
+    pub tag : String,
     pub user_id : i32
 }
 
