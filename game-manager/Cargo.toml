@@ -9,7 +9,7 @@ publish = false
 [dependencies]
 async-trait = "0.1.68"
 axum = {version = "0.6.18", features = ["ws", "headers", "multipart"]}
-chrono = "0.4.24"
+chrono = { version = "0.4.24", features = ["serde"] }
 futures = "0.3"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 headers = "0.3"
