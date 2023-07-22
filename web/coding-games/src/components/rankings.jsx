@@ -1,26 +1,29 @@
 import {
     Box,
+    createTheme,
     Grid,
-    styled,
     Paper,
-    TableContainer,
+    styled,
     Table,
+    TableBody,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
-    TableCell,
-    TableBody
+    ThemeProvider
 } from "@suid/material";
 import {createSignal, onMount} from "solid-js";
-import { ThemeProvider, createTheme } from '@suid/material';
 import {GamesService} from "../utils/services/game-manager-service";
 
 export default function Rankings() {
     const [rankData, setRankData] = createSignal([]);
     const Item = styled(Paper)(({theme}) => ({
         ...theme.typography.body2,
-        backgroundColor:'transparent',
+        backgroundColor: 'transparent',
         padding: theme.spacing(1),
         textAlign: "center",
+        maxWidth: "200px",
+        marginLeft:"45%",
         color: theme.palette.text.secondary,
     }));
     onMount(async () => {
@@ -65,51 +68,53 @@ export default function Rankings() {
     return (
         <>
             <ThemeProvider theme={darkTheme}>
-            <Box sx={{flexGrow: 1}}>
-                <Grid container spacing={2}>
-                    {
-                        rankData().map(game => {
-                            return (<>
-                                <Grid item xs={6} md={6}>
-                                    <Box sx={{flexGrow: 1, marginTop:"20px"}}>
-                                    <Item>{game.name}</Item>
-                                    <TableContainer component={Paper}>
-                                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell>Username</TableCell>
-                                                    <TableCell align="right">Elo</TableCell>
-                                                    <TableCell align="right">Game amount</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {game.rankings.map(
-                                                    (row) => {
-                                                        console.log(row)
-                                                        return (
-                                                        <TableRow
-                                                            sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                                                        >
-                                                            <TableCell component="th" scope="row">
-                                                                {row.username}
-                                                            </TableCell>
-                                                            <TableCell align="right">{row.rank}</TableCell>
-                                                            <TableCell align="right">{row.nb_games}</TableCell>
-                                                        </TableRow>
-                                                    )
-                                                    }
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                    </Box>
-                                </Grid>
-                                </>
-                            )
-                        })
-                    }
-                </Grid>
-            </Box>
+                <Box sx={{flexGrow: 1}}>
+                    <Grid container spacing={2}>
+                        {
+                            rankData().map(game => {
+                                return (<>
+                                        <Grid item xs={6} md={6}>
+                                            <Box sx={{flexGrow: 1, marginTop: "20px"}}>
+                                                <Item>{game.name}</Item>
+                                                <TableContainer component={Paper}>
+                                                    <Table sx={{minWidth: 650}} aria-label="simple table">
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell>Username</TableCell>
+                                                                <TableCell align="right">Elo</TableCell>
+                                                                <TableCell align="right">Game amount</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {game.rankings.map(
+                                                                (row) => {
+                                                                    console.log(row)
+                                                                    return (
+                                                                        <TableRow
+                                                                            sx={{"&:last-child td, &:last-child th": {border: 0}}}
+                                                                        >
+                                                                            <TableCell component="th" scope="row">
+                                                                                {row.username}
+                                                                            </TableCell>
+                                                                            <TableCell
+                                                                                align="right">{row.rank}</TableCell>
+                                                                            <TableCell
+                                                                                align="right">{row.nb_games}</TableCell>
+                                                                        </TableRow>
+                                                                    )
+                                                                }
+                                                            )}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </Box>
+                                        </Grid>
+                                    </>
+                                )
+                            })
+                        }
+                    </Grid>
+                </Box>
             </ThemeProvider>
         </>
     )

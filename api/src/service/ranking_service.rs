@@ -8,7 +8,7 @@ use crate::database::repository::ranking_repository::RankingRepository;
 
 use crate::domain::error::database_error_to_status_code;
 use crate::domain::model::ranking::Ranking;
-
+use crate::domain::model::ranking_by_game::RankingByGame;
 
 
 pub struct RankingService {
@@ -32,6 +32,9 @@ impl RankingService {
 
     pub async fn get_ranking_by_user(&self, user_id: i32) -> Result<Vec<Ranking>, StatusCode> {
         self.ranking_repository.get_ranking_by_user(user_id).await.map_err(database_error_to_status_code)
+    }
+    pub async fn get_all_rankings_by_game(&self) -> Result<Vec<RankingByGame>, StatusCode> {
+        self.ranking_repository.get_all_rankings_by_game().await.map_err(database_error_to_status_code)
     }
 
     pub async fn get_ranking_by_game(&self, game_id: i32) -> Result<Vec<Ranking>, StatusCode> {
