@@ -20,6 +20,7 @@ import {DeleteOutlineOutlined, SaveAltOutlined, VideogameAssetOutlined} from "@s
 import {GamesService} from "../utils/services/game-manager-service";
 import {indentWithTab} from "@codemirror/commands";
 import {keymap} from "@codemirror/view";
+import {UserStore} from "../utils/user-store";
 
 
 export default function Editor() {
@@ -32,8 +33,11 @@ export default function Editor() {
         max_players: 2,
         id: null
     })
+
+    /** TODO change the call for token use **/
     onMount(async () => {
-        let res = await GamesService.findMyGames(1);
+        UserStore.save({id: 1})
+        let res = await GamesService.findMyGames(UserStore.get().id);
         setCodes(res.data)
     });
     const [drawerState, setDrawerState] = createSignal(false);
