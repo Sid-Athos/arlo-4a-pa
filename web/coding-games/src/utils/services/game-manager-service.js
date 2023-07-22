@@ -4,12 +4,12 @@ const getConnectedFriends = async () => {
     return (await GameManagerInstance.getInstance.get("friends/connected_friends"));
 }
 
-const getMyGames = async () => {
-    return (await GameManagerInstance.getInstance.get("games/mine/1"));
+const getMyGames = async (idUser) => {
+    return (await GameManagerInstance.getInstance.get("games/mine/" + idUser));
 }
 
-const updateGame = async (game) => {
-    return (await GameManagerInstance.getInstance.put("games/1", game));
+const updateGame = async (id, game) => {
+    return (await GameManagerInstance.getInstance.put("games/" + id, game));
 }
 
 
