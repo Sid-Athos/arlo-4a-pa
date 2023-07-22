@@ -5,7 +5,7 @@ import {python} from "@codemirror/lang-python";
 import {
     Box, Button,
     Container,
-    Divider, Drawer, FormControl, FormGroup, FormHelperText,
+    Divider, Drawer, FormControl, FormGroup,
     Grid, InputLabel,
     List,
     ListItem,
@@ -40,20 +40,16 @@ export default function Editor() {
     const [language, setLanguage] = createSignal(python())
     const [languageString, setLanguageString] = createSignal("python")
 
-    const toggleDrawer =
-        (anchor, open) => (event) => {
-
+    const toggleDrawer = (anchor, open) => (event) => {
             if (event.type === "keydown") {
                 const keyboardEvent = event;
                 if (keyboardEvent.key === "Tab" || keyboardEvent.key === "Shift")
                     return;
             }
             setDrawerState(open);
-
         };
 
     const list = (anchor) => (
-
         <Box
             role="presentation"
             onClick={toggleDrawer(anchor, false)}
@@ -61,14 +57,12 @@ export default function Editor() {
             sx={{}}
         >
             <List>
-                {["Save", "Delete"].map((text, index) => (
+                {["Save", "Delete"].map((text) => (
                     <ListItem disablePadding>
                         <ListItemButton onclick={() => clickDrawerItem(text)}>
                             <ListItemIcon sx={{color: 'white'}}>
                                 {text === "Save" ? <SaveAltOutlined></SaveAltOutlined> :
                                     <DeleteOutlineOutlined></DeleteOutlineOutlined>}
-
-
                             </ListItemIcon>
                             <ListItemText primary={text}/>
                         </ListItemButton>
@@ -91,8 +85,15 @@ export default function Editor() {
             </List>
         </Box>
     );
-    const clickDrawerItem = (e) => {
-        console.log(e)
+    const clickDrawerItem = async (e) => {
+        switch (e) {
+            case "Save":
+                await save()
+                break;
+            case "Delete":
+                await GamesService.remove(currentCode().id)
+                break;
+        }
     }
     const clickDrawerGameItem = (e) => {
         setCurrentCode(codes().find(item => item.name === e))
@@ -120,10 +121,23 @@ export default function Editor() {
     const saveOnCtrlS = async (e) => {
         if (e.ctrlKey && e.key === "s") {
             e.preventDefault()
-            if(currentCode().id){
-                await GamesService.saveUpdatedGame(currentCode())
-            }
+            await save()
         }
+    }
+
+    const save = async () => {
+        if (currentCode().id) {
+            let payload = createPayload(currentCode())
+            await GamesService.updateGame(currentCode().id, payload)
+        } else {
+            let payload = createPayload(currentCode())
+            await GamesService.newGame(payload)
+        }
+    }
+
+    const createPayload = (payload) => {
+        delete payload.id
+        return payload
     }
 
     const updateCode = (key, value) => {
@@ -149,7 +163,6 @@ export default function Editor() {
             </Drawer>
             <Container maxWidth="sm" sx={{paddingTop: '50px'}}>
                 <Button onClick={toggleDrawer("right", true)}>{"Contextual menu"}</Button>
-
                 <Box sx={{flexGrow: 1}}>
                     <Grid container spacing={3}>
                         <Grid item xs={6} md={8}>

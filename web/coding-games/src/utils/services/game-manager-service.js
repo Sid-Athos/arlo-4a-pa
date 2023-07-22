@@ -12,9 +12,19 @@ const updateGame = async (id, game) => {
     return (await GameManagerInstance.getInstance.put("games/" + id, game));
 }
 
+const createGame = async (game) => {
+    return (await GameManagerInstance.getInstance.post("games/", game));
+}
+
+const deleteGame = async (id) => {
+    return (await GameManagerInstance.getInstance.put("games/" + id));
+}
+
 
 export const GamesService = {
     findPlayers: getConnectedFriends,
     findMyGames: getMyGames,
-    saveUpdatedGame: updateGame
+    updateGame: updateGame,
+    newGame: createGame,
+    remove: deleteGame
 }
