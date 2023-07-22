@@ -110,7 +110,7 @@ impl LobbyRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("UPDATE coding_games.lobby SET is_launched = true WHERE lobby_id = $1 RETURNING *", &[&lobby_id])
+            .query_one("UPDATE coding_games.lobby SET is_launched = true WHERE id = $1 RETURNING *", &[&lobby_id])
             .await
             .map_err(database_error_not_found)?;
 
