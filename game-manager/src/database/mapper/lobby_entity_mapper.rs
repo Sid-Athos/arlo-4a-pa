@@ -11,7 +11,8 @@ impl LobbyEntityMapper {
             game_id: lobby_entity.game_id,
             code: lobby_entity.code,
             private: lobby_entity.private,
-            is_launched: lobby_entity.is_launched
+            is_launched: lobby_entity.is_launched,
+            game_history_id: lobby_entity.game_history_id,
         }
     }
 }

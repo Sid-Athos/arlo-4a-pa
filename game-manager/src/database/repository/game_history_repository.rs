@@ -54,4 +54,17 @@ impl GameHistoryRepository {
 
         Ok(GameHistoryEntityMapper::entity_to_domain(result))
     }
+
+    pub async fn get_by_id(&self, id: i32) -> Result<GameHistory, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.game_history WHERE id = $1", &[&id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = GameHistoryEntity::new(row);
+
+        Ok(GameHistoryEntityMapper::entity_to_domain(result))
+    }
 }

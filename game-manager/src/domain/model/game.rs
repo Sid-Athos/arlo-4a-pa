@@ -9,5 +9,6 @@ pub struct Game {
     pub max_players: i32,
     pub language: String,
     pub code : Option<String>,
-    pub user_id : i32
+    pub user_id : i32,
+    pub tag : uuid
 }

@@ -6,3 +6,5 @@ pub mod invite_service;
 pub mod game_service;
 pub mod friend_list_service;
 pub mod ws_session_service;
+pub mod docker_manager_service;
+pub mod dto;
