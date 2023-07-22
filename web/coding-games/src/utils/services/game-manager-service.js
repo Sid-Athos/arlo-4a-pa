@@ -9,6 +9,10 @@ const getRankByGames = async () => {
     return (await ApiInstance.getInstance.get("ranking/games"));
 }
 
+const getPublicLobbies = async () => {
+    return (await GameManagerInstance.getInstance.get("lobby/get_public"));
+}
+
 const getMyGames = async (idUser) => {
     return (await GameManagerInstance.getInstance.get("games/mine/" + idUser));
 }
@@ -32,5 +36,6 @@ export const GamesService = {
     updateGame: updateGame,
     newGame: createGame,
     remove: deleteGame,
-    allGamesRanking: getRankByGames
+    allGamesRanking: getRankByGames,
+    getAvailableLobbies:getPublicLobbies
 }

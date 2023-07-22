@@ -26,7 +26,6 @@ impl GameRepository {
             .await
             .map_err(database_error_not_found)?;
 
-        print!("{:?}", row);
         let result = GameEntity::new_without_code(row);
 
         Ok(GameEntityMapper::entity_to_domain(result))

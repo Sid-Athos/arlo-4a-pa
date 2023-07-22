@@ -68,10 +68,10 @@ export default function Rankings() {
     return (
         <>
             <ThemeProvider theme={darkTheme}>
-                <Box sx={{flexGrow: 1}}>
+                <Box sx={{flexGrow: 1, m : 2}}>
                     <Grid container spacing={2}>
                         {
-                            rankData().map(game => {
+                            rankData().map((game, index) => {
                                 return (<>
                                         <Grid item xs={6} md={6}>
                                             <Box sx={{flexGrow: 1, marginTop: "20px"}}>
@@ -80,6 +80,7 @@ export default function Rankings() {
                                                     <Table sx={{minWidth: 650}} aria-label="simple table">
                                                         <TableHead>
                                                             <TableRow>
+                                                                <TableCell>#</TableCell>
                                                                 <TableCell>Username</TableCell>
                                                                 <TableCell align="right">Elo</TableCell>
                                                                 <TableCell align="right">Game amount</TableCell>
@@ -87,12 +88,15 @@ export default function Rankings() {
                                                         </TableHead>
                                                         <TableBody>
                                                             {game.rankings.map(
-                                                                (row) => {
-                                                                    console.log(row)
+                                                                (row, index) => {
+
                                                                     return (
                                                                         <TableRow
                                                                             sx={{"&:last-child td, &:last-child th": {border: 0}}}
                                                                         >
+                                                                            <TableCell component="th" scope="row">
+                                                                                {index + 1}
+                                                                            </TableCell>
                                                                             <TableCell component="th" scope="row">
                                                                                 {row.username}
                                                                             </TableCell>
