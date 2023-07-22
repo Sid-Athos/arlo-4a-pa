@@ -134,7 +134,7 @@ impl LobbyService {
 
         lobby = self.lobby_repository.set_launch_for_lobby_id(lobby_id).await.map_err(database_error_to_status_code)?;
         for i in 0..lobby_members.len() {
-            self.lobby_member_repository.set_player(lobby_members[i].id, (i + 1) as i32);
+            self.lobby_member_repository.set_player(lobby_members[i].id, (i + 1) as i32).await.map_err(database_error_to_status_code)?;
         }
 
         return Ok(lobby);
