@@ -4,7 +4,7 @@ class GameMoveHistory {
 
   int id;
   int player;
-  GameSvgInfo game_state;
+  String game_state;
   String action;
   int action_number;
 

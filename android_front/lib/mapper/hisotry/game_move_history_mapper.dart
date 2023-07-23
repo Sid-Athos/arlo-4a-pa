@@ -7,7 +7,8 @@ class GameMoveHistoryResponseMapper {
     return GameMoveHistory(
       id: json['id'],
       player: json['player'],
-      game_state: GameSvgInfoResponseMapper.fromJson(json['game_state']),
+      game_state: json['game_state'],
+      //game_state: GameSvgInfoResponseMapper.fromJson(json['game_state']),
       action: json['action'],
       action_number: json['action_number']
     );

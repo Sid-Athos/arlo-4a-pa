@@ -42,7 +42,8 @@ class _ReplayGameViewState extends State<ReplayGameView> {
           children: [
             Expanded(
               child: Center(
-                 child: SvgPicture.string(gameMoveHistory[move_index].game_state.createSVG()),
+                 //child: SvgPicture.string(gameMoveHistory[move_index].game_state.createSVG()),
+                child: Container(),
                ),
             ),
             Center(
