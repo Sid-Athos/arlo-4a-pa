@@ -5,9 +5,9 @@ use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::game_actions_response::GameActionsResponse;
 use crate::entrypoint::websocket::response::game_display_response::GameDisplayResponse;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
-use crate::service::dto::actions_response::ActionsResponse;
-use crate::service::dto::display_response::DisplayResponse;
-use crate::service::dto::game_state_response::GameStateResponse;
+use crate::service::dto::response::actions_response::ActionsResponse;
+use crate::service::dto::response::display_response::DisplayResponse;
+use crate::service::dto::response::game_state_response::GameStateResponse;
 
 #[derive(Serialize, Deserialize)]
 pub struct DockerManagerResponse {

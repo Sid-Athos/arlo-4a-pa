@@ -10,8 +10,8 @@ use crate::database::repository::game_move_history_repository::GameMoveHistoryRe
 use crate::database::repository::game_repository::GameRepository;
 use crate::database::repository::lobby_repository::LobbyRepository;
 use crate::domain::error::database_error_to_status_code;
-use crate::service::dto::command_request::CommandRequest;
-use crate::service::dto::docker_manager_response::DockerManagerResponse;
+use crate::service::dto::request::command_request::CommandRequest;
+use crate::service::dto::response::docker_manager_response::DockerManagerResponse;
 use crate::service::lobby_service::LobbyService;
 
 pub struct DockerManagerService {

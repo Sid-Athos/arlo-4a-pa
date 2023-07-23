@@ -14,3 +14,4 @@ pub mod sdp_offer_request;
 pub mod sdp_answer_request;
 pub mod register_ice_candidate_request;
 pub mod emote_request;
+pub mod game_action_request;
