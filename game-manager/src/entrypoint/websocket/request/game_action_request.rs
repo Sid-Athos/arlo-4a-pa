@@ -39,7 +39,24 @@ impl GameActionRequest {
 
         let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&actions_request).unwrap()).await.map_err(status_code_to_string)?;
         if docker_manager_response.game_state.game_over {
+            let mut winner_index = 0;
+            let mut max_score = docker_manager_response.game_state.scores[0];
+            let mut loser_rankings = 0;
+            let mut nb_losers = 0;
+            for i in 0..docker_manager_response.game_state.scores.len() {
+                if max_score < docker_manager_response.game_state.scores[i] {
+                    max_score = docker_manager_response.game_state.scores[i];
+                    winner_index = i;
+                }
+            }
+            //TODO le plus gros score est le vainqueur (player 1 to player N dans l'ordre)
+            //TODO calculer la moyenne des perdants
             for lobby_member in &lobby_members {
+                if lobby_member.player != winner_index as i32 {
+                    loser_rankings += docker_manager_service.get_ranking(lobby_member.user_id, lobby.game_id).await.map_err(status_code_to_string)?;
+                    nb_losers += 1;
+                }
+                //docker_manager_service.get_ranking(lobby_member.user_id);
                 lobby_service.exit_lobby(lobby_member.user_id).await.map_err(status_code_to_string)?;
             }
         }

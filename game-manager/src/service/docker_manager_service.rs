@@ -2,8 +2,9 @@ use std::env::current_exe;
 use std::str::from_utf8;
 use axum::body::HttpBody;
 use axum::http::{Method, StatusCode};
-use hyper::{Body, Client, Request, Uri};
+use hyper::{Body, Client, HeaderMap, Request, Uri};
 use hyper::body::{Buf, to_bytes};
+use hyper::header::AUTHORIZATION;
 use crate::database::init::ConnectionPool;
 use crate::database::repository::game_history_repository::GameHistoryRepository;
 use crate::database::repository::game_move_history_repository::GameMoveHistoryRepository;
@@ -46,7 +47,7 @@ impl DockerManagerService {
                 current_history= self.game_history_repository.get_by_id(id).await.map_err(database_error_to_status_code)?;
             }
         }
-
+        let game_tag = game.tag;
         let mut moves = self.get_all_past_moves(current_history.id).await?;
         moves.push(user_move.clone());
         let game_dto = CommandRequest::new(game.language, moves);
@@ -55,14 +56,9 @@ impl DockerManagerService {
         println!("body_str: {}", body_str);
 
         let client = Client::new();
-        /*let req = Request::builder()
-            .method(Method::POST)
-            .uri(format!("http://dev.mikusupremacy.fr:7588/containers/{}", game.tag))
-            .body(Body::from(body_str))
-            .unwrap();*/
         let req = Request::builder()
             .method(Method::POST)
-            .uri(format!("http://dev.mikusupremacy.fr:7588/containers/morpion"))
+            .uri(format!("http://dev.mikusupremacy.fr:7588/containers/{}", game_tag))
             .body(Body::from(body_str))
             .unwrap();
 
@@ -92,5 +88,22 @@ impl DockerManagerService {
         }
 
         return Ok(vec_history);
+    }
+
+    pub async fn get_ranking(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
+        let client = Client::new();
+        let req = Request::builder()
+            .method(Method::POST)
+            .uri(format!("http://127.0.0.1:7590/ranking/user/{}/{}", user_id,game_id))
+            .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
+            .body(Body::from(""))
+            .unwrap();
+        let response = client.request(req).await.unwrap();
+        println!("body: {:?}", response.body());
+        println!("status: {:?}", response.status());
+        if response.status() != StatusCode::OK {
+            return Err(response.status());
+        }
+        Ok(1)
     }
 }

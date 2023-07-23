@@ -29,7 +29,6 @@ pub fn user_routes(pool: Pool<PostgresConnectionManager<NoTls>>) -> Router {
         .route("/user/change_password", put(change_password).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/user", put(update_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/user/search/:pseudo", get(search_user).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
-        .route("/user/add_experience", put(add_experience).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .route("/user/other_players/:user_id", get(get_other_players).route_layer(middleware::from_fn_with_state(pool.clone(), is_logged)))
         .layer(middleware::from_fn(check_api_key))
         .with_state(pool)
