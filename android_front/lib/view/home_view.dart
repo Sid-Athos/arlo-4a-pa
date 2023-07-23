@@ -13,6 +13,8 @@ import 'package:miku/mapper/game/game_svg_info_response_mapper.dart';
 import 'package:miku/mapper/user/user_response_mapper.dart';
 import 'package:miku/view/friends/friend_list_view.dart';
 import 'package:miku/view/game/game_left_dialog.dart';
+import 'package:miku/view/game/game_lose_dialog.dart';
+import 'package:miku/view/game/game_win_dialog.dart';
 
 import 'package:miku/view/lobby/game_list_view.dart';
 import 'package:miku/view/game/game_view.dart';
@@ -124,6 +126,12 @@ class _HomeState extends State<HomeView> {
         case "\"CannotStartGame\"":
           developer.log("CannotStartGame");
           return;
+        case "\"GameWin\"":
+          showGameWinDialog();
+          return;
+        case "\"GameLose\"":
+          showGameLoseDialog();
+          return;
         case "\"GameStopped\"":
           showGameLeftDialog();
           return;
@@ -197,6 +205,26 @@ class _HomeState extends State<HomeView> {
         }
       }
     });
+  }
+
+  showGameLoseDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: navigatorKeys[1].currentContext!,
+      builder: (BuildContext context) {
+        return GameLoseDialog();
+      },
+    ).then((value) => {navigatorKeys[1].currentState!.pop()});
+  }
+
+  showGameWinDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: navigatorKeys[1].currentContext!,
+      builder: (BuildContext context) {
+        return GameWinDialog();
+      },
+    ).then((value) => {navigatorKeys[1].currentState!.pop()});
   }
 
   showGameLeftDialog() {
