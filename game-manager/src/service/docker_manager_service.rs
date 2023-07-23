@@ -94,7 +94,7 @@ impl DockerManagerService {
         let client = Client::new();
         let req = Request::builder()
             .method(Method::POST)
-            .uri(format!("http://127.0.0.1:7590/ranking/user/{}/{}", user_id,game_id))
+            .uri(format!("http://dev.mikusupremacy.fr:7590/ranking/user/{}/{}", user_id,game_id))
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .body(Body::from(""))
             .unwrap();
