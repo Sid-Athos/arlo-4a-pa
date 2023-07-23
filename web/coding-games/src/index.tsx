@@ -26,6 +26,8 @@ import ListUsersComponent from "./components/list-users.jsx";
 import NotificationsComponent from "./components/notifications.jsx";
 
 import NavBarComponent from "./render/navbar.jsx";
+
+import Chat from "./components/dsdqs.jsx";
 // @ts-ignore
 import {UserProvider} from "./components/user-provider.jsx";
 import SearchIcon from "@suid/icons-material/Search";
@@ -60,6 +62,7 @@ render(
                         <Route path={"/ranking"} component={RankingComponent}></Route>
                         <Route path={"/game-lobbies"} component={GameLobbyComponent}></Route>
                         <Route path={"/search-user"} component={ListUsersComponent}></Route>
+                        <Route path={"/chat"} component={Chat}></Route>
                     </Routes>
         </UserProvider>
                 </Router>
