@@ -8,7 +8,7 @@ class GameHistoryResponseMapper {
       id: json['id'],
       game: GameResponseMapper.fromJson(json['game']),
       nb_players: json['nb_players'],
-      dateTime: DateTime.parse(json['dateTime'])
+      dateTime: DateTime.parse(json['date_time'])
     );
   }
 }

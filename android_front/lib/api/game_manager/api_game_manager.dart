@@ -77,6 +77,8 @@ class ApiGameManager {
 
   static Future<List<Lobby>> getPublicLobbyForGame(int gameId) async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
       final response = await dio.get('$baseURL/lobby/get_public/$gameId');
       final data = response.data as List<dynamic>;
       return data.map((json) => LobbyResponseMapper.fromJson(json)).toList();
@@ -99,6 +101,8 @@ class ApiGameManager {
 
   static Future<List<GameMoveHistory>> getGameMoveHistory(int gameHistoryId) async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
       final response = await dio.get('$baseURL/history/moves/$gameHistoryId');
       final data = response.data as List<dynamic>;
       return data.map((json) => GameMoveHistoryResponseMapper.fromJson(json)).toList();

@@ -32,16 +32,14 @@ class GameHistoryCardWidget extends StatelessWidget {
           color: const Color(0xFF1A2025),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 16.0, left: 16.0, top: 8.0),
-            child: Flexible(
-              child: ListTile(
-                title: Text(
-                  game_history.game.name,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                subtitle: Text(
-                  "${game_history.dateTime.month}/${game_history.dateTime.day}/${game_history.dateTime.year} ${game_history.dateTime.minute}:${game_history.dateTime.hour}",
-                  style: const TextStyle(color: Colors.white38),
-                ),
+            child: ListTile(
+              title: Text(
+                game_history.game.name,
+                style: const TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                "${game_history.dateTime.month}/${game_history.dateTime.day}/${game_history.dateTime.year} ${game_history.dateTime.hour}:${game_history.dateTime.minute}",
+                style: const TextStyle(color: Colors.white38),
               ),
             ),
           ),
