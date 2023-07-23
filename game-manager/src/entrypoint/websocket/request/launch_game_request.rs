@@ -29,6 +29,7 @@ impl LaunchGameRequest {
         let lobby_started = lobby_service.start_game(lobby.id).await.map_err(status_code_to_string)?;
         let lobby_members = lobby_service.get_lobby_member(lobby.id).await.map_err(status_code_to_string)?;
         let game_history = game_history_service.create(lobby.id).await.map_err(status_code_to_string)?;
+        lobby_service.set_game_history_id(lobby_started.id, game_history.id).await.map_err(status_code_to_string)?;
 
         let init_request = InitRequest::new(lobby_members.len() as i32);
         let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&init_request).unwrap()).await.map_err(status_code_to_string)?;

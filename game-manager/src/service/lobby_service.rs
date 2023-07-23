@@ -139,4 +139,8 @@ impl LobbyService {
 
         return Ok(lobby);
     }
+
+    pub async fn set_game_history_id(&self, lobby_id: i32, game_history_id: i32) -> Result<Lobby, StatusCode> {
+        self.lobby_repository.set_game_history_id(lobby_id, game_history_id).await.map_err(database_error_to_status_code)
+    }
 }

@@ -38,16 +38,12 @@ impl DockerManagerService {
 
         let game = self.game_repository.get_by_id(current_lobby.game_id).await.map_err(database_error_to_status_code)?;
         let lobby_member = self.lobby_service.get_lobby_member_by_user_id(user_id).await?;
-        let lobby_members = self.lobby_service.get_lobby_member(current_lobby.id).await?;
         let current_history;
 
         match current_lobby.game_history_id {
-            Some(value) => {
-                current_history = self.game_history_repository.get_by_id(value).await.map_err(database_error_to_status_code)?;
-            },
-            None => {
-                current_history = self.game_history_repository.create(lobby_members.len() as i32, game.id).await.map_err(database_error_to_status_code)?;
-                current_lobby = self.lobby_repository.set_game_history_id(current_lobby.id, current_history.id).await.map_err(database_error_to_status_code)?;
+            None => return Err(StatusCode::UNAUTHORIZED),
+            Some(id) => {
+                current_history= self.game_history_repository.get_by_id(id).await.map_err(database_error_to_status_code)?;
             }
         }
 
