@@ -9,8 +9,9 @@ const instance = axios.create({
 });
 
 const setAuthorizationHeader = (token) => {
+    console.log(token)
     instance.interceptors.request.use(conf => {
-        conf.headers.setAuthorization(token)
+        conf.headers.Authorization = token
         return conf
     })
 

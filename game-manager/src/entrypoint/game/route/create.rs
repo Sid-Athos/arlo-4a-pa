@@ -22,6 +22,7 @@ pub async fn create_game(State(pool): State<ConnectionPool>,  Extension(user): E
     let game_service = GameService::new(
         pool.clone()
     );
+    println!("{:?}",game);
 
     let game = game_service.create_game(game.name,game.max_players,game.min_players,game.description,game.language,game.code,user.id).await?;
 

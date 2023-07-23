@@ -3,8 +3,11 @@ use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_duplicate_key, database_error_not_found, DatabaseError};
 use crate::database::entity::ranking_entity::RankingEntity;
+use crate::database::entity::ranking_game_user_entity::RankByGameEntity;
+use crate::database::mapper::ranking_by_game_entity_mapper::RankingByGameEntityMapper;
 use crate::database::mapper::ranking_entity_mapper::RankingEntityMapper;
 use crate::domain::model::ranking::Ranking;
+use crate::domain::model::ranking_by_game::RankingByGame;
 
 pub struct RankingRepository {
     pub connection: Pool<PostgresConnectionManager<NoTls>>,
@@ -43,6 +46,24 @@ impl RankingRepository {
         let result = RankingEntity::new(row);
 
         Ok(RankingEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn get_all_rankings_by_game(&self) -> Result<Vec<RankingByGame>, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let rows = conn
+            .query("SELECT r.rank, r.nb_games, u.pseudo, g.name from coding_games.ranking as r JOIN coding_games.user as u on r.user_id = u.id JOIN coding_games.game as g on r.game_id = g.id ORDER BY r.game_id, r.rank DESC;", &[])
+            .await
+            .map_err(database_error_duplicate_key)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(RankingByGameEntityMapper::entity_to_domain(RankByGameEntity::new(row)));
+        }
+
+        Ok(result)
     }
 
     pub async fn update_ranking(&self, game_id: i32, user_id: i32, new_ranking : i32) -> Result<Ranking, DatabaseError> {

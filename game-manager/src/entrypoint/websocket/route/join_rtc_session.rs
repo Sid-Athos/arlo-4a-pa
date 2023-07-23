@@ -9,7 +9,7 @@ use crate::service::lobby_service::LobbyService;
 use crate::service::user_service::UserService;
 use crate::service::ws_session_service::WsSessionService;
 
-pub async fn join_rtc_session(State(pool): State<ConnectionPool>, connections: Extension<Connections>, Extension(user): Extension<User>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
+pub async fn join_rtc_session(State(pool): State<ConnectionPool>, _connections: Extension<Connections>, Extension(user): Extension<User>) -> Result<Json<Vec<UserResponse>>, StatusCode> {
 
     let ws_service = WsSessionService::new(pool.clone());
     let user_service = UserService::new(pool.clone());

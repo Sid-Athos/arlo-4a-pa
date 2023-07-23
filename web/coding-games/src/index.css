@@ -25,6 +25,11 @@ code {
     p: 4;
 }
 
+.MuiDrawer-paper {
+   color:#decba4;
+    background-color: #282c34;
+}
+
 .logScreenTypography{
     font-size: 22px;
     text-align: center;

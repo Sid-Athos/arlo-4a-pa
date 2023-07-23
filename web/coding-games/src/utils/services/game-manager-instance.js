@@ -10,10 +10,9 @@ const instance = axios.create({
 
 const setAuthorizationHeader = (token) => {
     instance.interceptors.request.use(conf => {
-        conf.headers.setAuthorization(token)
+        conf.headers.Authorization = token
         return conf
     })
-
 }
 
 export const GameManagerInstance = {

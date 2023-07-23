@@ -6,3 +6,4 @@ pub mod update;
 pub mod get_by_id;
 pub mod delete_by_user;
 pub mod delete_by_admin;
+pub mod get_my_games;
