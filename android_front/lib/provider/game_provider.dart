@@ -146,7 +146,7 @@ class GameProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setAction(GameAction gameAction) {
+  void setAction(GameAction? gameAction) {
     this.gameAction = gameAction;
     notifyListeners();
   }

@@ -9,7 +9,7 @@ class GameAction {
     required this.zones,
   });
 
-  bool isInZones(double x, double y) {
+  bool isInZones(int x, int y) {
     for (int i = 0; i < zones.length; i++) {
       if (zones[i].isInZone(x, y)) {
         return true;

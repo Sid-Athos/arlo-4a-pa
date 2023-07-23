@@ -133,15 +133,17 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
-            gameProvider.setSvgDisplay(GameSvgInfoResponseMapper.fromJson(
-                jsonDecode(tmpSvgDisplayData)));
-            gameProvider.setAction(
-                GameActionResponseMapper.fromJson(jsonDecode(tmpActionData)));
             gameProvider
                 .addMessage(MessageResponseWS.fromJson(json["Message"]));
             break;
           case "Emote":
             gameProvider.addEmote(EmoteResponseWS.fromJson(json["Emote"]));
+            break;
+          case "GameDisplay":
+            gameProvider.setSvgDisplay(GameSvgInfoResponseMapper.fromJson(json["GameDisplay"]));
+            break;
+          case "GameAction":
+            gameProvider.setAction(GameActionResponseMapper.fromJson(json["GameAction"]));
             break;
           case "Lobby":
             lobby.update(json["Lobby"]);
