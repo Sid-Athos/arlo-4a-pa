@@ -10,6 +10,7 @@ use crate::entrypoint::websocket::request::create_lobby_request::CreateLobbyRequ
 use crate::entrypoint::websocket::request::decline_invite_lobby_request::DeclineInviteLobbyRequest;
 use crate::entrypoint::websocket::request::emote_request::EmoteRequest;
 use crate::entrypoint::websocket::request::exit_lobby_request::ExitLobbyRequest;
+use crate::entrypoint::websocket::request::game_action_request::GameActionRequest;
 use crate::entrypoint::websocket::request::give_lobby_host_request::GiveHostRequest;
 use crate::entrypoint::websocket::request::invite_user_lobby_request::InviteUserLobbyRequest;
 use crate::entrypoint::websocket::request::join_lobby_request::JoinLobbyRequest;
@@ -34,6 +35,7 @@ pub enum RequestEnum {
     CreateLobby(CreateLobbyRequest),
     JoinLobby(JoinLobbyRequest),
     ExitLobby,
+    GameAction(GameActionRequest),
     GiveHost(GiveHostRequest),
     KickUser(KickUserRequest),
     InviteUserLobby(InviteUserLobbyRequest),
@@ -60,6 +62,10 @@ impl RequestEnum {
             RequestEnum::Exit => {
                 connections.send_to_vec_user_id(ResponseEnum::Bye, vec![user.id]).await;
                 return true;
+            }
+            RequestEnum::GameAction(action) => {
+                let action = action.compute(pool, connections.clone(), user.clone()).await;
+                ErrorResponse::send_error(action, connections.clone(), user).await;
             }
             RequestEnum::Message(message) => {
                 let response = message.compute(pool, connections.clone(), user.clone()).await;
