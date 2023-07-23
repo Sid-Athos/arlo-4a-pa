@@ -42,7 +42,7 @@ export default function Notifications() {
         setInterval(async () => {
             if (UserStore.get().token) {
                 await UserService.friendRequests().then(res => {
-                    setNotifications(res.data.filter(friendRequest => friendRequest.recipient.pseudo !== UserStore.get().username))
+                    setNotifications(res.data.filter(friendRequest => friendRequest.applicant.pseudo !== UserStore.get().username))
                 })
 
             }

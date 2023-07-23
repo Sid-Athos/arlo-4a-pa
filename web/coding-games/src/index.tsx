@@ -3,7 +3,7 @@ import {render} from 'solid-js/web';
 // @ts-ignore
 import './index.css';
 import {Router, Route, Routes, useNavigate} from "@solidjs/router";
-import {AppBar, Box, Button, Divider, IconButton, Stack, TextField, Toolbar, Typography} from "@suid/material";
+import {AppBar, Box, Button, Divider, IconButton, Link, Stack, TextField, Toolbar, Typography} from "@suid/material";
 import MenuIcon from "@suid/icons-material/Menu";
 import {createSignal} from "solid-js";
 // @ts-ignore
@@ -24,10 +24,13 @@ import ListUsersComponent from "./components/list-users.jsx";
 
 // @ts-ignore
 import NotificationsComponent from "./components/notifications.jsx";
+
+import NavBarComponent from "./render/navbar.jsx";
 // @ts-ignore
 import {UserProvider} from "./components/user-provider.jsx";
 import SearchIcon from "@suid/icons-material/Search";
 const root = document.getElementById('root');
+const [open, setOpen] = createSignal(false);
 
 // @ts-ignore
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
@@ -35,68 +38,31 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
         'Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got mispelled?',
     );
 }
-const handleOpen = () => setOpen(true);
-const [open, setOpen] = createSignal(false);
+
 import { A } from "@solidjs/router";
 
 
 // @ts-ignore
 render(
     () => (
+        <Box sx={{backgroundColor: '#282c34', minHeight: '100vh'}}>
+            <Box sx={{flexGrow: 1}}>
         <Router>
         <UserProvider token={""}>
-            <Box sx={{backgroundColor: '#282c34', minHeight: '100vh'}}>
-                <Box sx={{flexGrow: 1}}>
-                    <AppBar position="sticky" sx={{backgroundColor: '#282c34'}}>
-                        <Toolbar>
-                            <IconButton
-                                size="large"
-                                edge="start"
-                                color="inherit"
-                                aria-label="menu"
-                                sx={{mr: 2}}
-                            >
-                                <MenuIcon/>
-                            </IconButton>
-                            <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
-                                <Stack
-                                    direction="row"
-                                    divider={<Divider orientation="vertical" flexItem/>}
-                                    spacing={4}
-                                >
-                                    <Typography>
-                                        <A href="/game_lobbies"> Games</A>
-                                    </Typography>
-                                    <Typography>
-                                        <A href={"/ranking"}> Leaderboard</A>
-                                    </Typography>
-                                    <Typography>
-                                        <A href={"/code-editor"}> Code Editor</A>
-                                    </Typography>
-                                    <Typography>
-                                        <A href={"/search-user"}> Search Users</A>
-                                    </Typography>
-                                </Stack>
-                            </Typography>
-                            <Button color="inherit" onClick={handleOpen}>Login</Button>
-                            <div>
-
-                                <NotificationsComponent></NotificationsComponent>
-                            </div>
-                        </Toolbar>
-                    </AppBar>
-                </Box>
+            <NavBarComponent setOpen={setOpen} open={open}>
+            </NavBarComponent>
                     <Routes>
                         {/* @ts_ignore */}
                         <Route path={"/"}
                                component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
-                        <Route path={"/lobby"} component={<LobbyComponent></LobbyComponent>}></Route>
-                        <Route path={"/code-editor"} component={<GameEditorComponent></GameEditorComponent>}></Route>
-                        <Route path={"/ranking"} component={<RankingComponent></RankingComponent>}></Route>
-                        <Route path={"/game-lobbies"} component={<GameLobbyComponent></GameLobbyComponent>}></Route>
-                        <Route path={"/search-user"} component={<ListUsersComponent ></ListUsersComponent>}></Route>
+                        <Route path={"/lobby"} component={LobbyComponent}></Route>
+                        <Route path={"/code-editor"} component={GameEditorComponent}></Route>
+                        <Route path={"/ranking"} component={RankingComponent}></Route>
+                        <Route path={"/game-lobbies"} component={GameLobbyComponent}></Route>
+                        <Route path={"/search-user"} component={ListUsersComponent}></Route>
                     </Routes>
-            </Box>
         </UserProvider>
                 </Router>
+                    </Box>
+                </Box>
     ), root!);

@@ -14,7 +14,7 @@ import {
     ListItemText, MenuItem, Select, TextField, Typography
 } from "@suid/material";
 import {oneDark} from "@codemirror/theme-one-dark";
-import {createSignal, onMount} from "solid-js";
+import {createEffect, createSignal, onCleanup, onMount} from "solid-js";
 import {DeleteOutlineOutlined, SaveAltOutlined, VideogameAssetOutlined} from "@suid/icons-material";
 import {GamesService} from "../utils/services/game-manager-service";
 import {indentWithTab} from "@codemirror/commands";
@@ -34,23 +34,23 @@ export default function Editor() {
 
     /** TODO change the call for token use **/
     onMount(async () => {
-        UserStore.save({id: 1})
-        let res = await GamesService.findMyGames(UserStore.get().id);
-        setCodes(res.data)
+            let res = await GamesService.findMyGames();
+            setCodes(res.data)
     });
+
 
     const [drawerState, setDrawerState] = createSignal(false);
     const [language, setLanguage] = createSignal(python())
     const [languageString, setLanguageString] = createSignal("python")
 
-    const toggleDrawer = (anchor, open) => (event) => {
-            if (event.type === "keydown") {
-                const keyboardEvent = event;
-                if (keyboardEvent.key === "Tab" || keyboardEvent.key === "Shift")
-                    return;
-            }
-            setDrawerState(open);
-        };
+    const toggleDrawer = (anchor, open) => async (event) => {
+        if (event.type === "keydown") {
+            const keyboardEvent = event;
+            if (keyboardEvent.key === "Tab" || keyboardEvent.key === "Shift")
+                return;
+        }
+        setDrawerState(open);
+    };
 
     const list = (anchor) => (
         <Box
@@ -134,11 +134,15 @@ export default function Editor() {
             await GamesService.updateGame(currentCode().id, payload)
         } else {
             let payload = createPayload(currentCode())
-            await GamesService.newGame(payload)
+            let res = await GamesService.newGame(payload).data
+            console.log(res)
+            //updateCode("id", res.id)
         }
     }
 
     const createPayload = (payload) => {
+        console.log(payload)
+        payload.language = languageString()
         delete payload.id
         return payload
     }
@@ -146,7 +150,7 @@ export default function Editor() {
     const updateCode = (key, value) => {
         let current = currentCode()
         current[key] = value
-        setCurrentCode(Object.create(current))
+        setCurrentCode({...current})
     }
     return (
         <>

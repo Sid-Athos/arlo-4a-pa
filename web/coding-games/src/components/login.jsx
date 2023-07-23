@@ -15,7 +15,7 @@ import {useNavigate} from "@solidjs/router";
 import {useUserProvider} from "./user-provider";
 import {UserStore} from "../utils/user-store";
 
-export default function LoginComponent ({open, setOpen})  {
+export default function LoginComponent ({open,setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
     const [userSignIn, setUserSignIn] = createSignal({nickname : "", password: ""});
     const [userSignInError, setUserSignInError] = createSignal(false);

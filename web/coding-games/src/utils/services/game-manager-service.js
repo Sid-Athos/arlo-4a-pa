@@ -13,8 +13,8 @@ const getPublicLobbies = async () => {
     return (await GameManagerInstance.getInstance.get("lobby/get_public"));
 }
 
-const getMyGames = async (idUser) => {
-    return (await GameManagerInstance.getInstance.get("games/mine/" + idUser));
+const getMyGames = async () => {
+    return (await GameManagerInstance.getInstance.get("games/mine"));
 }
 
 const updateGame = async (id, game) => {
@@ -22,7 +22,7 @@ const updateGame = async (id, game) => {
 }
 
 const createGame = async (game) => {
-    return (await GameManagerInstance.getInstance.post("games/", game));
+    return (await GameManagerInstance.getInstance.post("games", game));
 }
 
 const deleteGame = async (id) => {

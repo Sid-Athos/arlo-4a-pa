@@ -1,3 +1,4 @@
+use std::fmt::format;
 use std::fs::File;
 use std::io::Write;
 use axum::http::StatusCode;
@@ -23,8 +24,8 @@ impl GameService {
         self.game_repository.get_all().await.map_err(database_error_to_status_code)
     }
 
-    pub async fn get_my_games(&self, game_id: i32) -> Result<Vec<Game>, StatusCode> {
-        self.game_repository.get_my_games(game_id).await.map_err(database_error_to_status_code)
+    pub async fn get_my_games(&self, user_id: i32) -> Result<Vec<Game>, StatusCode> {
+        self.game_repository.get_my_games(user_id).await.map_err(database_error_to_status_code)
     }
 
     pub async fn get_by_id(&self, game_id: i32) -> Result<Game, StatusCode> {
@@ -33,8 +34,9 @@ impl GameService {
 
     pub async fn create_game(&self, name : String, max_players : i32, min_players : i32, description : Option<String>, language : String, code : String, user_id : i32)-> Result<Game, StatusCode>{
         let game = self.game_repository.create(name,min_players,max_players,description,language,user_id, code.clone()).await.map_err(database_error_to_status_code)?;
-
-        let mut f = File::create(format!("ressources/games/{}.{}",game.id,game.language)).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
+        print!("{:?}", game);
+        let mut f = File::create(format!("resources/games/{}.{}",game.id,game.language)).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
+        let code_literal = format!(r#"{:?}"#, code);
         f.write_all(code.as_bytes()).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
         Ok(game)
     }
