@@ -1,11 +1,13 @@
 use axum::Extension;
 use futures_util::TryFutureExt;
+use hyper::body::Buf;
 use crate::database::init::ConnectionPool;
 use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::entrypoint::websocket::response::game_started_response::GameStartedResponse;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
+use crate::service::docker_manager_service::DockerManagerService;
 use crate::service::game_history_service::GameHistoryService;
 use crate::service::game_members_history_service::GameMembersHistoryService;
 use crate::service::lobby_service::LobbyService;
@@ -19,11 +21,14 @@ impl LaunchGameRequest {
         let lobby_service = LobbyService::new(pool.clone());
         let game_history_service = GameHistoryService::new(pool.clone());
         let game_members_history_service = GameMembersHistoryService::new(pool.clone());
+        let docker_manager_service = DockerManagerService::new(pool.clone());
 
         let lobby = lobby_service.get_by_user_id(user.id).await.map_err(status_code_to_string)?;
         let lobby_started = lobby_service.start_game(lobby.id).await.map_err(status_code_to_string)?;
         let lobby_members = lobby_service.get_lobby_member(lobby.id).await.map_err(status_code_to_string)?;
         let game_history = game_history_service.create(lobby.id).await.map_err(status_code_to_string)?;
+
+        let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, String::from("{\"init\":{\"players\":2}}")).await.map_err(status_code_to_string)?;
 
         let game_started_response = GameStartedResponse::from_domain(lobby_started, pool.clone()).await?;
 
@@ -34,6 +39,8 @@ impl LaunchGameRequest {
         }
 
         connections.send_to_vec_user_id(ResponseEnum::GameStarted(game_started_response), members_user_id).await;
+
+        docker_manager_response.send_to_users(connections, lobby_members).await;
 
         Ok(())
     }

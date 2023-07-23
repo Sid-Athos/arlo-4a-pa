@@ -1,5 +1,7 @@
 use serde::Serialize;
 use crate::entrypoint::websocket::response::emote_response::EmoteResponse;
+use crate::entrypoint::websocket::response::game_actions_response::GameActionsResponse;
+use crate::entrypoint::websocket::response::game_display_response::GameDisplayResponse;
 use crate::entrypoint::websocket::response::game_started_response::GameStartedResponse;
 use crate::entrypoint::websocket::response::ice_candidate_response::ICECandidateResponse;
 use crate::entrypoint::websocket::response::invite_response::InviteResponse;
@@ -33,6 +35,8 @@ pub enum ResponseEnum {
     CannotStartGame,
     BadMessage,
     GameStopped,
+    GameDisplay(GameDisplayResponse),
+    GameAction(GameActionsResponse),
     GameStarted(GameStartedResponse),
     ICECandidate(ICECandidateResponse),
     SDPAnswer(SDPAnswerResponse),

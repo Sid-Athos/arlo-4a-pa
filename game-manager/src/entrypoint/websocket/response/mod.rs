@@ -13,3 +13,5 @@ pub mod sdp_answer_response;
 pub mod sdp_offer_response;
 pub mod user_left_rtc_session;
 pub mod emote_response;
+pub mod game_display_response;
+pub mod game_actions_response;
