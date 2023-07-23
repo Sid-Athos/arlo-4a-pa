@@ -1,7 +1,7 @@
 
 pub enum DatabaseError {
     DuplicateKey,
-    //InvalidInput,
+    InvalidInput,
     NotFound,
     CannotGetConnectionToDatabase,
 }

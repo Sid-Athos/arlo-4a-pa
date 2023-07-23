@@ -79,12 +79,12 @@ impl GameRepository {
         Ok(GameEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn create(&self, name : String, min_players: i32, max_players : i32, description : Option<String> , language : String, user_id : i32, code : String) -> Result<Game, DatabaseError> {
+    pub async fn create(&self, name : String, min_players: i32, max_players : i32, description : Option<String> , language : String, user_id : i32, code : String, tag : String) -> Result<Game, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
-        let uuid = Uuid::new_v4();
+
         let row = conn
-            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &uuid.to_string()])
+            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &tag])
             .await
             .map_err(database_error_not_found)?;
 
