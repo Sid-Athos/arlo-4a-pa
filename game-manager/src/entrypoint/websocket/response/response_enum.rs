@@ -35,6 +35,8 @@ pub enum ResponseEnum {
     CannotStartGame,
     BadMessage,
     GameStopped,
+    GameWin,
+    GameLose,
     GameDisplay(GameDisplayResponse),
     GameAction(GameActionsResponse),
     GameStarted(GameStartedResponse),

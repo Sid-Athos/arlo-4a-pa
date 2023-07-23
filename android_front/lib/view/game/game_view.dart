@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:miku/api/game_manager/request/game_action_request.dart';
 import 'package:miku/model/game/game_started.dart';
 import 'package:miku/model/webrtc/ice_candidate_model.dart';
 import 'package:miku/provider/game_provider.dart';
@@ -106,8 +107,9 @@ class _GameViewState extends State<GameView> {
           body: Center(
             child: GestureDetector(
               onTapUp: (TapUpDetails tapUpDetails) {
-                if (gameProvider.gameAction != null && gameProvider.gameAction!.isInZones(tapUpDetails.localPosition.dx, tapUpDetails.localPosition.dy)) {
-                  print(tapUpDetails.localPosition);
+                if (gameProvider.gameAction != null && gameProvider.gameAction!.isInZones(tapUpDetails.localPosition.dx.floor(), tapUpDetails.localPosition.dy.floor())) {
+                  channel.sink.add(GameActionRequest.toJson(tapUpDetails.localPosition.dx.floor(), tapUpDetails.localPosition.dy.floor()));
+                  gameProvider.setAction(null);
                 }
               },
               child: (gameProvider.gameSvgInfo != null) ? SvgPicture.string(gameProvider.gameSvgInfo!.createSVG()) : Container(),

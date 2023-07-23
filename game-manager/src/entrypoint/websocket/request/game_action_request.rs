@@ -2,7 +2,7 @@ use axum::Extension;
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use crate::database::init::ConnectionPool;
-use crate::domain::error::status_code_to_string;
+use crate::domain::error::{database_error_to_status_code, status_code_to_string};
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
 use crate::service::docker_manager_service::DockerManagerService;
@@ -38,6 +38,12 @@ impl GameActionRequest {
         }
 
         let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&actions_request).unwrap()).await.map_err(status_code_to_string)?;
+        if docker_manager_response.game_state.game_over {
+            for lobby_member in &lobby_members {
+                lobby_service.exit_lobby(lobby_member.user_id).await.map_err(status_code_to_string)?;
+            }
+        }
+
         docker_manager_response.send_to_users(connections, lobby_members).await;
 
         return Ok(());

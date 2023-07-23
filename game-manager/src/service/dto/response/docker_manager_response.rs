@@ -45,5 +45,29 @@ impl DockerManagerResponse {
 
             connections.send_to_vec_user_id(ResponseEnum::GameAction(game_action_response), send_to).await;
         }
+
+        if self.game_state.game_over {
+            let mut winners = vec![];
+            let mut send_to_winners = vec![];
+            let mut send_to_losers = vec![];
+
+            for i in 0..self.game_state.scores.len() {
+                if self.game_state.scores[i] == 1 {
+                    winners.push((i + 1) as i32);
+                }
+            }
+
+            for lobby_member in &lobby_members {
+                if winners.contains(&lobby_member.player) {
+                    send_to_winners.push(lobby_member.user_id);
+                } else {
+                    send_to_losers.push(lobby_member.user_id);
+                }
+            }
+
+            connections.send_to_vec_user_id(ResponseEnum::GameWin, send_to_winners).await;
+            connections.send_to_vec_user_id(ResponseEnum::GameLose, send_to_losers).await;
+        }
+
     }
 }
