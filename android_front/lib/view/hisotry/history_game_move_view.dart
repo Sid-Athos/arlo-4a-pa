@@ -68,9 +68,10 @@ class _HistoryGameMoveViewState extends State<HistoryGameMoveView> {
                        physics: const AlwaysScrollableScrollPhysics(),
                        child: Column(
                          mainAxisAlignment: MainAxisAlignment.center,
+                         mainAxisSize: MainAxisSize.max,
                          children: const <Widget>[
                            Padding(
-                             padding: EdgeInsets.all(16.0),
+                             padding: EdgeInsets.only(top: 256, bottom: 16),
                              child: Icon(
                                Icons.search_off,
                                color: Colors.white,
@@ -94,7 +95,7 @@ class _HistoryGameMoveViewState extends State<HistoryGameMoveView> {
              ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
+            padding: const EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
