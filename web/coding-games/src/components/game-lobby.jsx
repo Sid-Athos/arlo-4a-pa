@@ -20,7 +20,6 @@ export default function GameLobby() {
     onMount(async () => {
         let res = await GamesService.getAvailableLobbies()
         setGameLobbies(res.data)
-        console.log(res.data)
     })
     const darkTheme = createTheme({
         palette: {
@@ -57,7 +56,6 @@ export default function GameLobby() {
                                 <TableBody>
                                     {gameLobbies().map(
                                         (row, index) => {
-                                            console.log(row)
                                             return (
                                                 <TableRow
                                                     sx={{"&:last-child td, &:last-child th": {border: 0}}}

@@ -2,8 +2,8 @@
 import {render} from 'solid-js/web';
 // @ts-ignore
 import './index.css';
-import {Router, Route, Routes} from "@solidjs/router";
-import {AppBar, Box, Button, Divider, IconButton, Stack, Toolbar, Typography} from "@suid/material";
+import {Router, Route, Routes, useNavigate} from "@solidjs/router";
+import {AppBar, Box, Button, Divider, IconButton, Stack, TextField, Toolbar, Typography} from "@suid/material";
 import MenuIcon from "@suid/icons-material/Menu";
 import {createSignal} from "solid-js";
 // @ts-ignore
@@ -12,15 +12,21 @@ import LoginComponent from "./components/login.jsx";
 import GameEditorComponent from "./components/game-editor.jsx";
 // @ts-ignore
 import LobbyComponent from "./components/lobby.jsx";
-
 // @ts-ignore
 import RankingComponent from "./components/rankings.jsx";
-
+// @ts-ignore
+import SearchComponent from "./components/search-bar.jsx";
+// @ts-ignore
 import GameLobbyComponent from "./components/game-lobby.jsx";
 
 // @ts-ignore
-import {UserProvider} from "./components/user-provider.jsx";
+import ListUsersComponent from "./components/list-users.jsx";
 
+// @ts-ignore
+import NotificationsComponent from "./components/notifications.jsx";
+// @ts-ignore
+import {UserProvider} from "./components/user-provider.jsx";
+import SearchIcon from "@suid/icons-material/Search";
 const root = document.getElementById('root');
 
 // @ts-ignore
@@ -31,9 +37,13 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 const handleOpen = () => setOpen(true);
 const [open, setOpen] = createSignal(false);
+import { A } from "@solidjs/router";
 
+
+// @ts-ignore
 render(
     () => (
+        <Router>
         <UserProvider token={""}>
             <Box sx={{backgroundColor: '#282c34', minHeight: '100vh'}}>
                 <Box sx={{flexGrow: 1}}>
@@ -52,24 +62,30 @@ render(
                                 <Stack
                                     direction="row"
                                     divider={<Divider orientation="vertical" flexItem/>}
-                                    spacing={2}
+                                    spacing={4}
                                 >
                                     <Typography>
-                                        Games
+                                        <A href="/game_lobbies"> Games</A>
                                     </Typography>
                                     <Typography>
-                                        Leaderboard
+                                        <A href={"/ranking"}> Leaderboard</A>
                                     </Typography>
                                     <Typography>
-                                        Code Editor
+                                        <A href={"/code-editor"}> Code Editor</A>
+                                    </Typography>
+                                    <Typography>
+                                        <A href={"/search-user"}> Search Users</A>
                                     </Typography>
                                 </Stack>
                             </Typography>
                             <Button color="inherit" onClick={handleOpen}>Login</Button>
+                            <div>
+
+                                <NotificationsComponent></NotificationsComponent>
+                            </div>
                         </Toolbar>
                     </AppBar>
                 </Box>
-                <Router>
                     <Routes>
                         {/* @ts_ignore */}
                         <Route path={"/"}
@@ -78,8 +94,9 @@ render(
                         <Route path={"/code-editor"} component={<GameEditorComponent></GameEditorComponent>}></Route>
                         <Route path={"/ranking"} component={<RankingComponent></RankingComponent>}></Route>
                         <Route path={"/game-lobbies"} component={<GameLobbyComponent></GameLobbyComponent>}></Route>
+                        <Route path={"/search-user"} component={<ListUsersComponent ></ListUsersComponent>}></Route>
                     </Routes>
-                </Router>
             </Box>
         </UserProvider>
+                </Router>
     ), root!);

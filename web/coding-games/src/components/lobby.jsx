@@ -31,7 +31,6 @@ export default function Lobby(){
     const handleOpen = () => setOpen(true);
     const [open, setOpen] = createSignal(false);
     const fetchGames = async (token) =>{
-        console.log(token)
         if(token !== ""){
             let res = await fetch("http://localhost:7589/games/all", {
                 headers: {

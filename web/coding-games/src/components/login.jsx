@@ -13,6 +13,7 @@ import {GameManagerInstance} from "../utils/services/game-manager-instance";
 import {UserService} from "../utils/services/user-service";
 import {useNavigate} from "@solidjs/router";
 import {useUserProvider} from "./user-provider";
+import {UserStore} from "../utils/user-store";
 
 export default function LoginComponent ({open, setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
@@ -24,7 +25,6 @@ export default function LoginComponent ({open, setOpen})  {
     const [userSignUpError, setUserSignUpError] = createSignal(false);
     const [userIsSignedIn, setUserIsSignedIn] = createSignal(false);
     const navigate = useNavigate();
-    const [userToken, { updateToken }] = useUserProvider();
     // @ts-ignore
     async function signIn() {
         if(userSignIn().nickname.length >= 5 && userSignIn().password.length >= 8){
@@ -47,12 +47,13 @@ export default function LoginComponent ({open, setOpen})  {
     }
 
     const setClientData = (response) => {
+        console.log(response)
         let userInfo = {...user}
         userInfo.nickname = userSignIn().nickname
         userInfo.token = "Bearer " + response.data.token
+        UserStore.save({token: response.data.token, username: userInfo.nickname, mail: userInfo.email})
         ApiInstance.updateAuthorizationHeader(userInfo.token );
         GameManagerInstance.updateAuthorizationHeader(userInfo.token);
-        updateToken(userInfo.token)
     }
 
 

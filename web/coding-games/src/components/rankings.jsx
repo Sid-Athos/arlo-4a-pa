@@ -26,6 +26,7 @@ export default function Rankings() {
         marginLeft:"45%",
         color: theme.palette.text.secondary,
     }));
+
     onMount(async () => {
         let res = await GamesService.allGamesRanking();
         divideRankingsByGame(res.data)
@@ -70,8 +71,7 @@ export default function Rankings() {
             <ThemeProvider theme={darkTheme}>
                 <Box sx={{flexGrow: 1, m : 2}}>
                     <Grid container spacing={2}>
-                        {
-                            rankData().map((game, index) => {
+                        {rankData().map((game) => {
                                 return (<>
                                         <Grid item xs={6} md={6}>
                                             <Box sx={{flexGrow: 1, marginTop: "20px"}}>
@@ -89,7 +89,6 @@ export default function Rankings() {
                                                         <TableBody>
                                                             {game.rankings.map(
                                                                 (row, index) => {
-
                                                                     return (
                                                                         <TableRow
                                                                             sx={{"&:last-child td, &:last-child th": {border: 0}}}
@@ -115,8 +114,7 @@ export default function Rankings() {
                                         </Grid>
                                     </>
                                 )
-                            })
-                        }
+                            })}
                     </Grid>
                 </Box>
             </ThemeProvider>
