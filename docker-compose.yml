@@ -55,6 +55,7 @@ services:
     depends_on:
       - api
       - gamemanager
+      - dockermanager
       - front
   certbot:
     container_name: "certbot"

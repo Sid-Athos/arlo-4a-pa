@@ -1,0 +1,17 @@
+FROM rust:1.68 as build
+ARG GAME_FILE_NAME
+
+RUN USER=root cargo new --bin game
+WORKDIR /game
+
+COPY ./configs/Cargo.toml ./Cargo.toml
+RUN cargo build --release
+
+RUN rm src/*.rs
+COPY ./games/"${GAME_FILE_NAME}" ./main.rs
+
+RUN rm ./target/release/deps/game*
+RUN cargo build --release
+
+FROM debian:bullseye-slim
+COPY --from=build /game/target/release/game .

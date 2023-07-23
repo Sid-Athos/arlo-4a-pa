@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 
-import 'package:miku/model/mapper/user_response_mapper.dart';
-import 'package:miku/model/user_model.dart';
+import 'package:miku/mapper/user/user_response_mapper.dart';
+import 'package:miku/model/user/user_model.dart';
 
 class MessageResponseWS {
   final String message;

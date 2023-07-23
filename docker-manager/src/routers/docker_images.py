@@ -8,7 +8,9 @@ router = APIRouter(
     prefix="/images",
     tags=["Images"],
     dependencies=[],
-    responses={404: {"description": "Not found"}, 204: {"description": "Successfully deleted"}},
+    responses={400: {"description": "Something went wrong"}, 404: {"description": "Not found"},
+               204: {"description": "Successfully deleted"}, 201: {"description": "Created"},
+               200: {"description": "Success"}},
 )
 
 

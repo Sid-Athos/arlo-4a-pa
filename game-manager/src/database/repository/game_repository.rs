@@ -1,6 +1,7 @@
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use tokio_postgres::NoTls;
+use uuid::{uuid, Uuid};
 use crate::database::database_error::{database_error_cannot_get_connection_to_database, database_error_not_found, DatabaseError};
 use crate::database::entity::game::GameEntity;
 use crate::database::mapper::game_entity_mapper::GameEntityMapper;
@@ -22,7 +23,7 @@ impl GameRepository {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("SELECT id,name,min_players,max_players,description,language,user_id FROM coding_games.game WHERE id = $1", &[&id])
+            .query_one("SELECT id,name,min_players,max_players,description,language,user_id,tag FROM coding_games.game WHERE id = $1", &[&id])
             .await
             .map_err(database_error_not_found)?;
 
@@ -81,8 +82,9 @@ impl GameRepository {
     pub async fn create(&self, name : String, min_players: i32, max_players : i32, description : Option<String> , language : String, user_id : i32, code : String) -> Result<Game, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
+        let uuid = Uuid::new_v4();
         let row = conn
-            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code])
+            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &uuid.to_string()])
             .await
             .map_err(database_error_not_found)?;
 

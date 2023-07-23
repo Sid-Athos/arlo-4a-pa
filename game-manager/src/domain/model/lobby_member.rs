@@ -6,4 +6,6 @@ pub struct LobbyMember {
     pub lobby_id: i32,
     pub user_id: i32,
     pub is_host: bool,
+    pub player : i32
+
 }

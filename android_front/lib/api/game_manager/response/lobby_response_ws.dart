@@ -1,15 +1,9 @@
-import 'dart:developer' as developer;
+import 'package:miku/model/lobby/lobby_model.dart';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:miku/model/lobby_model.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-
-import '../../../model/game_model.dart';
-import '../../../model/lobby_member_model.dart';
-import '../../../model/mapper/game_response_mapper.dart';
-import '../../../model/mapper/lobby_member_response_mapper.dart';
-import '../../../view/lobby_view.dart';
+import '../../../model/game/game_model.dart';
+import '../../../model/lobby/lobby_member_model.dart';
+import '../../../mapper/game/game_response_mapper.dart';
+import '../../../mapper/lobby/lobby_member_response_mapper.dart';
 
 class LobbyResponseWS {
   final int id;

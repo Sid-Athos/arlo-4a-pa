@@ -131,7 +131,7 @@ impl RankingRepository {
                                             WHEN fl.recipient_id = $1 THEN fl.applicant_id
                                             END AS friend_id
                         FROM coding_games.friend_list fl
-                        WHERE fl.applicant_id = $1 OR fl.recipient_id = $1 AND fl.accepted = true
+                        WHERE fl.accepted = true AND (fl.applicant_id = $1 OR fl.recipient_id = $1)
                         )
                       AND g.id = $2 ORDER BY r.rank DESC", &[&user_id,&game_id])
             .await

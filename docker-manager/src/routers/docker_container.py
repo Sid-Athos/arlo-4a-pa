@@ -1,13 +1,15 @@
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse, Response
 
+from ..model import ContainerExecModel
 from ..service import docker_container_service
 
 router = APIRouter(
     prefix="/containers",
     tags=["Containers"],
     dependencies=[],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"description": "Not found"}, 400: {"description": "Something went wrong"},
+               201: {"description": "Created"}, 200: {"description": "Success"}},
 )
 
 
@@ -24,20 +26,11 @@ async def run_container(image_name: str):
     return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
 
-@router.post("/{image_name}")
-async def exec_on_container(image_name: str, commands: list[str] | str):
-    container_id = docker_container_service.run_container(image_name)
-    if container_id == "":
-        return Response(status_code=status.HTTP_400_BAD_REQUEST)
-
-    if commands is list:
-        for command in commands:
-            content: dict | bool = docker_container_service.exec_on_container(container_id=container_id,
-                                                                              command=command)
-    else:
-        content: dict | bool = docker_container_service.exec_on_container(container_id=container_id, command=commands)
-
-    docker_container_service.close_container(container_id=container_id)
+@router.post("/{tag}")
+async def exec_on_container(tag: str, container_exec_model: ContainerExecModel):
+    content: str = docker_container_service.exec_on_container(tag=tag,
+                                                              language=container_exec_model.language,
+                                                              commands=container_exec_model.commands)
 
     if content:
         return JSONResponse(status_code=status.HTTP_200_OK, content=content)

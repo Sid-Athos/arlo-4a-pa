@@ -2,17 +2,21 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:miku/api/game_manager/request/accept_invite_lobby_request.dart';
 import 'package:miku/api/game_manager/request/decline_invite_lobby_request.dart';
-import 'package:miku/model/ice_candidate_model.dart';
-import 'package:miku/model/invite_model.dart';
-import 'package:miku/model/mapper/game_started_mapper.dart';
-import 'package:miku/model/mapper/user_response_mapper.dart';
-import 'package:miku/view/friend_list_view.dart';
+import 'package:miku/mapper/game/game_action_response_mapper.dart';
+import 'package:miku/model/webrtc/ice_candidate_model.dart';
+import 'package:miku/model/lobby/invite_model.dart';
+import 'package:miku/mapper/game/game_started_mapper.dart';
+import 'package:miku/mapper/game/game_svg_info_response_mapper.dart';
+import 'package:miku/mapper/user/user_response_mapper.dart';
+import 'package:miku/view/friends/friend_list_view.dart';
+import 'package:miku/view/game/game_left_dialog.dart';
 
-import 'package:miku/view/game_list_view.dart';
-import 'package:miku/view/game_view.dart';
-import 'package:miku/view/profile_view.dart';
+import 'package:miku/view/lobby/game_list_view.dart';
+import 'package:miku/view/game/game_view.dart';
+import 'package:miku/view/profile/profile_view.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -20,12 +24,12 @@ import 'dart:developer' as developer;
 
 import '../api/game_manager/response/emote_response_ws.dart';
 import '../api/game_manager/response/message_response_ws.dart';
-import '../model/game_model.dart';
-import '../model/lobby_model.dart';
-import '../model/mapper/invite_response_mapper.dart';
-import '../model/user_model.dart';
+import '../model/game/game_model.dart';
+import '../model/lobby/lobby_model.dart';
+import '../mapper/lobby/invite_response_mapper.dart';
+import '../model/user/user_model.dart';
 import '../provider/game_provider.dart';
-import 'lobby_view.dart';
+import 'lobby/lobby_view.dart';
 
 enum TabItem { friends, game, profile }
 
@@ -61,16 +65,14 @@ class _HomeState extends State<HomeView> {
       private: false,
       members: [],
       game:
-      Game(id: 0,
-          name: "",
-          description: "",
-          minPlayers: 0,
-          maxPlayers: 0));
-  GameProvider gameProvider = GameProvider(
-      messages: [],
-      isShowChat: false,
-      channel: null
-  );
+          Game(id: 0, name: "", description: "", minPlayers: 0, maxPlayers: 0));
+  GameProvider gameProvider =
+      GameProvider(messages: [], isShowChat: false, channel: null);
+
+  String tmpSvgDisplayData =
+      '{"width": "300","height": "300","content": [{"tag": "style","content": "line{stroke:black;stroke-width:4;}"},{"tag": "line","x1": "0","y1": "100","x2": "300","y2": "100"},{"tag": "line","x1": "100","y1": "0","x2": "100","y2": "300"},{"tag": "line","x1": "0","y1": "200","x2": "300","y2": "200"},{"tag": "line","x1": "200","y1": "0","x2": "200","y2": "300"},{"tag": "circle","cx": "50","cy": "50","r": "33","fill": "blue"}],"player": 2}';
+  String tmpActionData =
+      '{"type": "CLICK","zones": [{"x": 0,"y": 100,"width": 100,"height": 100},{"x": 0,"y": 200,"width": 100,"height": 100},{"x": 100,"y": 0,"width": 100,"height": 100},{"x": 100,"y": 100,"width": 100,"height": 100},{"x": 100,"y": 200,"width": 100,"height": 100},{"x": 200,"y": 0,"width": 100,"height": 100},{"x": 200,"y": 100,"width": 100,"height": 100},{"x": 200,"y": 200,"width": 100,"height": 100}]}';
 
   @override
   void initState() {
@@ -92,28 +94,26 @@ class _HomeState extends State<HomeView> {
           navigatorKeys[1]
               .currentState
               ?.push(
-            MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  ChangeNotifierProvider(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ChangeNotifierProvider(
                     create: (context) => lobby,
                     builder: (context, child) =>
                         LobbyView(channel: channel, user: user),
                   ),
-            ),
-          )
-              .then((value) =>
-          lobby = Lobby(
-              id: 0,
-              code: "",
-              gameId: 0,
-              private: false,
-              members: [],
-              game: Game(
+                ),
+              )
+              .then((value) => lobby = Lobby(
                   id: 0,
-                  name: "",
-                  description: "",
-                  minPlayers: 0,
-                  maxPlayers: 0)));
+                  code: "",
+                  gameId: 0,
+                  private: false,
+                  members: [],
+                  game: Game(
+                      id: 0,
+                      name: "",
+                      description: "",
+                      minPlayers: 0,
+                      maxPlayers: 0)));
           return;
         case "\"LobbyExited\"":
           developer.log("LobbyExited");
@@ -126,6 +126,10 @@ class _HomeState extends State<HomeView> {
           developer.log("UserInvited");
           return;
         case "\"CannotStartGame\"":
+          developer.log("CannotStartGame");
+          return;
+        case "\"GameStopped\"":
+          showGameLeftDialog();
           return;
       }
 
@@ -133,7 +137,12 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
-            gameProvider.addMessage(MessageResponseWS.fromJson(json["Message"]));
+            gameProvider.setSvgDisplay(GameSvgInfoResponseMapper.fromJson(
+                jsonDecode(tmpSvgDisplayData)));
+            gameProvider.setAction(
+                GameActionResponseMapper.fromJson(jsonDecode(tmpActionData)));
+            gameProvider
+                .addMessage(MessageResponseWS.fromJson(json["Message"]));
             break;
           case "Emote":
             gameProvider.addEmote(EmoteResponseWS.fromJson(json["Emote"]));
@@ -145,40 +154,39 @@ class _HomeState extends State<HomeView> {
             navigatorKeys[1]
                 .currentState
                 ?.push(
-              MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    ChangeNotifierProvider(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => ChangeNotifierProvider(
                       create: (context) => gameProvider,
-                      builder: (context, child) =>
-                          GameView(
-                            gameStarted:
+                      builder: (context, child) => GameView(
+                        gameStarted:
                             GameStartedMapper.fromJson(json["GameStarted"]),
-                            user: user,
-                            channel: channel,
-                          ),
+                        user: user,
+                        channel: channel,
+                      ),
                     ),
-              ),
-            )
-                .then((value) =>
-            gameProvider = GameProvider(
-                messages: [],
-                isShowChat: false,
-                channel: channel
-            ));
+                  ),
+                )
+                .then((value) {
+              navigatorKeys[1].currentState?.pop();
+              gameProvider = GameProvider(
+                  messages: [], isShowChat: false, channel: channel);
+            });
             break;
           case "SDPOffer":
-            gameProvider.answerSdpOffer(json["SDPOffer"]["sdp"], UserResponseMapper.fromJson(json["SDPOffer"]["from_user"]));
+            gameProvider.answerSdpOffer(json["SDPOffer"]["sdp"],
+                UserResponseMapper.fromJson(json["SDPOffer"]["from_user"]));
             break;
           case "SDPAnswer":
-            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"], UserResponseMapper.fromJson(json["SDPAnswer"]["from_user"]));
+            gameProvider.setRemoteAnswer(json["SDPAnswer"]["sdp"],
+                UserResponseMapper.fromJson(json["SDPAnswer"]["from_user"]));
             break;
           case "ICECandidate":
-            gameProvider.addIceCandidate(ICECandidate(
-                candidate: json["ICECandidate"]["candidate"],
-                sdp_mid: json["ICECandidate"]["sdp_mid"],
-                sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"]),
-                UserResponseMapper.fromJson(json["ICECandidate"]["from_user"])
-            );
+            gameProvider.addIceCandidate(
+                ICECandidate(
+                    candidate: json["ICECandidate"]["candidate"],
+                    sdp_mid: json["ICECandidate"]["sdp_mid"],
+                    sdp_m_line_index: json["ICECandidate"]["sdp_m_line_index"]),
+                UserResponseMapper.fromJson(json["ICECandidate"]["from_user"]));
             break;
           case "UserLeftRtcSession":
             gameProvider.userLeftCall(json["UserLeftRtcSession"]["user_id"]);
@@ -191,6 +199,16 @@ class _HomeState extends State<HomeView> {
         }
       }
     });
+  }
+
+  showGameLeftDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: navigatorKeys[1].currentContext!,
+      builder: (BuildContext context) {
+        return GameLeftDialog();
+      },
+    ).then((value) => {navigatorKeys[1].currentState!.pop()});
   }
 
   void showNotificationInvitedInLobby(Invite invite) {
@@ -266,11 +284,10 @@ class _HomeState extends State<HomeView> {
           key: navigatorKeys[1],
           onGenerateRoute: (settings) {
             return MaterialPageRoute(
-              builder: (context) =>
-                  GameScreen(
-                    channel: channel,
-                    lobby: lobby,
-                  ),
+              builder: (context) => GameScreen(
+                channel: channel,
+                lobby: lobby,
+              ),
             );
           }),
     );
@@ -297,7 +314,7 @@ class _HomeState extends State<HomeView> {
     ]);
     return WillPopScope(
       onWillPop: () async =>
-      !await navigatorKeys[currentTab].currentState!.maybePop(),
+          !await navigatorKeys[currentTab].currentState!.maybePop(),
       child: Scaffold(
         backgroundColor: const Color(0xFF21262B),
         body: Stack(children: <Widget>[

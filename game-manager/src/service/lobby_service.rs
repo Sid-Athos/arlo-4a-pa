@@ -122,4 +122,21 @@ impl LobbyService {
     pub async fn kick(&self, lobby_id: i32, user_id: i32) -> Result<LobbyMember, StatusCode> {
         self.lobby_member_repository.delete_by_user_id_lobby_id(user_id, lobby_id).await.map_err(database_error_to_status_code)
     }
+
+    pub async fn start_game(&self, lobby_id: i32) -> Result<Lobby, StatusCode> {
+        let mut lobby = self.lobby_repository.get_by_id(lobby_id).await.map_err(database_error_to_status_code)?;
+        let game = self.game_repository.get_by_id(lobby.game_id).await.map_err(database_error_to_status_code)?;
+        let lobby_members = self.lobby_member_repository.get_by_lobby_id(lobby_id).await.map_err(database_error_to_status_code)?;
+
+        if game.min_players > lobby_members.len() as i32 || game.max_players < lobby_members.len() as i32 {
+            return Err(StatusCode::NOT_ACCEPTABLE);
+        }
+
+        lobby = self.lobby_repository.set_launch_for_lobby_id(lobby_id).await.map_err(database_error_to_status_code)?;
+        for i in 0..lobby_members.len() {
+            self.lobby_member_repository.set_player(lobby_members[i].id, (i + 1) as i32).await.map_err(database_error_to_status_code)?;
+        }
+
+        return Ok(lobby);
+    }
 }

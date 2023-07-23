@@ -32,6 +32,7 @@ pub enum ResponseEnum {
     StartedGame,
     CannotStartGame,
     BadMessage,
+    GameStopped,
     GameStarted(GameStartedResponse),
     ICECandidate(ICECandidateResponse),
     SDPAnswer(SDPAnswerResponse),
