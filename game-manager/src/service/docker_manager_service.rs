@@ -15,6 +15,7 @@ use crate::domain::model::lobby_member::LobbyMember;
 use crate::service::dto::request::command_request::CommandRequest;
 use crate::service::dto::request::init_ranking_request::InitRankingRequest;
 use crate::service::dto::response::docker_manager_response::DockerManagerResponse;
+use crate::service::dto::response::ranking_response::RankingResponse;
 use crate::service::lobby_service::LobbyService;
 
 pub struct DockerManagerService {
@@ -110,8 +111,8 @@ impl DockerManagerService {
 
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
-        data = serde_json::from_str(&*data).unwrap();
-        println!("body: {:?}", data);
+        let result : RankingResponse = serde_json::from_str(&*data).unwrap();
+        println!("body: {:?}", result);
 
 
         Ok(1)
@@ -138,9 +139,8 @@ impl DockerManagerService {
 
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
-        println!("data: {:?}", data);
-        data = serde_json::from_str(&*data).unwrap();
-        println!("body: {:?}", data);
+        let result : RankingResponse = serde_json::from_str(&*data).unwrap();
+        println!("body: {:?}", result);
         Ok(1)
     }
 }
