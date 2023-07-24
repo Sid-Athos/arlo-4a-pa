@@ -11,11 +11,11 @@ use crate::service::game_move_history_service::GameMoveHistoryService;
 use crate::service::lobby_service::LobbyService;
 
 #[derive(Deserialize, Debug)]
-pub struct CreateLobbyRequestByGameMoveHistoryId {
+pub struct CreateLobbyByGameMoveHistoryIdRequest {
     game_move_id: i32,
 }
 
-impl CreateLobbyRequestByGameMoveHistoryId {
+impl CreateLobbyByGameMoveHistoryIdRequest {
 
     pub async fn compute(&self, pool: ConnectionPool, connections: Extension<Connections>, user: User) -> Result<(), String> {
 
