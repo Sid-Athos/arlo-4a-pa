@@ -46,7 +46,7 @@ impl GameActionRequest {
             for i in 0..docker_manager_response.game_state.scores.len() {
                 if max_score < docker_manager_response.game_state.scores[i] {
                     max_score = docker_manager_response.game_state.scores[i];
-                    winner_index = i;
+                    winner_index = i+1;
                 }
             }
             println!("winner_index : {:?} // max_score : {:?}",winner_index,max_score);
