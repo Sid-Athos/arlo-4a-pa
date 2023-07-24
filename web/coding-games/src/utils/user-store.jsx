@@ -7,7 +7,7 @@ const getUser = () => {
 }
 
 const saveUser = (toRegister) => {
-    setUser(toRegister)
+    setUser({user, ...toRegister})
 }
 
 export const UserStore = {

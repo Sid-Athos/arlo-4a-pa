@@ -1,57 +1,40 @@
-import {createEffect, createResource, createSignal, Match, on, onMount, Show, Switch} from "solid-js";
-import {useUserProvider} from "./user-provider";
+import {createResource, createSignal, onMount, Show} from "solid-js";
 import AgGridSolid from 'ag-grid-solid';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import {
-    Alert,
-    Box,
-    Button, ButtonGroup,
-    Card,
-    CardActions,
-    CardContent,
-    Fade,
-    Grid, Modal,
-    Stack,
-    TextField,
-    Typography
-} from "@suid/material";
+import {Box, Button, ButtonGroup, Card, CardActions, CardContent, Grid, Modal, Stack} from "@suid/material";
 import {GamesService} from "../utils/services/game-manager-service";
 import {UserStore} from "../utils/user-store";
 
 
 export default function Lobby(){
-    const handleOpen = () => setOpen(true);
+    const [gameList,setGameList] = createSignal([]);
+
     const [open, setOpen] = createSignal(false);
-    onMount(() => {
+    onMount(async () => {
         console.log(UserStore.get().token)
-        const socket = new WebSocket('ws://localhost:7589/ws?token='+ UserStore.get().token);
-        socket.onopen = function() {
-            this.send(JSON.stringify("hello"));
+        let data = await GamesService.findGames().data;
+        setGameList(data)
+        const socket = new WebSocket('ws://localhost:7589/ws?token=' + UserStore.get().token);
+        UserStore.save({socketConnection: socket})
+        socket.onopen = function () {
+            this.send(JSON.stringify({
+                CreateLobby: {
+                    game_id: 2,
+                    private: false
+                }
+            }));
         };
-        socket.onmessage = function(msg) {
-            if (msg.data && msg.data.slice(0, 3) === 'pub') {
-                console.log(message.data)
-                // resource updated, refetch resource
-            }
+        socket.onmessage = function (msg) {
+            console.log(JSON.parse(msg.data))
+
         };
+
     })
-    const fetchGames = async (token) =>{
-        if(token !== ""){
-            let res = await fetch("http://localhost:7589/games/all", {
-                headers: {
-                    Authorization: `${token}`,
-                    "api-key": 'coding_games',
-                },
-            });
-            setRowData(await res.json())
-        }
-    };
 
 
 
-    const [userToken, {updateToken }] = useUserProvider();
-    const [gameList] = createResource(userToken, fetchGames);
+
     const [rowData, setRowData] = createSignal([]);
     const columnDefs = [
         {

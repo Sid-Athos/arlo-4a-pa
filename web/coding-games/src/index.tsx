@@ -31,9 +31,7 @@ import Chat from "./components/dsdqs.jsx";
 
 import HomeMeeting from "./screens/Home.jsx";
 import Meeting from "./screens/Meeting.jsx";
-// @ts-ignore
-import {UserProvider} from "./components/user-provider.jsx";
-import SearchIcon from "@suid/icons-material/Search";
+
 const root = document.getElementById('root');
 const [open, setOpen] = createSignal(false);
 
@@ -53,7 +51,6 @@ render(
         <Box sx={{backgroundColor: '#282c34', minHeight: '100vh'}}>
             <Box sx={{flexGrow: 1}}>
         <Router>
-        <UserProvider token={""}>
             <NavBarComponent setOpen={setOpen} open={open}>
             </NavBarComponent>
                     <Routes>
@@ -69,7 +66,6 @@ render(
                         <Route path={"/meeting"} component={HomeMeeting}></Route>
                         <Route path="/:meetCode" element={<Meeting/>} />
                     </Routes>
-        </UserProvider>
                 </Router>
                     </Box>
                 </Box>

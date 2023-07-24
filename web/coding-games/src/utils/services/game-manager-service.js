@@ -17,6 +17,10 @@ const getMyGames = async () => {
     return (await GameManagerInstance.getInstance.get("games/mine"));
 }
 
+const getAllGames = async () => {
+    return (await GameManagerInstance.getInstance.get("games/all"));
+}
+
 const updateGame = async (id, game) => {
     return (await GameManagerInstance.getInstance.put("games/" + id, game));
 }
@@ -42,5 +46,6 @@ export const GamesService = {
     remove: deleteGame,
     allGamesRanking: getRankByGames,
     getAvailableLobbies:getPublicLobbies,
-    rtcMeeting: joinRtc
+    rtcMeeting: joinRtc,
+    findGames:getAllGames
 }
