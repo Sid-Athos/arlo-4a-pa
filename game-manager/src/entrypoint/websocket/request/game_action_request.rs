@@ -62,7 +62,7 @@ impl GameActionRequest {
                 }
                 println!("total ranking : {:?} // nblosers : {:?} // losers_id : {:?}",loser_rankings,nb_losers,losers_id);
                 lobby_service.exit_lobby(lobby_member.user_id).await.map_err(status_code_to_string)?;
-                docker_manager_service.add_experience(lobby_member.user_id);
+                docker_manager_service.add_experience(lobby_member.user_id).await.map_err(status_code_to_string)?;
             }
             docker_manager_service.update_ranking(lobby_members[winner_index-1].user_id,lobby.game_id,losers_id,false,loser_rankings/nb_losers).await.map_err(status_code_to_string)?;
 
