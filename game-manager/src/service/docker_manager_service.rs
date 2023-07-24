@@ -1,3 +1,4 @@
+use std::env;
 use std::env::current_exe;
 use std::str::from_utf8;
 use axum::body::HttpBody;
