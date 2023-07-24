@@ -20,25 +20,25 @@ use crate::service::dto::response::ranking_response::{Ranking, RankingResponse};
 use crate::service::lobby_service::LobbyService;
 
 pub struct DockerManagerService {
-    pub game_repository : GameRepository,
-    pub game_move_history_repository : GameMoveHistoryRepository,
-    pub lobby_service : LobbyService,
-    pub game_history_repository : GameHistoryRepository,
-    pub lobby_repository : LobbyRepository
+    pub game_repository: GameRepository,
+    pub game_move_history_repository: GameMoveHistoryRepository,
+    pub lobby_service: LobbyService,
+    pub game_history_repository: GameHistoryRepository,
+    pub lobby_repository: LobbyRepository,
 }
 
 impl DockerManagerService {
     pub fn new(pool: ConnectionPool) -> Self {
         DockerManagerService {
             game_repository: GameRepository::new(pool.clone()),
-            game_move_history_repository : GameMoveHistoryRepository::new(pool.clone()),
-            lobby_service : LobbyService::new(pool.clone()),
-            game_history_repository : GameHistoryRepository::new(pool.clone()),
-            lobby_repository : LobbyRepository::new(pool.clone())
+            game_move_history_repository: GameMoveHistoryRepository::new(pool.clone()),
+            lobby_service: LobbyService::new(pool.clone()),
+            game_history_repository: GameHistoryRepository::new(pool.clone()),
+            lobby_repository: LobbyRepository::new(pool.clone()),
         }
     }
 
-    pub async fn communicate_docker_manager(&self, user_id : i32, user_move : String) -> Result<DockerManagerResponse, StatusCode>{
+    pub async fn communicate_docker_manager(&self, user_id: i32, user_move: String) -> Result<DockerManagerResponse, StatusCode> {
         let mut current_lobby = self.lobby_service.get_by_user_id(user_id).await?;
 
         let game = self.game_repository.get_by_id(current_lobby.game_id).await.map_err(database_error_to_status_code)?;
@@ -48,7 +48,7 @@ impl DockerManagerService {
         match current_lobby.game_history_id {
             None => return Err(StatusCode::UNAUTHORIZED),
             Some(id) => {
-                current_history= self.game_history_repository.get_by_id(id).await.map_err(database_error_to_status_code)?;
+                current_history = self.game_history_repository.get_by_id(id).await.map_err(database_error_to_status_code)?;
             }
         }
         let game_tag = game.tag;
@@ -62,7 +62,7 @@ impl DockerManagerService {
         let client = Client::new();
         let req = Request::builder()
             .method(Method::POST)
-            .uri(format!("http://dev.mikusupremacy.fr:7588/containers/{}", game_tag))
+            .uri(format!("{}/containers/{}", &env::var("DOCKERMANAGER_URI").unwrap(), game_tag))
             .body(Body::from(body_str))
             .unwrap();
 
@@ -94,11 +94,11 @@ impl DockerManagerService {
         return Ok(vec_history);
     }
 
-    pub async fn get_ranking(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
+    pub async fn get_ranking(&self, user_id: i32, game_id: i32) -> Result<i32, StatusCode> {
         let client = Client::new();
         let req = Request::builder()
             .method(Method::GET)
-            .uri(format!("http://dev.mikusupremacy.fr:7590/ranking/user/{}/{}", user_id,game_id))
+            .uri(format!("{}/ranking/user/{}/{}", &env::var("API_URI").unwrap(), user_id, game_id))
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .header("api-key", "coding_games")
             .body(Body::from(""))
@@ -110,18 +110,18 @@ impl DockerManagerService {
 
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
-        let result : Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
+        let result: Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
         Ok(result.rank)
     }
 
-    pub async fn init_rankings(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
-        let init_ranking_request = InitRankingRequest::new(user_id,game_id);
+    pub async fn init_rankings(&self, user_id: i32, game_id: i32) -> Result<i32, StatusCode> {
+        let init_ranking_request = InitRankingRequest::new(user_id, game_id);
 
         let body_str = serde_json::to_string(&init_ranking_request).unwrap();
         let client = Client::new();
         let req = Request::builder()
             .method(Method::POST)
-            .uri("http://dev.mikusupremacy.fr:7590/ranking")
+            .uri(format!("{}/ranking", &env::var("API_URI").unwrap()))
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .header("api-key", "coding_games")
             .header(CONTENT_TYPE, "application/json")
@@ -134,18 +134,18 @@ impl DockerManagerService {
 
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
-        let result : Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
+        let result: Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
         Ok(result.rank)
     }
 
-    pub async fn update_ranking(&self, winner_id : i32, game_id : i32, losers_id : Vec<i32>, tie : bool, average_rank : i32) -> Result<StatusCode, StatusCode>{
-        let update_ranking_request = UpdateRankingRequest::new(winner_id,losers_id, game_id, tie, average_rank);
+    pub async fn update_ranking(&self, winner_id: i32, game_id: i32, losers_id: Vec<i32>, tie: bool, average_rank: i32) -> Result<StatusCode, StatusCode> {
+        let update_ranking_request = UpdateRankingRequest::new(winner_id, losers_id, game_id, tie, average_rank);
 
         let body_str = serde_json::to_string(&update_ranking_request).unwrap();
         let client = Client::new();
         let req = Request::builder()
             .method(Method::PUT)
-            .uri("http://dev.mikusupremacy.fr:7590/ranking")
+            .uri(format!("{}/ranking", &env::var("API_URI").unwrap()))
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .header("api-key", "coding_games")
             .header(CONTENT_TYPE, "application/json")
@@ -158,11 +158,11 @@ impl DockerManagerService {
         Ok(response.status())
     }
 
-    pub async fn add_experience(&self, user_id : i32)-> Result<StatusCode, StatusCode>{
+    pub async fn add_experience(&self, user_id: i32) -> Result<StatusCode, StatusCode> {
         let client = Client::new();
         let req = Request::builder()
             .method(Method::PUT)
-            .uri(format!("http://dev.mikusupremacy.fr:7590/user/add_experience/{}",user_id))
+            .uri(format!("{}/user/add_experience/{}", &env::var("DOCKERMANAGER_URI").unwrap(), user_id))
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .header("api-key", "coding_games")
             .header(CONTENT_TYPE, "application/json")
@@ -173,6 +173,5 @@ impl DockerManagerService {
             return Err(response.status());
         }
         Ok(response.status())
-
     }
 }
