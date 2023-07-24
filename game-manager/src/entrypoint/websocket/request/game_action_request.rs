@@ -39,7 +39,7 @@ impl GameActionRequest {
 
         let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&actions_request).unwrap()).await.map_err(status_code_to_string)?;
         if docker_manager_response.game_state.game_over {
-            let mut winner_index = 0;
+            let mut winner_index = 1;
             let mut max_score = docker_manager_response.game_state.scores[0];
             let mut loser_rankings = 0;
             let mut nb_losers = 0;
