@@ -30,7 +30,7 @@ security(
 ),
     tag="ranking"
 )]
-pub async fn get_ranking_by_user_id_and_game_id(State(pool): State<ConnectionPool>, Path(user_id): Path<i32>, Path(game_id) : Path<i32>) -> Result<Json<RankingResponse>, StatusCode> {
+pub async fn get_ranking_by_user_id_and_game_id(State(pool): State<ConnectionPool>, Path((user_id, game_id)): Path<(i32,i32)>) -> Result<Json<RankingResponse>, StatusCode> {
     let ranking_service = RankingService::new(
         RankingRepository::new(pool.clone()),
     );
