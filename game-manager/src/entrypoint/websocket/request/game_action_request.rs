@@ -49,6 +49,8 @@ impl GameActionRequest {
                     winner_index = i;
                 }
             }
+            println!("winner_index : {:?} // max_score : {:?}",winner_index,max_score);
+
             //TODO le plus gros score est le vainqueur (player 1 to player N dans l'ordre)
             //TODO calculer la moyenne des perdants
             let mut losers_id = vec![];
