@@ -94,7 +94,6 @@ impl DockerManagerService {
     }
 
     pub async fn get_ranking(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
-        println!("values : {} {}",user_id,game_id);
         let client = Client::new();
         let req = Request::builder()
             .method(Method::GET)
@@ -104,7 +103,6 @@ impl DockerManagerService {
             .body(Body::from(""))
             .unwrap();
         let response = client.request(req).await.unwrap();
-        println!("status: {:?}", response.status());
         if response.status() != StatusCode::OK {
             return Err(response.status());
         }
@@ -112,10 +110,7 @@ impl DockerManagerService {
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
         let result : Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
-        println!("body: {:?}", result);
-
-
-        Ok(1)
+        Ok(result.rank)
     }
 
     pub async fn init_rankings(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
@@ -132,7 +127,6 @@ impl DockerManagerService {
             .body(Body::from(body_str))
             .unwrap();
         let response = client.request(req).await.unwrap();
-        println!("status: {:?}", response.status());
         if response.status() != StatusCode::OK {
             return Err(response.status());
         }
@@ -140,7 +134,6 @@ impl DockerManagerService {
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
         let result : Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
-        println!("body: {:?}", result);
-        Ok(1)
+        Ok(result.rank)
     }
 }

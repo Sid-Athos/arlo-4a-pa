@@ -37,10 +37,8 @@ impl LaunchGameRequest {
             let ranking = docker_manager_service.get_ranking(lobby_member.user_id, lobby.game_id).await;
             match ranking {
                 Ok(value) => {
-                    println!("ok values : {:?}, {:?}", lobby_member.user_id, lobby.game_id);
                 },
                 Err(e) => {
-                    println!("je suis la ");
                     docker_manager_service.init_rankings(lobby_member.user_id, lobby.game_id).await.map_err(status_code_to_string)?;
                 }
             }

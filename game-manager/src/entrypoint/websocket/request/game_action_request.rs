@@ -51,12 +51,14 @@ impl GameActionRequest {
             }
             //TODO le plus gros score est le vainqueur (player 1 to player N dans l'ordre)
             //TODO calculer la moyenne des perdants
+            let mut losers_id = vec![];
             for lobby_member in &lobby_members {
                 if lobby_member.player != winner_index as i32 {
                     loser_rankings += docker_manager_service.get_ranking(lobby_member.user_id, lobby.game_id).await.map_err(status_code_to_string)?;
                     nb_losers += 1;
+                    losers_id.push(lobby_member.user_id);
                 }
-                //docker_manager_service.get_ranking(lobby_member.user_id);
+                println!("total ranking : {:?} // nblosers : {:?} // losers_id : {:?}",loser_rankings,nb_losers,losers_id);
                 lobby_service.exit_lobby(lobby_member.user_id).await.map_err(status_code_to_string)?;
             }
         }
