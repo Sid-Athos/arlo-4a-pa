@@ -1,6 +1,6 @@
 import { createSignal, For, Show } from "solid-js";
 import { IoPeople } from "solid-icons/io";
-import clickOutside from "../directives/clickOutside";
+import clickOutside from "../directives/ClickOutside";
 import { IoClose } from "solid-icons/io";
 
 export default function MeetingUsers(props) {

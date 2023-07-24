@@ -27,7 +27,7 @@ import NotificationsComponent from "./components/notifications.jsx";
 
 import NavBarComponent from "./render/navbar.jsx";
 
-import Chat from "./components/dsdqs.jsx";
+import Chat from "./components/chat.jsx";
 
 import HomeMeeting from "./screens/Home.jsx";
 import Meeting from "./screens/Meeting.jsx";

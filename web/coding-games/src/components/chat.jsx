@@ -1,6 +1,6 @@
 import {createSignal, For, Show} from "solid-js";
 import {
-    Avatar, Badge,
+    Badge,
     Box,
     Button,
     Card,
@@ -9,19 +9,20 @@ import {
     CardHeader,
     createTheme,
     FormGroup,
-    Grid, IconButton,
+    Grid,
+    IconButton,
     List,
     ListItem,
     ListItemButton,
-    ListItemText, styled,
+    ListItemText,
     TextField,
-    ThemeProvider, Typography
+    ThemeProvider,
+    Typography
 } from "@suid/material";
-import MoreVertIcon from "@suid/icons-material/MoreVert";
-import {Clear} from "@suid/icons-material";
 import ClearIcon from "@suid/icons-material/Clear";
 import MailIcon from "@suid/icons-material/Mail";
-import {createStore} from "solid-js/store";
+import {UserStore} from "../utils/user-store";
+import useSockets from "../hooks/useSockets";
 
 export default function Chat() {
     const [showChat, setShowChat] = createSignal(true)
@@ -36,15 +37,28 @@ export default function Chat() {
         },
     });
 
-
-
     const handleShowChat = () => {
         let current = showChat();
         setShowChat(!current)
     }
 
+    useSockets().store.socket?.onmessage ((msg) => {
+        useSockets().handleMessages(msg.data)
+    });
 
     let date = new Date().toDateString();
+
+    const sendOnCtrlEnter = (e) => {
+        if (e.altKey && e.key === "Enter") {
+            e.preventDefault()
+            console.log(e.target.value)
+            let messageList = messages();
+            messageList.push({message: e.target.value, user: {pseudo: UserStore.get().username}})
+            setMessages([...messageList])
+            e.target.value = ""
+            //useSockets().sendMessage({message: e.target.value})
+        }
+    }
 
     return (<>
         <ThemeProvider theme={darkTheme}>
@@ -146,8 +160,8 @@ export default function Chat() {
                     <CardActions>
                         <Box sx={{position:"relative", maxWidth:200, right:-40, bottom:0}} align={"right"}>
                             <FormGroup >
-                                <TextField multiline sx={{width:300}}></TextField>
-                                <Button>Send Message</Button>
+                                <TextField multiline sx={{width:300}} onkeydown={sendOnCtrlEnter}></TextField>
+                                {/**<Button >Send Message</Button>*/}
                             </FormGroup>
 
                         </Box>

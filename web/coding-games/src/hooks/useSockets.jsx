@@ -18,9 +18,7 @@ export default function useSockets() {
             //await GamesService.rtcMeeting()
         };
     }
-    store.socket?.onmessage ((msg) => {
-        handleMessages(JSON.parse(msg.data))
-    });
+
     const sendMessage = (jsonToSend) => {
         store.socket.send(JSON.stringify(jsonToSend))
     }
@@ -28,13 +26,14 @@ export default function useSockets() {
         store.socket?.close;
     });
 
+    store.socket.add
 
     const handleMessages = (jsonSocketMessage) => {
         if(jsonSocketMessage.Message){
-            console.log(jsonSocketMessage.Message)
+            return jsonSocketMessage.Message;
 
         }else if(jsonSocketMessage.Emote){
-            console.log(jsonSocketMessage.Emote)
+            return jsonSocketMessage.Emote;
 
         } else if(jsonSocketMessage.UserInvited){
             console.log(jsonSocketMessage.UserInvited)
@@ -141,6 +140,7 @@ export default function useSockets() {
     return {
         store,
         setUpSockets,
-        sendMessage
+        sendMessage,
+        handleMessages
     };
 }
