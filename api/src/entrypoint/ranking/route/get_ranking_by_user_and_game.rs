@@ -18,6 +18,7 @@ use crate::service::ranking_service::RankingService;
     path = "/ranking/user/{user_id}/{game_id}",
     params(
         ("user_id" = String,),
+        ("game_id" = String,)
     ),
     responses(
         (status = 200, description = "Rankings found", body = RankingResponse,),

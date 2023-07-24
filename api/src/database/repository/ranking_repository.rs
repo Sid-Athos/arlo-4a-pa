@@ -41,7 +41,7 @@ impl RankingRepository {
         let row = conn
             .query_one("SELECT r.* FROM coding_games.ranking r WHERE game_id = $1 AND user_id = $2", &[&game_id, &user_id])
             .await
-            .map_err(database_error_duplicate_key)?;
+            .map_err(database_error_not_found)?;
 
         let result = RankingEntity::new(row);
 
