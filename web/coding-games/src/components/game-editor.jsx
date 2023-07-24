@@ -41,7 +41,7 @@ export default function Editor() {
 
     const [drawerState, setDrawerState] = createSignal(false);
     const [language, setLanguage] = createSignal(python())
-    const [languageString, setLanguageString] = createSignal("python")
+    const [languageString, setLanguageString] = createSignal("python3")
 
     const toggleDrawer = (anchor, open) => async (event) => {
         if (event.type === "keydown") {
@@ -101,13 +101,13 @@ export default function Editor() {
     const clickDrawerGameItem = (e) => {
         setCurrentCode(codes().find(item => item.name === e))
         setLanguage(codes().find(item => item.name === e).language === "java"? java():python())
-        setLanguageString(codes().find(item => item.name === e).language === "java"? "java":"python")
+        setLanguageString(codes().find(item => item.name === e).language === "java"? "java":"python3")
     }
     const swapLanguage = (language) => {
         switch (language) {
-            case 'python':
+            case 'python3':
                 setLanguage(python())
-                setLanguageString("python")
+                setLanguageString("python3")
                 break;
             case 'java':
                 setLanguage(java())

@@ -1,3 +1,4 @@
+use std::env;
 use std::fmt::format;
 use std::fs::File;
 use std::io::Write;
@@ -16,7 +17,6 @@ pub struct GameService {
 }
 
 impl GameService {
-
     pub fn new(pool: ConnectionPool) -> Self {
         GameService {
             game_repository: GameRepository::new(pool.clone()),
@@ -35,15 +35,15 @@ impl GameService {
         self.game_repository.get_by_id(game_id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn create_game(&self, name : String, max_players : i32, min_players : i32, description : Option<String>, language : String, code : String, user_id : i32)-> Result<Game, StatusCode>{
+    pub async fn create_game(&self, name: String, max_players: i32, min_players: i32, description: Option<String>, language: String, code: String, user_id: i32) -> Result<Game, StatusCode> {
         let tag = Uuid::new_v4().to_string();
-        let game = self.game_repository.create(name,min_players,max_players,description,language,user_id, code.clone(), tag).await.map_err(database_error_to_status_code)?;
+        let game = self.game_repository.create(name, min_players, max_players, description, language, user_id, code.clone(), tag).await.map_err(database_error_to_status_code)?;
         print!("{:?}", game);
-        let mut f = File::create(format!("resources/games/{}.{}",game.id,game.language)).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
+        let mut f = File::create(format!("resources/games/{}.{}", game.id, game.language)).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
         let code_literal = format!(r#"{:?}"#, code);
-        f.write_all(code.as_bytes()).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
+        f.write_all(code.as_bytes()).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-        let create_image_request = CreateImageRequest::new(game.language.clone(), game.tag.clone(), game.language.clone());
+        let create_image_request = CreateImageRequest::new(game.language.clone(), game.tag.clone(), format!("{}.{}", game.id, game.language));
 
         let body_str = serde_json::to_string(&create_image_request).unwrap();
         println!("body_str: {}", body_str);
@@ -51,7 +51,7 @@ impl GameService {
         let client = Client::new();
         let req = Request::builder()
             .method(Method::POST)
-            .uri(format!("http://dev.mikusupremacy.fr:7588/images/"))
+            .uri(format!("{}/images/", &env::var("DOCKERMANAGER_URI").unwrap()))
             .body(Body::from(body_str))
             .unwrap();
 
@@ -64,20 +64,20 @@ impl GameService {
         Ok(game)
     }
 
-    pub async fn get_game_by_id(&self, id : i32, user_id : i32)-> Result<Game, StatusCode>{
-        let game  = self.game_repository.get_game_and_code_by_id(id).await.map_err(database_error_to_status_code)?;
+    pub async fn get_game_by_id(&self, id: i32, user_id: i32) -> Result<Game, StatusCode> {
+        let game = self.game_repository.get_game_and_code_by_id(id).await.map_err(database_error_to_status_code)?;
         if game.user_id == user_id {
             Ok(game)
-        }else{
+        } else {
             self.game_repository.get_by_id(id).await.map_err(database_error_to_status_code)
         }
     }
 
-    pub async fn delete_by_user(&self, id: i32, user_id : i32) -> Result<Game, StatusCode> {
+    pub async fn delete_by_user(&self, id: i32, user_id: i32) -> Result<Game, StatusCode> {
         let game = self.game_repository.get_by_id(id).await.map_err(database_error_to_status_code)?;
         if game.user_id == user_id {
             self.game_repository.delete(id).await.map_err(database_error_to_status_code)
-        }else {
+        } else {
             Err(StatusCode::UNAUTHORIZED)
         }
     }
@@ -86,7 +86,7 @@ impl GameService {
         self.game_repository.delete(id).await.map_err(database_error_to_status_code)
     }
 
-    pub async fn update_game(&self, update_game_command: UpdateGameCommand, user_id : i32) -> Result<Game, StatusCode> {
+    pub async fn update_game(&self, update_game_command: UpdateGameCommand, user_id: i32) -> Result<Game, StatusCode> {
         let mut game = self.game_repository.get_by_id(update_game_command.id).await.map_err(database_error_to_status_code)?;
 
 
@@ -112,12 +112,11 @@ impl GameService {
 
         if update_game_command.code.is_some() && user_id == game.user_id {
             game = self.game_repository.update_code(update_game_command.code.clone().unwrap_or_default(), update_game_command.id).await.map_err(database_error_to_status_code)?;
-            let mut f = File::create(format!("ressources/games/{}.{}",game.id,game.language)).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
+            let mut f = File::create(format!("ressources/games/{}.{}", game.id, game.language)).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
             let code = update_game_command.code.unwrap();
-            f.write_all(code.as_bytes()).map_err(|_|StatusCode::INTERNAL_SERVER_ERROR)?;
+            f.write_all(code.as_bytes()).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
         }
 
         Ok(game)
     }
-
 }
