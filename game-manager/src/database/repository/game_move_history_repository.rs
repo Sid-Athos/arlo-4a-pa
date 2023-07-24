@@ -22,6 +22,20 @@ impl GameMoveHistoryRepository {
         }
     }
 
+    pub async fn get_last_by_game_history_id(&self, game_history_id: i32) -> Result<GameMoveHistory, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.game_move_history WHERE game_history_id = $1 ORDER BY action_number DESC LIMIT 1", &[&game_history_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = GameMoveHistoryEntity::new(row);
+
+        Ok(GameMoveHistoryEntityMapper::entity_to_domain(result))
+    }
+
     pub async fn get_all_by_game_history_id(&self, game_history_id: i32) -> Result<Vec<GameMoveHistory>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
         tracing::info!("Init db get all");

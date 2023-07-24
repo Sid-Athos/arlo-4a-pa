@@ -16,6 +16,10 @@ impl GameMoveHistoryService {
         }
     }
 
+    pub async fn get_last_by_game_history_id(&self, game_history_id: i32) -> Result<GameMoveHistory, StatusCode> {
+        self.game_move_history_repository.get_last_by_game_history_id(game_history_id).await.map_err(database_error_to_status_code)
+    }
+
     pub async fn get_all_by_game_history_id(&self, game_history_id: i32) -> Result<Vec<GameMoveHistory>, StatusCode> {
         self.game_move_history_repository.get_all_by_game_history_id(game_history_id).await.map_err(database_error_to_status_code)
     }
