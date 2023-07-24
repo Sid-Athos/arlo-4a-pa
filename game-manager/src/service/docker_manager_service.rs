@@ -117,11 +117,11 @@ impl DockerManagerService {
         Ok(1)
     }
 
-    pub async fn init_rankings(&self, user_id : i32, game_id : i32){
+    pub async fn init_rankings(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
         let init_ranking_request = InitRankingRequest::new(user_id,game_id);
 
         let body_str = serde_json::to_string(&init_ranking_request).unwrap();
-
+        println!("json : {:?}", body_str);
         let client = Client::new();
         let req = Request::builder()
             .method(Method::POST)
@@ -132,10 +132,14 @@ impl DockerManagerService {
             .unwrap();
         let response = client.request(req).await.unwrap();
         println!("status: {:?}", response.status());
+        if response.status() != StatusCode::OK {
+            return Err(response.status());
+        }
 
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
         data = serde_json::from_str(&*data).unwrap();
         println!("body: {:?}", data);
+        Ok(1)
     }
 }
