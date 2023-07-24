@@ -482,7 +482,7 @@ dependencies = [
 
 [[package]]
 name = "game-manager"
-version = "0.1.68"
+version = "0.1.69"
 dependencies = [
  "async-trait",
  "axum",
