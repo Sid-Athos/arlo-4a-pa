@@ -34,12 +34,13 @@ impl LaunchGameRequest {
         let init_request = InitRequest::new(lobby_members.len() as i32);
         let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&init_request).unwrap()).await.map_err(status_code_to_string)?;
         for lobby_member in &lobby_members {
-            let ranking = docker_manager_service.get_ranking(lobby_member.user_id, lobby.game_id).await.map_err(status_code_to_string);
+            let ranking = docker_manager_service.get_ranking(lobby_member.user_id, lobby.game_id).await;
             match ranking {
                 Ok(value) => {
-                    println!("ranking : {:?}", value);
+                    println!("ok values : {:?}, {:?}", lobby_member.user_id, lobby.game_id);
                 },
-                Err(e) => {
+                Err(..) => {
+                    println!("je suis la ");
                     docker_manager_service.init_rankings(lobby_member.user_id, lobby.game_id);
                 }
             }

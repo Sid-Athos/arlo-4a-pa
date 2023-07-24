@@ -103,7 +103,10 @@ impl DockerManagerService {
             .body(Body::from(""))
             .unwrap();
         let response = client.request(req).await.unwrap();
-        println!("body: {:?}", response.body());
+        let bytes = to_bytes(response).await.unwrap();
+        let mut data = String::from(from_utf8(&bytes).unwrap());
+        data = serde_json::from_str(&*data).unwrap();
+        println!("body: {:?}", data);
         println!("status: {:?}", response.status());
         if response.status() != StatusCode::OK {
             return Err(response.status());
@@ -125,7 +128,10 @@ impl DockerManagerService {
             .body(Body::from(body_str))
             .unwrap();
         let response = client.request(req).await.unwrap();
-        println!("body: {:?}", response.body());
+        let bytes = to_bytes(response).await.unwrap();
+        let mut data = String::from(from_utf8(&bytes).unwrap());
+        data = serde_json::from_str(&*data).unwrap();
+        println!("body: {:?}", data);
         println!("status: {:?}", response.status());
         response.status()
         /*if response.status() != StatusCode::OK {
