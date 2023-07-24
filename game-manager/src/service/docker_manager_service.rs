@@ -136,8 +136,9 @@ impl DockerManagerService {
             return Err(response.status());
         }
 
-        let bytes = to_bytes(response.body()).await.unwrap();
+        let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
+        println!("data: {:?}", data);
         data = serde_json::from_str(&*data).unwrap();
         println!("body: {:?}", data);
         Ok(1)
