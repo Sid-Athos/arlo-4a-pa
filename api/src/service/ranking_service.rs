@@ -106,6 +106,8 @@ impl RankingService {
                 p2_new_ranking = p2.rank as f64 + ((p2_k * (0.0 - (1.0 - win_chance))) * ratio);
             }
             println!("elo_diff : {} // power : {} // win_chance : {} // winner_k : {} // loser_k : {} // winner_new_ranking : {} // loser_new_ranking : {}", elo_diff, power, win_chance, p1_k, p2_k, p1_new_ranking, p2_new_ranking);
+            println!("loser_id : {}  loser _old_ranking : {} // winner_id : {}", id,p2.rank,winner_id);
+
             result.push(self.ranking_repository.update_ranking(game_id,id,p2_new_ranking.round() as i32).await.map_err(database_error_to_status_code).unwrap());
 
         }
