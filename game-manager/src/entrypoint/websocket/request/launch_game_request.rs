@@ -38,6 +38,9 @@ impl LaunchGameRequest {
             match ranking {
                 None => {
                     docker_manager_service.init_rankings(lobby_member.id, lobby.game_id);
+                },
+                Some(value) => {
+                    println!("ranking : {:?}", value);
                 }
             }
         }
