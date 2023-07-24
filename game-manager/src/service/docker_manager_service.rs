@@ -14,6 +14,7 @@ use crate::domain::error::database_error_to_status_code;
 use crate::domain::model::lobby_member::LobbyMember;
 use crate::service::dto::request::command_request::CommandRequest;
 use crate::service::dto::request::init_ranking_request::InitRankingRequest;
+use crate::service::dto::request::update_ranking_request::UpdateRankingRequest;
 use crate::service::dto::response::docker_manager_response::DockerManagerResponse;
 use crate::service::dto::response::ranking_response::{Ranking, RankingResponse};
 use crate::service::lobby_service::LobbyService;
@@ -135,5 +136,43 @@ impl DockerManagerService {
         let mut data = String::from(from_utf8(&bytes).unwrap());
         let result : Ranking = RankingResponse::new(serde_json::from_str(&*data).unwrap()).await;
         Ok(result.rank)
+    }
+
+    pub async fn update_ranking(&self, winner_id : i32, game_id : i32, losers_id : Vec<i32>, tie : bool, average_rank : i32) -> Result<StatusCode, StatusCode>{
+        let update_ranking_request = UpdateRankingRequest::new(winner_id,losers_id, game_id, tie, average_rank);
+
+        let body_str = serde_json::to_string(&update_ranking_request).unwrap();
+        let client = Client::new();
+        let req = Request::builder()
+            .method(Method::PUT)
+            .uri("http://dev.mikusupremacy.fr:7590/ranking")
+            .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
+            .header("api-key", "coding_games")
+            .header(CONTENT_TYPE, "application/json")
+            .body(Body::from(body_str))
+            .unwrap();
+        let response = client.request(req).await.unwrap();
+        if response.status() != StatusCode::OK {
+            return Err(response.status());
+        }
+        Ok(response.status())
+    }
+
+    pub async fn add_experience(&self, user_id : i32)-> Result<StatusCode, StatusCode>{
+        let client = Client::new();
+        let req = Request::builder()
+            .method(Method::PUT)
+            .uri(format!("http://dev.mikusupremacy.fr:7590/user/add_experience/{}",user_id))
+            .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
+            .header("api-key", "coding_games")
+            .header(CONTENT_TYPE, "application/json")
+            .body(Body::from(""))
+            .unwrap();
+        let response = client.request(req).await.unwrap();
+        if response.status() != StatusCode::OK {
+            return Err(response.status());
+        }
+        Ok(response.status())
+
     }
 }
