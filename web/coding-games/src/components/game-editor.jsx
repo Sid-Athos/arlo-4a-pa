@@ -137,13 +137,11 @@ export default function Editor() {
         } else {
             let payload = createPayload(currentCode())
             let res = await GamesService.newGame(payload).data
-            console.log(res)
-            //updateCode("id", res.id)
+            updateCode("id", res.id)
         }
     }
 
     const createPayload = (payload) => {
-        console.log(payload)
         payload.language = languageString()
         delete payload.id
         return payload

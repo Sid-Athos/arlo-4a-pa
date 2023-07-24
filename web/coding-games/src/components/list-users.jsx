@@ -1,4 +1,4 @@
-import {createSignal, onMount, Show} from "solid-js";
+import {createSignal, For, onMount, Show} from "solid-js";
 import {UserService} from "../utils/services/user-service";
 import {Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from "@suid/material";
 import SearchComponent from "./search-bar.jsx"
@@ -22,6 +22,7 @@ export default function ListUsers() {
     const [userList, setUserList] = createSignal([])
 
     const addFriend = async (recipientId) => {
+
         await UserService.addFriend({recipient_id: recipientId})
     }
     return (
@@ -39,17 +40,18 @@ export default function ListUsers() {
 
                     </List>
                     <List sx={{color:"white"}}>
-                        {userList().map(user => {
-                            return (<><ListItem disablePadding>
-                                    <ListItemText primary={user.pseudo} sx={{maxWidth:'250px'}}/>
-                                    <ListItemText primary={user.experience} sx={{maxWidth:'250px'}}/>
-                                    <ListItemText primary={user.level} sx={{maxWidth:'250px'}}/>
-                                    <ListItemButton onClick={() => addFriend(user.id)} sx={{maxWidth:'250px'}}>
-                                            <PlusIcon/>
-                                    </ListItemButton>
-                            </ListItem></>)
+                        <For each={userList()}>{(user) =>
+                            <><ListItem disablePadding>
+                                <ListItemText primary={user.pseudo} sx={{maxWidth:'250px'}}/>
+                                <ListItemText primary={user.experience} sx={{maxWidth:'250px'}}/>
+                                <ListItemText primary={user.level} sx={{maxWidth:'250px'}}/>
+                                <ListItemButton onClick={() => addFriend(user.id)} sx={{maxWidth:'250px'}}>
+                                    <PlusIcon/>
+                                </ListItemButton>
+                            </ListItem></>
+                        }
 
-                        })}
+                        </For>
                     </List>
 
                 </Show>

@@ -2,7 +2,19 @@ import {createResource, createSignal, onMount, Show} from "solid-js";
 import AgGridSolid from 'ag-grid-solid';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import {Box, Button, ButtonGroup, Card, CardActions, CardContent, Grid, Modal, Stack} from "@suid/material";
+import {
+    Box,
+    Button,
+    ButtonGroup,
+    Card,
+    CardActions,
+    CardContent, createTheme,
+    Grid,
+    Modal,
+    Paper,
+    Stack,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, ThemeProvider
+} from "@suid/material";
 import {GamesService} from "../utils/services/game-manager-service";
 import {UserStore} from "../utils/user-store";
 import useSockets from "../hooks/useSockets";
@@ -11,87 +23,96 @@ export default function Lobby(){
     const [gameList,setGameList] = createSignal([]);
 
     const [open, setOpen] = createSignal(false);
+    const [privateLobby, setPrivateLobby] = createSignal(false);
+
     onMount(async () => {
-        console.log(UserStore.get().token)
-        let data = await GamesService.findGames().data;
+        let data = (await GamesService.findGames()).data;
         setGameList(data)
         useSockets().setUpSockets()
     })
 
-
-
-
-    const [rowData, setRowData] = createSignal([]);
-    const columnDefs = [
-        {
-            field: 'name',
-            headerName:'Jeu',
-            width: 200
-        },
-        {
-            field: 'min_players',
-            headerName :'Participants minimum',
-            width: 200
-        },
-        {
-            field: 'max_players',
-            headerName: 'Participants maximum',
-            width: 200
-        },
-        {
-            field: 'description',
-            headerName: 'Description',
-            width: 200
-        },
-        {
-            field: 'actions',
-            suppressMovable: true,
-            width: 200,
-            headerName: 'Actions',
-            cellRenderer: params => renderManagementOptions("products", params, true, false),
-            pinned: 'right',
-        }
-        //{ field: 'actions'}
-    ];
-     const initGame = async () => {
+     const initGame = async (gameId) => {
          const res = await GamesService.findPlayers();
-         console.log(res);
-
-     }
+         console.log(res)
+         const payload = {
+             game_id: gameId,
+             private: privateLobby()
+         }
+         //useSockets().sendMessage(payload)
+    }
 
     const initReplay = () => {
 
     }
-    function renderManagementOptions(type, params, withSave, withDelete) {
+    function renderManagementOptions(gameId) {
         return (
             <>
                 <Button
                     style={{border: "none"}}
-                    onClick={(e) => initGame(type, params)}>Play</Button>
-                 <Button onClick={() => initReplay(params)}>Replay</Button>
+                    onClick={() => initGame(gameId)}>Play</Button>
+                 <Button onClick={() => initReplay()}>Replay</Button>
 
             </>);
     }
     const handleClose = () => setOpen(false);
-
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+        },
+    });
     return (
         <>
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
-                    <Grid item xs={6} md={8}>
 
                         <Show
                             when={!gameList.loading}
                             fallback={null}
                         >
-                            {JSON.stringify(gameList())}
-                            <div className="ag-theme-alpine-dark" style={{ height: '150px', width: '800px', marginLeft:"300px", top:"100px"}}>
-                                <AgGridSolid
-                                    columnDefs={columnDefs}
-                                    rowData={rowData()}
-                                    defaultColDef={columnDefs}
-                                />
-                            </div>
+                            <ThemeProvider theme={darkTheme}>
+                            <TableContainer component={Paper}>
+                                <Table sx={{minWidth: 550, maxWidth:1100,ml:30,mt:10}} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell align={"left"}>#</TableCell>
+                                            <TableCell>Game</TableCell>
+                                            <TableCell align="right">Min players</TableCell>
+                                            <TableCell align="right">Max players</TableCell>
+                                            <TableCell align="right">Description</TableCell>
+                                            <TableCell align="right">Actions</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {gameList().map(
+                                            (row, index) => {
+                                                return (
+                                                    <TableRow
+                                                        sx={{"&:last-child td, &:last-child th": {border: 0}}}
+                                                    >
+                                                        <TableCell component="th" scope="row" align={"left"}>
+                                                            {index + 1}
+                                                        </TableCell>
+                                                        <TableCell component="th" scope="row">
+                                                            {row.name}
+                                                        </TableCell>
+                                                        <TableCell component="th" scope="row" align="right">
+                                                            {row.min_players}
+                                                        </TableCell>
+                                                        <TableCell component="th" scope="row" align="right">
+                                                            {row.max_players}
+                                                        </TableCell>
+                                                        <TableCell
+                                                            align="right">{row.description}</TableCell>
+                                                        <TableCell
+                                                            align="right">{() => renderManagementOptions(row.id)}</TableCell>
+                                                    </TableRow>
+                                                )
+                                            }
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                            </ThemeProvider>
                         </Show>
                         <Modal
                             open={open()}
@@ -117,9 +138,7 @@ export default function Lobby(){
                             </Card>
                         </Modal>
                     </Grid>
-                    <Grid item xs={6} md={4}>
-                    </Grid>
-                </Grid>
+
             </Box>
         </>
     )

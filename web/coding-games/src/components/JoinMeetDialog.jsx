@@ -3,7 +3,7 @@ import { IoClose } from "solid-icons/io";
 import { createSignal, Show } from "solid-js";
 import { copyToClipboard } from "../utils/clipboard";
 import {useParams} from "@solidjs/router";
-import clickOutside from "../directives/clickOutside";
+import clickOutside from "../directives/ClickOutside";
 export default function JoinMeetDialog() {
     const [showJoinDialog, setShowJoinDialog] = createSignal(true);
     const params = useParams();
@@ -11,7 +11,7 @@ export default function JoinMeetDialog() {
     return (
         <Show when={showJoinDialog()}>
             <div
-                className="absolute top-0 left-0 max-full p-4"
+                style="absolute top-0 left-0 max-full p-4"
                 use:clickOutside={() => setShowJoinDialog(false)}
             >
                 <div className="bg-gray-700 shadow rounded-lg px-3 py-4">

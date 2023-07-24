@@ -33,7 +33,6 @@ export default function useMeet() {
     });
 
     onMount(async () => {
-        console.log("http:///localhost:7589/rtc/join_rtc")
         const socket = io("http:///localhost:7589?");
 
         setStore("socket", socket);
@@ -44,7 +43,6 @@ export default function useMeet() {
             setStore("currentUser", user);
         });
         socket.on("userJoined", (user) => {
-            console.log(user)
             setStore("remoteUser", user);
             callUser(user);
         });
