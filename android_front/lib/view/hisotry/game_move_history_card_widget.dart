@@ -29,16 +29,14 @@ class GameMoveHistoryCardWidget extends StatelessWidget {
           color: const Color(0xFF1A2025),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 16.0, left: 16.0, top: 8.0),
-            child: Flexible(
-              child: ListTile(
-                title: Text(
-                  "Player ${game_move_history.player}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                subtitle: Text(
-                  "N'${game_move_history.action_number}",
-                  style: const TextStyle(color: Colors.white38),
-                ),
+            child: ListTile(
+              title: Text(
+                "Player ${game_move_history.player}",
+                style: const TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                "N'${game_move_history.action_number}",
+                style: const TextStyle(color: Colors.white38),
               ),
             ),
           ),

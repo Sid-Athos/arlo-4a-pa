@@ -1,10 +1,11 @@
+import '../game/full_game_state_model.dart';
 import '../game/game_svg_info_model.dart';
 
 class GameMoveHistory {
 
   int id;
   int player;
-  String game_state;
+  FullGameState game_state;
   String action;
   int action_number;
 
