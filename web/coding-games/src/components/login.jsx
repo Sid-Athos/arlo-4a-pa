@@ -7,12 +7,11 @@ import {
 } from "@suid/material";
 import {createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import UnloggedScreen from "../render/unlogged/unlogged-screen";
+import UnLoggedScreen from "../render/unlogged/unlogged-screen";
 import {ApiInstance} from "../utils/services/api-instance";
 import {GameManagerInstance} from "../utils/services/game-manager-instance";
 import {UserService} from "../utils/services/user-service";
 import {useNavigate} from "@solidjs/router";
-import {useUserProvider} from "./user-provider";
 import {UserStore} from "../utils/user-store";
 
 export default function LoginComponent ({open,setOpen})  {
@@ -47,7 +46,6 @@ export default function LoginComponent ({open,setOpen})  {
     }
 
     const setClientData = (response) => {
-        console.log(response)
         let userInfo = {...user}
         userInfo.nickname = userSignIn().nickname
         userInfo.token = "Bearer " + response.data.token
@@ -99,10 +97,10 @@ export default function LoginComponent ({open,setOpen})  {
                 </p>
                 <img src={logo} className={styles.logo} alt="logo" />
             </header>
-            <UnloggedScreen open={open} handleClose={handleClose} userSignIn={userSignIn} userSignUp={userSignUp} userSignInError={userSignInError} userSignUpError={userSignUpError} signIn={signIn}
+            <UnLoggedScreen open={open} handleClose={handleClose} userSignIn={userSignIn} userSignUp={userSignUp} userSignInError={userSignInError} userSignUpError={userSignUpError} signIn={signIn}
                             userSignUpErrorMessage={userSignUpErrorMessage} submitSignInFormOnPressEnter={submitSignInFormOnPressEnter} submitSignUpFormOnPressEnter={submitSignUpFormOnPressEnter}
                             userSignInErrorMessage={userSignInErrorMessage} setUserSignInError={setUserSignInError} setUserSignIn={setUserSignIn} setUserSignUp={setUserSignUp}
-                            setUserSignUpError={setUserSignUpError} signUp={signUp} userIsSignedIn={userIsSignedIn} setUserIsSignedIn={setUserIsSignedIn}></UnloggedScreen>
+                            setUserSignUpError={setUserSignUpError} signUp={signUp} userIsSignedIn={userIsSignedIn} setUserIsSignedIn={setUserIsSignedIn}></UnLoggedScreen>
         </Box>
     );
 };

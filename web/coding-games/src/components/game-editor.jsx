@@ -100,6 +100,8 @@ export default function Editor() {
     }
     const clickDrawerGameItem = (e) => {
         setCurrentCode(codes().find(item => item.name === e))
+        setLanguage(codes().find(item => item.name === e).language === "java"? java():python())
+        setLanguageString(codes().find(item => item.name === e).language === "java"? "java":"python")
     }
     const swapLanguage = (language) => {
         switch (language) {
@@ -152,6 +154,17 @@ export default function Editor() {
         current[key] = value
         setCurrentCode({...current})
     }
+    const resetFields = () => {
+        let current = currentCode()
+        current.code = "";
+        current.id = null;
+        current.name = "";
+        current.language = "python3";
+        current.min_players = 2;
+        current.max_players = 2;
+        current.description = "";
+        setCurrentCode({...current})
+    }
     return (
         <>
             <Drawer
@@ -170,6 +183,7 @@ export default function Editor() {
             </Drawer>
             <Container maxWidth="sm" sx={{paddingTop: '50px'}}>
                 <Button onClick={toggleDrawer("right", true)}>{"Contextual menu"}</Button>
+                <Button onClick={resetFields}>{"Reset fields"}</Button>
                 <Box sx={{flexGrow: 1}}>
                     <Grid container spacing={3}>
                         <Grid item xs={6} md={8}>
