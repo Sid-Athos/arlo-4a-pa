@@ -163,7 +163,7 @@ impl DockerManagerService {
         let client = Client::new();
         let req = Request::builder()
             .method(Method::PUT)
-            .uri(format!("{}/user/add_experience/{}", &env::var("DOCKERMANAGER_URI").unwrap(), user_id))
+            .uri(format!("{}/user/add_experience/{}", &env::var("API_URI").unwrap(), user_id))
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .header("api-key", "coding_games")
             .header(CONTENT_TYPE, "application/json")

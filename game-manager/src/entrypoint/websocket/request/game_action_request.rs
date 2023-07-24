@@ -43,7 +43,7 @@ impl GameActionRequest {
             let mut max_score = docker_manager_response.game_state.scores[0];
             let mut loser_rankings = 0;
             let mut nb_losers = 0;
-            for i in 0..docker_manager_response.game_state.scores.len() {
+            for i in 1..docker_manager_response.game_state.scores.len() {
                 if max_score < docker_manager_response.game_state.scores[i] {
                     max_score = docker_manager_response.game_state.scores[i];
                     winner_index = i+1;
@@ -51,8 +51,6 @@ impl GameActionRequest {
             }
             println!("winner_index : {:?} // max_score : {:?}",winner_index,max_score);
 
-            //TODO le plus gros score est le vainqueur (player 1 to player N dans l'ordre)
-            //TODO calculer la moyenne des perdants
             let mut losers_id = vec![];
             for lobby_member in &lobby_members {
                 if lobby_member.player != winner_index as i32 {
