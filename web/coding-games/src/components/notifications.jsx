@@ -81,9 +81,11 @@ export default function Notifications() {
 
                 </Fade>
             </Show>
-            <Badge badgeContent={notificationsAmount()} color={"primary"} onclick={handleOpen}>
-                <NotificationsIcon color="action" sx={{color: "#fff"}}/>
+            <Show when={!UserStore.get().token}>
+            <Badge badgeContent={notificationsAmount()} color={"primary"} onclick={handleOpen} sx={{paddingTop:"6px"}}>
+                <NotificationsIcon color="action" sx={{color: "#fff", fontSize:20}}/>
             </Badge>
+            </Show>
             <Modal
                 open={open()}
                 onClose={handleClose}

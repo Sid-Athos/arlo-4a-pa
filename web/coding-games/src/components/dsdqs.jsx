@@ -36,35 +36,6 @@ export default function Chat() {
         },
     });
 
-    const [store, setStore] = createStore({
-        error: null,
-        socket: null,
-        peer: null,
-        currentStream: null,
-        currentUser: null,
-
-        remoteStream: null,
-        remoteUser: null,
-        remoteMuted: false,
-        remoteWebCam: true,
-
-        incommingCall: false,
-        incommingPayload: null,
-
-        muted: false,
-        webCam: true,
-    });
-
-    function getVideoSrc(el, accessor) {
-        const mediaStream = accessor();
-        if ("srcObject" in el) {
-            el.srcObject = mediaStream;
-        } else {
-            el.src = URL.createObjectURL(mediaStream);
-        }
-    }
-
-
 
 
     const handleShowChat = () => {
@@ -85,12 +56,7 @@ export default function Chat() {
                 </Button>
             </Show>
             <Show when={showChat()}>
-                <video
-                    autoPlay
-                    controls={false}
-                    playsInline
-                    use:getVideoSrc={stream}
-                ></video>
+
                 <Card sx={{minWidth: 400, maxWidth:400, mL: 3, minHeight:400, position:"absolute", bottom:0, right:0}}>
                     <CardHeader
                         action={

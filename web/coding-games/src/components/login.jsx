@@ -33,7 +33,7 @@ export default function LoginComponent ({open,setOpen})  {
                     setClientData(res);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
-                    navigate("/lobby",{token: res.data.token})
+                    navigate("/lobby")
                     handleClose();
                 }
             } catch (error) {
@@ -49,9 +49,9 @@ export default function LoginComponent ({open,setOpen})  {
         let userInfo = {...user}
         userInfo.nickname = userSignIn().nickname
         userInfo.token = "Bearer " + response.data.token
-        UserStore.save({token: response.data.token, username: userInfo.nickname, mail: userInfo.email})
         ApiInstance.updateAuthorizationHeader(userInfo.token );
         GameManagerInstance.updateAuthorizationHeader(userInfo.token);
+        UserStore.save({token: response.data.token, username: userInfo.nickname, mail: userInfo.email})
     }
 
 
@@ -60,8 +60,10 @@ export default function LoginComponent ({open,setOpen})  {
         if(userSignUp().email.length > 0 && userSignUp().password.length >= 3 && userSignUp().nickname.length >= 5){
             try {
                 const userCreated = await UserService.signUp(userSignUp());
+                console.log(userCreated)
                 if(userCreated.status === 200){
-                    setClientData(userCreated);
+                    let res = await UserService.signIn({nickname: userSignUp().nickname, password: userSignUp().nickname})
+                    setClientData(res);
                     setUserSignInError(false)
                     setUserIsSignedIn(true)
                     navigate("/lobby")

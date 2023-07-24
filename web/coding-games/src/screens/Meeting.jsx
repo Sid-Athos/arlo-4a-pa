@@ -22,10 +22,7 @@ export default function Meeting() {
                             <section className="h-full grid place-items-center">
                                 <Show
                                     when={store.webCam}
-                                    fallback={
-                                        <Avatar className="w-40 h-40">
-                                            <FaSolidUser />
-                                        </Avatar>
+                                    fallback={<></>
                                     }
                                 >
                                     <Stream stream={store.currentStream} name="You" />
@@ -37,10 +34,7 @@ export default function Meeting() {
                                 <section className="grid place-items-center">
                                     <Show
                                         when={store.remoteStream && store.remoteWebCam}
-                                        fallback={
-                                            <Avatar className="w-40 h-40">
-                                                <FaSolidUser />
-                                            </Avatar>
+                                        fallback={<></>
                                         }
                                     >
                                         <Stream stream={store.remoteStream} name="Remote" />

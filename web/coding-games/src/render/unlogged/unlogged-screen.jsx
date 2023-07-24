@@ -52,7 +52,7 @@ const UnloggedScreen = (
             aria-describedby="modal-modal-description"
         >
             <Card
-                className="signCard"
+                className="signCard" sx={{m:3}}
             >
                 <CardContent>
                     <Stack spacing={2}>

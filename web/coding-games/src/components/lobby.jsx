@@ -5,7 +5,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import {Box, Button, ButtonGroup, Card, CardActions, CardContent, Grid, Modal, Stack} from "@suid/material";
 import {GamesService} from "../utils/services/game-manager-service";
 import {UserStore} from "../utils/user-store";
-
+import useSockets from "../hooks/useSockets";
 
 export default function Lobby(){
     const [gameList,setGameList] = createSignal([]);
@@ -15,21 +15,7 @@ export default function Lobby(){
         console.log(UserStore.get().token)
         let data = await GamesService.findGames().data;
         setGameList(data)
-        const socket = new WebSocket('ws://localhost:7589/ws?token=' + UserStore.get().token);
-        UserStore.save({socketConnection: socket})
-        socket.onopen = function () {
-            this.send(JSON.stringify({
-                CreateLobby: {
-                    game_id: 2,
-                    private: false
-                }
-            }));
-        };
-        socket.onmessage = function (msg) {
-            console.log(JSON.parse(msg.data))
-
-        };
-
+        useSockets().setUpSockets()
     })
 
 
