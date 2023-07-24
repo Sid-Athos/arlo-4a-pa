@@ -323,12 +323,13 @@ class _HomeState extends State<HomeView> {
     return Offstage(
       offstage: currentTab != 2,
       child: Navigator(
-          key: navigatorKeys[2],
-          onGenerateRoute: (settings) {
-            return MaterialPageRoute(
-              builder: (context) => ProfileView(user: user),
-            );
-          }),
+        key: navigatorKeys[2],
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => ProfileView(user: user),
+          );
+        }
+      ),
     );
   }
 
