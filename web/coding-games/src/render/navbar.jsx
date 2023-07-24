@@ -35,6 +35,8 @@ export default function NavBar({setOpen}){
                                 <Link href={"#"}  underline={"none"} color="white" onclick={() => nav("/ranking")}> Leaderboard</Link>
                                 <Link href={"#"}  underline={"none"} color="white" onclick={() => nav("/code-editor")}> Code Editor</Link>
                                 <Link href={"#"} underline={"none"} color="white" onclick={() => nav("/search-user")}> Search Users</Link>
+                                <Link href={"#"} underline={"none"} color="white" onclick={() => nav("/meeting")}> Meeting</Link>
+
                             </Stack>
                         </Typography>
                         <Button color="inherit" onClick={handleOpen}>Login</Button>
