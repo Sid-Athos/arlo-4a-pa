@@ -13,6 +13,7 @@ impl LobbyEntityMapper {
             private: lobby_entity.private,
             is_launched: lobby_entity.is_launched,
             game_history_id: lobby_entity.game_history_id,
+            from_move_history_id: lobby_entity.from_move_history_id,
         }
     }
 }

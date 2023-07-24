@@ -7,5 +7,6 @@ pub struct Lobby {
     pub game_id: i32,
     pub private: bool,
     pub is_launched: bool,
-    pub game_history_id : Option<i32>
+    pub game_history_id : Option<i32>,
+    pub from_move_history_id : Option<i32>
 }

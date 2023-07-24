@@ -65,12 +65,12 @@ impl LobbyRepository {
         Ok(result)
     }
 
-    pub async fn create_lobby(&self, code: String, game_id: i32, private: bool) -> Result<Lobby, DatabaseError> {
+    pub async fn create_lobby(&self, code: String, game_id: i32, private: bool, from_move_history_id : Option<i32>) -> Result<Lobby, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("INSERT INTO coding_games.lobby (code, game_id, private) VALUES ($1, $2, $3) RETURNING *", &[&code, &game_id, &private])
+            .query_one("INSERT INTO coding_games.lobby (code, game_id, private, from_move_history_id) VALUES ($1, $2, $3, &4) RETURNING *", &[&code, &game_id, &private, &from_move_history_id])
             .await
             .map_err(database_error_not_found)?;
 
