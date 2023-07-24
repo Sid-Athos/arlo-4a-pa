@@ -93,6 +93,7 @@ impl DockerManagerService {
     }
 
     pub async fn get_ranking(&self, user_id : i32, game_id : i32) -> Result<i32, StatusCode>{
+        println!("values : {} {}",user_id,game_id);
         let client = Client::new();
         let req = Request::builder()
             .method(Method::GET)
