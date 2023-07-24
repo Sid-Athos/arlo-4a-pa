@@ -19,7 +19,11 @@ dependencies = [
 
 [[package]]
 name = "api"
+<<<<<<< HEAD
+version = "0.1.18"
+=======
 version = "0.1.22"
+>>>>>>> d720f91e1010bc0c6540051bf3915baac06e2fa3
 dependencies = [
  "async-trait",
  "axum",

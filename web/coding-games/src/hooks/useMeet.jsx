@@ -21,8 +21,8 @@ export default function useMeet() {
         remoteMuted: false,
         remoteWebCam: true,
 
-        incommingCall: false,
-        incommingPayload: null,
+        incomingCall: false,
+        incomingPayload: null,
 
         muted: false,
         webCam: true,
@@ -33,9 +33,7 @@ export default function useMeet() {
     });
 
     onMount(async () => {
-        console.log("http:///localhost:7589/rtc/join_rtc")
-        await GamesService.rtcMeeting()
-        const socket = io("http:///localhost:7589/rtc/join_rtc");
+        const socket = io("http:///localhost:7589?");
 
         setStore("socket", socket);
 
@@ -258,7 +256,6 @@ export default function useMeet() {
 
     return {
         store,
-
         toggleMic,
         toggleWebCam,
         endCall,

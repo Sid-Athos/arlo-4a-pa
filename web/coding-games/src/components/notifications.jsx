@@ -40,8 +40,10 @@ export default function Notifications() {
 
     onMount(() => {
         setInterval(async () => {
+            console.log(UserStore.get().username)
             if (UserStore.get().token) {
                 await UserService.friendRequests().then(res => {
+                    console.log(res)
                     setNotifications(res.data.filter(friendRequest => friendRequest.applicant.pseudo !== UserStore.get().username))
                 })
 
@@ -81,9 +83,11 @@ export default function Notifications() {
 
                 </Fade>
             </Show>
-            <Badge badgeContent={notificationsAmount()} color={"primary"} onclick={handleOpen}>
-                <NotificationsIcon color="action" sx={{color: "#fff"}}/>
+            <Show when={UserStore.get().token}>
+            <Badge badgeContent={notificationsAmount()} color={"primary"} onclick={handleOpen} sx={{paddingTop:"6px"}}>
+                <NotificationsIcon color="action" sx={{color: "#fff", fontSize:20}}/>
             </Badge>
+            </Show>
             <Modal
                 open={open()}
                 onClose={handleClose}
