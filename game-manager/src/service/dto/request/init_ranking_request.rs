@@ -1,4 +1,6 @@
-#[derive(Serialize, Deserialize, ToSchema)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct InitRankingRequest {
     pub user_id: i32,
     pub game_id: i32,
