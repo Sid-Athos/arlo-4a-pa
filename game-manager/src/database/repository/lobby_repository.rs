@@ -65,12 +65,26 @@ impl LobbyRepository {
         Ok(result)
     }
 
-    pub async fn create_lobby(&self, code: String, game_id: i32, private: bool, from_move_history_id : Option<i32>) -> Result<Lobby, DatabaseError> {
+    pub async fn create_lobby(&self, code: String, game_id: i32, private: bool) -> Result<Lobby, DatabaseError> {
 
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
         let row = conn
-            .query_one("INSERT INTO coding_games.lobby (code, game_id, private, from_move_history_id) VALUES ($1, $2, $3, &4) RETURNING *", &[&code, &game_id, &private, &from_move_history_id])
+            .query_one("INSERT INTO coding_games.lobby (code, game_id, private) VALUES ($1, $2, $3) RETURNING *", &[&code, &game_id, &private])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = LobbyEntity::new(row);
+
+        Ok(LobbyEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn set_history_id(&self, lobby_id: i32, from_move_history_id : i32) -> Result<Lobby, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("UPDATE coding_games.lobby SET from_move_history_id = $1 WHERE id = $2 RETURNING *", &[&from_move_history_id, &lobby_id])
             .await
             .map_err(database_error_not_found)?;
 

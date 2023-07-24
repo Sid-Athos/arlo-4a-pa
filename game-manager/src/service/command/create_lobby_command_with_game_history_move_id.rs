@@ -12,7 +12,7 @@ impl CreateLobbyCommandWithGameHistoryMoveId {
         CreateLobbyCommandWithGameHistoryMoveId {
             user_id,
             game_id,
-            private : false,
+            private : true,
             game_move_history_id,
         }
     }

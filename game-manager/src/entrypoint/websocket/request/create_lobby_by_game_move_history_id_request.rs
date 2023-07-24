@@ -21,11 +21,15 @@ impl CreateLobbyByGameMoveHistoryIdRequest {
 
         let lobby_service = LobbyService::new(pool.clone());
         let game_move_history_service = GameMoveHistoryService::new(pool.clone());
+        println!("coucou1");
 
         let game_id = game_move_history_service.get_game_id(self.game_move_id).await.map_err(status_code_to_string)?;
-        let command = CreateLobbyCommandWithGameHistoryMoveId::new(user.id,game_id , self.game_move_id);
+        println!("coucou1");
+        let command = CreateLobbyCommandWithGameHistoryMoveId::new(user.id, game_id, self.game_move_id);
+        println!("coucou1");
 
         lobby_service.create_from_move_history_id(command).await.map_err(status_code_to_string)?;
+        println!("coucou1");
 
         connections.send_to_vec_user_id(ResponseEnum::LobbyCreated, vec![user.id]).await;
 

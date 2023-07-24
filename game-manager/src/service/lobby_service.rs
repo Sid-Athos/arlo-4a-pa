@@ -82,7 +82,7 @@ impl LobbyService {
             code.push(random_number as char);
         }
 
-        let lobby = self.lobby_repository.create_lobby(code, lobby_command.game_id, lobby_command.private, None).await.map_err(database_error_to_status_code)?;
+        let lobby = self.lobby_repository.create_lobby(code, lobby_command.game_id, lobby_command.private).await.map_err(database_error_to_status_code)?;
 
         self.lobby_member_repository.create(lobby_command.user_id, lobby.id, true).await.map_err(database_error_to_status_code)?;
 
@@ -103,10 +103,14 @@ impl LobbyService {
             let random_number: u8 = thread_rng().gen_range(0..26) + 65;
             code.push(random_number as char);
         }
-
-        let lobby = self.lobby_repository.create_lobby(code, lobby_command.game_id, lobby_command.private, Option::from(lobby_command.game_move_history_id)).await.map_err(database_error_to_status_code)?;
+        println!("coucou");
+        let mut lobby = self.lobby_repository.create_lobby(code, lobby_command.game_id, lobby_command.private).await.map_err(database_error_to_status_code)?;
+        println!("coucou");
+        lobby = self.lobby_repository.set_history_id(lobby.id, lobby_command.game_move_history_id).await.map_err(database_error_to_status_code)?;
+        println!("coucou");
 
         self.lobby_member_repository.create(lobby_command.user_id, lobby.id, true).await.map_err(database_error_to_status_code)?;
+        println!("coucou");
 
         Ok(lobby)
     }
