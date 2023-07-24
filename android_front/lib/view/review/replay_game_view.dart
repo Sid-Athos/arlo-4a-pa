@@ -12,8 +12,8 @@ class ReplayGameView extends StatefulWidget {
 
   @override
   _ReplayGameViewState createState() => _ReplayGameViewState(
-    gameMoveHistory: gameMoveHistory,
-  );
+        gameMoveHistory: gameMoveHistory,
+      );
 }
 
 class _ReplayGameViewState extends State<ReplayGameView> {
@@ -21,6 +21,7 @@ class _ReplayGameViewState extends State<ReplayGameView> {
 
   List<GameMoveHistory> gameMoveHistory;
   int move_index = 0;
+  int player_index = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class _ReplayGameViewState extends State<ReplayGameView> {
         return showDialog(
           context: context,
           builder: (context) => ConfirmCloseReplayDialog(),
-        ).then( (leave) {
+        ).then((leave) {
           if (leave) {
             return true;
           }
@@ -37,40 +38,73 @@ class _ReplayGameViewState extends State<ReplayGameView> {
         });
       },
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Game replay"),
+          backgroundColor: const Color(0xFF21262B),
+        ),
         backgroundColor: const Color(0xFF21262B),
         body: Column(
           children: [
             Expanded(
               child: Center(
-                 child: SvgPicture.string(gameMoveHistory[move_index].game_state.createSVG()),
-               ),
+                child: SvgPicture.string(gameMoveHistory[move_index]
+                    .game_state
+                    .displays[player_index]
+                    .createSVG()),
+              ),
             ),
-            Center(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 25),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      if (move_index > 0) {
-                        setState(() {
-                          move_index -= 1;
-                        });
-                      }
-                    },
-                    color: (move_index <= 0) ? const Color(0xFF222ab7) : const Color(0xFF626af7),
-                    icon: const Icon(Icons.navigate_before),
-                    tooltip: 'Before',
+                  Padding(
+                    padding: const EdgeInsets.only(right: 25),
+                    child: IconButton(
+                      onPressed: () {
+                        if (move_index > 0) {
+                          setState(() {
+                            move_index -= 1;
+                          });
+                        }
+                      },
+                      color: (move_index <= 0)
+                          ? const Color(0xFF222ab7)
+                          : const Color(0xFF626af7),
+                      icon: const Icon(Icons.navigate_before),
+                    ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      if (move_index < gameMoveHistory.length - 1) {
+                  ElevatedButton(
+                      onPressed: () {
                         setState(() {
-                          move_index += 1;
+                          player_index += 1;
+                          if (player_index >= gameMoveHistory[move_index]
+                              .game_state
+                              .displays.length) {
+                            player_index = 0;
+                          }
                         });
-                      }
-                    },
-                    color: (move_index >= gameMoveHistory.length - 1) ? const Color(0xFF222ab7) : const Color(0xFF626af7),
-                    icon: const Icon(Icons.navigate_next),
-                    tooltip: 'Next',
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF626af7)
+                      ),
+                      child: Text("P${player_index + 1}")),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25),
+                    child: IconButton(
+                      onPressed: () {
+                        if (move_index < gameMoveHistory.length - 1) {
+                          setState(() {
+                            move_index += 1;
+                          });
+                        }
+                      },
+                      color: (move_index >= gameMoveHistory.length - 1)
+                          ? const Color(0xFF222ab7)
+                          : const Color(0xFF626af7),
+                      icon: const Icon(Icons.navigate_next),
+                    ),
                   ),
                 ],
               ),

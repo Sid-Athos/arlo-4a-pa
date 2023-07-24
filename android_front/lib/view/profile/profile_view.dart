@@ -178,8 +178,7 @@ class _ProfileViewState extends State<ProfileView> {
               child: ElevatedButton(
                 onPressed: () async {
                   await ApiUser.logout();
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.remove("login_token");
                   exit(0);
                 },

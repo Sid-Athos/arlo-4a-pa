@@ -32,7 +32,7 @@ pub async fn update_ranking(State(pool): State<ConnectionPool>, Json(ranking): J
         RankingRepository::new(pool.clone())
     );
 
-    let rankings = ranking_service.update_ranking2(ranking.game_id,ranking.p1_id,ranking.p2_id,ranking.tie,ranking.winner_id).await?;
+    let rankings = ranking_service.update_ranking3(ranking.game_id,ranking.losers_id,ranking.tie,ranking.winner_id, ranking.average_rank).await?;
 
     Ok(Json(RankingResponse::from_vec_domain(rankings, pool).await))
 }

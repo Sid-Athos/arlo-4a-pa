@@ -6,7 +6,8 @@ pub struct LobbyEntity {
     pub game_id: i32,
     pub private: bool,
     pub is_launched: bool,
-    pub game_history_id : Option<i32>
+    pub game_history_id : Option<i32>,
+    pub from_move_history_id : Option<i32>
 }
 
 impl LobbyEntity {
@@ -17,7 +18,8 @@ impl LobbyEntity {
             game_id: row.get("game_id"),
             private: row.get("private"),
             is_launched: row.get("is_launched"),
-            game_history_id : row.get("game_history_id")
+            game_history_id : row.get("game_history_id"),
+            from_move_history_id: row.get("from_move_history_id"),
         }
     }
 }

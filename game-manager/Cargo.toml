@@ -1,6 +1,6 @@
 [package]
 name = "game-manager"
-version = "0.1.56"
+version = "0.1.80"
 edition = "2021"
 publish = false
 

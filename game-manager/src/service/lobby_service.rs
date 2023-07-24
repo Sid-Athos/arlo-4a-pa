@@ -8,6 +8,7 @@ use crate::domain::error::database_error_to_status_code;
 use crate::domain::model::lobby::Lobby;
 use crate::domain::model::lobby_member::LobbyMember;
 use crate::service::command::create_lobby_command::CreateLobbyCommand;
+use crate::service::command::create_lobby_command_with_game_history_move_id::CreateLobbyCommandWithGameHistoryMoveId;
 use crate::service::ws_session_service::WsSessionService;
 
 pub struct LobbyService {
@@ -82,6 +83,28 @@ impl LobbyService {
         }
 
         let lobby = self.lobby_repository.create_lobby(code, lobby_command.game_id, lobby_command.private).await.map_err(database_error_to_status_code)?;
+
+        self.lobby_member_repository.create(lobby_command.user_id, lobby.id, true).await.map_err(database_error_to_status_code)?;
+
+        Ok(lobby)
+    }
+
+    pub async fn create_from_move_history_id(&self, lobby_command: CreateLobbyCommandWithGameHistoryMoveId) -> Result<Lobby, StatusCode> {
+
+        match self.get_by_user_id(lobby_command.user_id).await {
+            Ok(_) => {
+                self.exit_lobby(lobby_command.user_id).await?;
+            },
+            Err(_) => {}
+        };
+
+        let mut code = String::new();
+        for _ in 0..6 {
+            let random_number: u8 = thread_rng().gen_range(0..26) + 65;
+            code.push(random_number as char);
+        }
+        let mut lobby = self.lobby_repository.create_lobby(code, lobby_command.game_id, lobby_command.private).await.map_err(database_error_to_status_code)?;
+        lobby = self.lobby_repository.set_history_id(lobby.id, lobby_command.game_move_history_id).await.map_err(database_error_to_status_code)?;
 
         self.lobby_member_repository.create(lobby_command.user_id, lobby.id, true).await.map_err(database_error_to_status_code)?;
 
