@@ -103,18 +103,21 @@ impl DockerManagerService {
             .body(Body::from(""))
             .unwrap();
         let response = client.request(req).await.unwrap();
-        let bytes = to_bytes(response).await.unwrap();
-        let mut data = String::from(from_utf8(&bytes).unwrap());
-        data = serde_json::from_str(&*data).unwrap();
-        println!("body: {:?}", data);
         println!("status: {:?}", response.status());
         if response.status() != StatusCode::OK {
             return Err(response.status());
         }
+
+        let bytes = to_bytes(response).await.unwrap();
+        let mut data = String::from(from_utf8(&bytes).unwrap());
+        data = serde_json::from_str(&*data).unwrap();
+        println!("body: {:?}", data);
+
+
         Ok(1)
     }
 
-    pub async fn init_rankings(&self, user_id : i32, game_id : i32)-> StatusCode{
+    pub async fn init_rankings(&self, user_id : i32, game_id : i32){
         let init_ranking_request = InitRankingRequest::new(user_id,game_id);
 
         let body_str = serde_json::to_string(&init_ranking_request).unwrap();
@@ -128,15 +131,11 @@ impl DockerManagerService {
             .body(Body::from(body_str))
             .unwrap();
         let response = client.request(req).await.unwrap();
+        println!("status: {:?}", response.status());
+
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
         data = serde_json::from_str(&*data).unwrap();
         println!("body: {:?}", data);
-        println!("status: {:?}", response.status());
-        response.status()
-        /*if response.status() != StatusCode::OK {
-            return Err();
-        }
-        Ok(1)*/
     }
 }
