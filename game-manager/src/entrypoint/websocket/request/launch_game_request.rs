@@ -41,8 +41,15 @@ impl LaunchGameRequest {
                 },
                 Err(e) => {
                     println!("je suis la ");
-                    let val = docker_manager_service.init_rankings(lobby_member.user_id, lobby.game_id).await?;
-                    println!("result : {}",val);
+                    let val = docker_manager_service.init_rankings(lobby_member.user_id, lobby.game_id).await;
+                    match val {
+                        Ok(value) => {
+                            println!("result : {}",value);
+                        },
+                        Err(e) => {
+                            println!("Status code  : {}",e);
+                        }
+                    }
 
                 }
             }
