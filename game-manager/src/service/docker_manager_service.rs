@@ -121,11 +121,12 @@ impl DockerManagerService {
         let init_ranking_request = InitRankingRequest::new(user_id,game_id);
 
         let body_str = serde_json::to_string(&init_ranking_request).unwrap();
+        println!("body json : {:?}", Body::from(body_str.clone()));
         println!("json : {:?}", body_str);
         let client = Client::new();
         let req = Request::builder()
             .method(Method::POST)
-            .uri(format!("http://dev.mikusupremacy.fr:7590/ranking"))
+            .uri("http://dev.mikusupremacy.fr:7590/ranking")
             .header(AUTHORIZATION, "Bearer Dzpr6W62FaYY7bDZ1TWwFks3kjIkLGVlDzvUCMi4RJiwKN8ICbd6pR9c7OLgpmsFOR98OvLD2ANq1g7YV1WrluiPzaBGzZk9UlKG0YfM8rNYWqLn9xQY3kachyii1hYEZ0HzmdlwdzXPIn8S3m422mSx33nvFljPoyhAMAcfmYhatFqbI9iFOGF1IZDUDFGMjbdlZIhyrvQgO0cv50xXcIFerlkiHSXHG2w72dJT94z57UhgN1dlgoOEUpikfCcz")
             .header("api-key", "coding_games")
             .body(Body::from(body_str))
