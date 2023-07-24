@@ -17,19 +17,25 @@ import {
     Typography
 } from "@suid/material";
 import {GamesService} from "../utils/services/game-manager-service";
+import {UserStore} from "../utils/user-store";
 
-const socket = new WebSocket('ws://localhost:7589/ws/');
-socket.onopen = function() {
-    this.send(JSON.stringify("hello"));
-};
-socket.onmessage = function(msg) {
-    if (msg.data && msg.data.slice(0, 3) === 'pub') {
-        // resource updated, refetch resource
-    }
-};
+
 export default function Lobby(){
     const handleOpen = () => setOpen(true);
     const [open, setOpen] = createSignal(false);
+    onMount(() => {
+        console.log(UserStore.get().token)
+        const socket = new WebSocket('ws://localhost:7589/ws?token='+ UserStore.get().token);
+        socket.onopen = function() {
+            this.send(JSON.stringify("hello"));
+        };
+        socket.onmessage = function(msg) {
+            if (msg.data && msg.data.slice(0, 3) === 'pub') {
+                console.log(message.data)
+                // resource updated, refetch resource
+            }
+        };
+    })
     const fetchGames = async (token) =>{
         if(token !== ""){
             let res = await fetch("http://localhost:7589/games/all", {
