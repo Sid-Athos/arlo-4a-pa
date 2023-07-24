@@ -6,7 +6,8 @@ class GameActionResponseMapper {
   static GameAction fromJson(Map<String, dynamic> json) {
     return GameAction(
       type: json["type"],
-        zones: (json['zones'] as List<dynamic>).map((e) => GameActionZoneResponseMapper.fromJson(e)).toList()
+      zones: (json['zones'] as List<dynamic>).map((e) => GameActionZoneResponseMapper.fromJson(e)).toList(),
+      player: json["player"]
     );
   }
 }

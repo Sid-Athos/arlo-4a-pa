@@ -3,10 +3,12 @@ import 'game_action_zone_model.dart';
 class GameAction {
   String type;
   List<GameActionZone> zones;
+  int player;
 
   GameAction({
     required this.type,
     required this.zones,
+    required this.player
   });
 
   bool isInZones(int x, int y) {
