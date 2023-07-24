@@ -32,17 +32,19 @@ impl LaunchGameRequest {
         let lobby_members = lobby_service.get_lobby_member(lobby.id).await.map_err(status_code_to_string)?;
         let game_history = game_history_service.create(lobby.id).await.map_err(status_code_to_string)?;
         lobby_service.set_game_history_id(lobby_started.id, game_history.id).await.map_err(status_code_to_string)?;
-
+        let docker_manager_response;
         if lobby.from_move_history_id.is_some() {
             let last_move = game_move_history_service.get_move_by_id(lobby.from_move_history_id.unwrap()).await.map_err(status_code_to_string)?;
-            for i in 1..last_move.action_number+1 {
+            for i in 1..last_move.action_number {
                 let current_move = game_move_history_service.get_move_by_action_number_and_game_history_id(i,last_move.game_history_id).await.map_err(status_code_to_string)?;
                 game_move_history_service.create(current_move.player,game_history.id,current_move.game_state,current_move.action).await.map_err(status_code_to_string)?;
             }
-        }
+            docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, last_move.action).await.map_err(status_code_to_string)?;
+        }else {
+            let init_request = InitRequest::new(lobby_members.len() as i32);
+            docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&init_request).unwrap()).await.map_err(status_code_to_string)?;
 
-        let init_request = InitRequest::new(lobby_members.len() as i32);
-        let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&init_request).unwrap()).await.map_err(status_code_to_string)?;
+        }
         for lobby_member in &lobby_members {
             let ranking = docker_manager_service.get_ranking(lobby_member.user_id, lobby.game_id).await;
             match ranking {
