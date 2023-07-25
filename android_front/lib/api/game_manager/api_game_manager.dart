@@ -16,7 +16,7 @@ import '../../model/history/game_history_model.dart';
 import '../../model/history/game_move_history_model.dart';
 
 class ApiGameManager {
-  static const String baseURLWS = "ws://dev.mikusupremacy.fr:7589";
+  static const String baseURLWS = "wss://dev.mikusupremacy.fr/gamemanager";
   static const String baseURL = "https://dev.mikusupremacy.fr/gamemanager";
   static final dio = Dio();
 
