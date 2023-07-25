@@ -4,7 +4,8 @@ const instance = axios.create({
     baseURL: 'https://dev.mikusupremacy.fr/gamemanager/',
     headers: {
         'Content-Type': 'application/json',
-        'api-key' : 'coding_games'
+        'api-key' : 'coding_games',
+        Authorization: sessionStorage.getItem("token")
     },
 });
 

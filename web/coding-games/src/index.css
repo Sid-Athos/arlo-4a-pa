@@ -82,6 +82,7 @@ code {
     calc(-1 * var(--px)) calc(-1 * var(--px)) var(--black),
     calc(var(--px)) var(--px) var(--black);
     box-sizing: border-box;
+    white-space: pre-wrap;
     width: 200px;
 }
 

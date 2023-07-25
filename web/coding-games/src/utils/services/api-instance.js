@@ -4,12 +4,16 @@ const instance = axios.create({
     baseURL: 'https://dev.mikusupremacy.fr/api',
     headers: {
         'Content-Type': 'application/json',
-        'api-key' : 'coding_games'
+        'api-key' : 'coding_games',
+        'Authorization':sessionStorage.getItem("token")
     },
 });
 
+
+
+
+
 const setAuthorizationHeader = (token) => {
-    console.log(token)
     instance.interceptors.request.use(conf => {
         conf.headers.Authorization = token
         return conf
