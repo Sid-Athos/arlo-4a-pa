@@ -5,6 +5,7 @@ import {useNavigate, useParams} from "@solidjs/router";
 import {ApiInstance} from "../utils/services/api-instance";
 import {GameManagerInstance} from "../utils/services/game-manager-instance";
 import {GamesService} from "../utils/services/game-manager-service";
+import {UserStore} from "../utils/user-store";
 export default function useMeet() {
     const navigate = useNavigate();
     const params = useParams();
@@ -33,7 +34,7 @@ export default function useMeet() {
     });
 
     onMount(async () => {
-        const socket = io("http:///localhost:7589?");
+        const socket = io("https://dev.mikusupremacy.fr/gamemanager/?"+ UserStore.get().token);
 
         setStore("socket", socket);
 

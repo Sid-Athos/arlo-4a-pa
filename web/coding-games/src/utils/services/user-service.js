@@ -20,6 +20,10 @@ const addFriend = async (user) => {
     return await ApiInstance.getInstance.post(`/friend-list`, user)
 }
 
+const findFriends = async () => {
+    return await ApiInstance.getInstance.get(`/friend-list`)
+}
+
 const getFriendRequests = async () => {
     return await ApiInstance.getInstance.get(`/friend-list/requests`)
 }
@@ -41,5 +45,6 @@ export const UserService = {
     addFriend: addFriend,
     friendRequests: getFriendRequests,
     acceptFriend: acceptFriendRequest,
-    declineFriend: declineFriendRequest
+    declineFriend: declineFriendRequest,
+    friends: findFriends
 }

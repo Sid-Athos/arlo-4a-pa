@@ -15,10 +15,10 @@ export default function useSockets() {
     onMount(() => {
         let ws;
         if(sessionStorage.getItem("token")){
-            ws = createWS(`ws://localhost:7589/ws?token=${sessionStorage.getItem("token")}`);
+            ws = createWS(`ws://dev.mikusupremacy.fr:7589/ws?token=${sessionStorage.getItem("token")}`);
 
         } else {
-          ws = createWS(`ws://localhost:7589/ws?token=${UserStore.get().token}`);
+          ws = createWS(`ws://dev.mikusupremacy.fr:7589/ws?token=${UserStore.get().token}`);
         }
         setSocket("websockets",ws)
         sendMessage("Hello")
