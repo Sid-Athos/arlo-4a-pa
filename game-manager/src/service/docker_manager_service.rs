@@ -58,7 +58,7 @@ impl DockerManagerService {
         let game_dto = CommandRequest::new(game.language, moves);
 
         let body_str = serde_json::to_string(&game_dto).unwrap();
-        println!("body_str: {}", body_str);
+        //println!("body_str: {}", body_str);
 
         let client = Client::new();
         let req = Request::builder()
@@ -76,7 +76,7 @@ impl DockerManagerService {
         let bytes = to_bytes(response).await.unwrap();
         let mut data = String::from(from_utf8(&bytes).unwrap());
         data = serde_json::from_str(&*data).unwrap();
-        println!("body: {:?}", data);
+        //println!("body: {:?}", data);
 
         self.game_move_history_repository.create(lobby_member.player, data.clone(), user_move, current_history.id).await.map_err(database_error_to_status_code)?;
 

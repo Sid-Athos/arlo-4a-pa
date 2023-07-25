@@ -74,7 +74,7 @@ impl GameActionRequest {
         let docker_manager_service = DockerManagerService::new(pool.clone());
         let lobby_service = LobbyService::new(pool.clone());
 
-        let docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&actions_request).unwrap()).await.map_err(status_code_to_string)?;
+        let mut docker_manager_response = docker_manager_service.communicate_docker_manager(user.id, serde_json::to_string(&actions_request).unwrap()).await.map_err(status_code_to_string)?;
         if docker_manager_response.game_state.game_over {
             let mut winner_index = 1;
             let mut max_score = docker_manager_response.game_state.scores[0];
@@ -101,10 +101,28 @@ impl GameActionRequest {
             }
             docker_manager_service.update_ranking(lobby_members[winner_index-1].user_id,lobby.game_id,losers_id,false,loser_rankings/nb_losers).await.map_err(status_code_to_string)?;
 
+        } else {
+            if !GameActionRequest::as_actions(&docker_manager_response) {
+                docker_manager_response.game_state.game_over = true;
+                for lobby_member in &lobby_members {
+                    lobby_service.exit_lobby(lobby_member.user_id).await.map_err(status_code_to_string)?;
+                }
+            }
         }
 
         docker_manager_response.send_to_users(connections, lobby_members).await;
 
         return Ok(());
+    }
+
+    pub fn as_actions(docker_manager_response: &DockerManagerResponse) -> bool {
+
+        for i in 0..docker_manager_response.requested_actions.len() {
+            if docker_manager_response.requested_actions[i].zones.len() > 0 {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
