@@ -123,6 +123,15 @@ class _HomeState extends State<HomeView> {
         case "\"UserInvited\"":
           developer.log("UserInvited");
           return;
+        case "\"LobbyHostGiven\"":
+          developer.log("LobbyHostGiven");
+          return;
+        case "\"LobbyHostTaken\"":
+          developer.log("LobbyHostTaken");
+          return;
+        case "\"UserKicked\"":
+          developer.log("UserKicked");
+          return;
         case "\"CannotStartGame\"":
           developer.log("CannotStartGame");
           return;
