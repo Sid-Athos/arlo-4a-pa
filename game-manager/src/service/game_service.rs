@@ -57,7 +57,7 @@ impl GameService {
 
         let response = client.request(req).await.unwrap();
 
-        println!("status: {:?}", response.status());
+        println!("status teeee: {:?}\n\n\n", response.status());
         if response.status() != StatusCode::CREATED {
             return Err(response.status());
         }
