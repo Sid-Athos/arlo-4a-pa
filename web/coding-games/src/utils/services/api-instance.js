@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: 'https://dev.mikusupremacy/api',
+    baseURL: 'https://dev.mikusupremacy.fr/api',
     headers: {
         'Content-Type': 'application/json',
         'api-key' : 'coding_games'
