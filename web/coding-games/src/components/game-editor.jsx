@@ -1,6 +1,8 @@
 import {CodeMirror} from "@solid-codemirror/codemirror";
 import {basicSetup} from "codemirror";
 import {java} from "@codemirror/lang-java";
+
+import {rust} from "@codemirror/lang-rust";
 import {python} from "@codemirror/lang-python";
 import {
     Box, Button,
@@ -99,9 +101,18 @@ export default function Editor() {
         }
     }
     const clickDrawerGameItem = (e) => {
-        setCurrentCode(codes().find(item => item.name === e))
-        setLanguage(codes().find(item => item.name === e).language === "java"? java():python())
-        setLanguageString(codes().find(item => item.name === e).language === "java"? "java":"python3")
+        let currentCode = codes().find(item => item.name === e)
+        setCurrentCode(currentCode)
+        if(e.language === "python3"){
+            setLanguage(python())
+            setLanguageString("python3")
+        } else if(e.language === "rust"){
+            setLanguage(rust())
+            setLanguageString("rust")
+        } else {
+            setLanguage(java())
+            setLanguageString("java")
+        }
     }
     const swapLanguage = (language) => {
         switch (language) {
@@ -112,6 +123,10 @@ export default function Editor() {
             case 'java':
                 setLanguage(java())
                 setLanguageString("java")
+                break;
+            case'rust':
+                setLanguage(rust)
+                setLanguageString("rust")
                 break;
             default:
                 alert("ton langage n'existe pas")
@@ -224,6 +239,7 @@ export default function Editor() {
                                     >
                                         <MenuItem value={'python3'}>python</MenuItem>
                                         <MenuItem value={'java'}>java</MenuItem>
+                                        <MenuItem value={'rust'}>rust</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <FormControl

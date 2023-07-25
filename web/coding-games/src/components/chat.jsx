@@ -6,26 +6,47 @@ import {
     Card,
     CardActions,
     CardContent,
-    CardHeader,
-    createTheme,
-    Divider,
+    CardHeader, Container,
+    createTheme, Dialog, DialogActions, DialogContent, DialogTitle,
+    Divider, FormControl,
     FormGroup,
     Grid,
-    IconButton,
+    IconButton, InputLabel,
     List,
     ListItem,
     ListItemButton,
-    ListItemText,
+    ListItemText, Menu, MenuItem, Select,
     TextField,
     ThemeProvider
 } from "@suid/material";
 import ClearIcon from "@suid/icons-material/Clear";
 import MailIcon from "@suid/icons-material/Mail";
 import {UserStore} from "../utils/user-store";
+import {MoreVert} from "@suid/icons-material";
 
 export default function Chat({socket, sendMessage, conversation, setConvo}) {
     const [showChat, setShowChat] = createSignal(true)
     const [rowsValue, setRowsValue] = createSignal(2)
+    const [anchorEl, setAnchorEl] = createSignal(null);
+    const [showKickUserDialog, setShowKickUserDialog] = createSignal(false)
+    const [showGiveHostDialog, setShowGiveHostDialog] = createSignal(false)
+    const [toKick, setToKick] = createSignal({});
+    const [toHost, setToHost] = createSignal({})
+    const open = () => Boolean(anchorEl());
+    const handleClose = (str) => {
+        if(str){
+            console.log(str)
+                if(recipients().length > 0){
+            if(str === "Kick"){
+                console.log(recipients())
+                    setShowKickUserDialog(true)
+            } else {
+                setShowGiveHostDialog(true)
+            }
+                }
+        }
+        setAnchorEl(null);
+    };
 
     const darkTheme = createTheme({
         palette: {
@@ -40,8 +61,7 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
     }
 
     const recipients = createMemo(() => {
-        console.log(conversation())
-        return [...new Set(conversation().map(message => message.from_user.pseudo))];
+        return [...new Set(conversation().filter(message => message.from_user.pseudo !== UserStore.get().username))];
     });
 
 
@@ -58,8 +78,91 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
         }
     }
 
+    const handleCloseDialog = () => {
+        setShowKickUserDialog(false)
+    }
+
+    const giveHost = () => {
+
+    }
+
+    const updateUserToKick = (val)=> {
+        console.log(val)
+    }
+    const updateUserForhost = (val)=> {
+        console.log(val)
+    }
+
+    const handleCloseHostDialog = (e) => {
+        setShowGiveHostDialog(false)
+    }
+
     return (<>
         <ThemeProvider theme={darkTheme}>
+            <Show when={showGiveHostDialog()}>
+                <Dialog
+                    open={showGiveHostDialog()}
+                    onClose={handleCloseHostDialog}
+                    aria-describedby="alert-dialog-slide-description"
+                >
+                    <DialogTitle>{"Lobby settings"}</DialogTitle>
+                    <DialogContent>
+                        <FormControl fullWidth>
+                            <InputLabel id="demo-simple-select-label">Kick user(s)</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+
+                                label="Age"
+                                onchange={updateUserForhost}
+                            >
+                                {recipients().map(user => {
+                                    return (
+                                        <>
+                                            <MenuItem value={user.from_user.id}>user.from_user.pseudo</MenuItem>
+
+                                        </>
+                                    )
+                                })}
+                                <MenuItem value={2}>Arnaud</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => handleCloseHostDialog}>Cancel</Button>
+                        <Button onClick={() => giveHost}>Kick user(s)</Button>
+                    </DialogActions>
+                </Dialog>
+            </Show>
+            <Show when={showKickUserDialog()}>
+
+            <Dialog
+                open={showKickUserDialog()}
+                onClose={handleCloseDialog}
+                aria-describedby="alert-dialog-slide-description"
+            >
+                <DialogTitle>{"Lobby settings"}</DialogTitle>
+                <DialogContent>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Kick user(s)</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={recipients()}
+                            label="Age"
+                            onchange={updateUserToKick}
+                        >
+                            <MenuItem value={1}>Armand</MenuItem>
+                            <MenuItem value={2}>Arnaud</MenuItem>
+                        </Select>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => handleCloseDialog}>Cancel</Button>
+                    <Button onClick={() => kickUser}>Kick user(s)</Button>
+                </DialogActions>
+            </Dialog>
+            </Show>
             <Show when={!showChat()}>
                 <Button sx={{backgroundColor: "black", position: "absolute", bottom: 0, right: 0, width: 200}}
                         variant="outlined" onclick={handleShowChat}>Open chat
@@ -69,6 +172,16 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
                 </Button>
             </Show>
             <Show when={showChat()}>
+                <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl()}
+                    open={open()}
+                    onClose={() => handleClose(null)}
+                    MenuListProps={{ "aria-labelledby": "basic-button" }}
+                >
+                    <MenuItem onClick={() => handleClose("Kick")}>KickUser</MenuItem>
+                    <MenuItem onClick={() => handleClose("GiveHost")}>Give Host</MenuItem>
+                </Menu>
                 <Card sx={{
                     minWidth: 400,
                     maxWidth: 400,
@@ -80,8 +193,10 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
                 }}>
                     <CardHeader
                         action={
-                            <IconButton aria-label="settings" onclick={handleShowChat}>
-                                <ClearIcon sx={{color: "#fff"}}/>
+                            <IconButton aria-label="settings" onClick={(event) => {
+                                setAnchorEl(event.currentTarget);
+                            }}>
+                                <MoreVert sx={{color: "#fff"}}/>
                             </IconButton>
                         }
                         sx={{maxHeight: 50}}
@@ -91,7 +206,7 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
                     />
                     <Divider/>
                     <Divider/>
-                    <CardContent sx={{minWidth: 275, maxWidth: 500, maxHeight: 280, mL: 3, overflow: "scroll"}}>
+                    <CardContent sx={{minWidth: 275, maxWidth: 500, maxHeight: 260, mL: 3, overflow: "scroll"}}>
                         <Grid container>
                             <Grid item xs={5} md={4} sx={{minWidth: 350}}>
                                 <div style={{paddingTop: "20"}}>
@@ -130,7 +245,7 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
                                                     )
                                                 }
                                             } else {
-                                                if (i() === conversation.length - 1) {
+                                                if (i() === conversation().length - 1) {
                                                     return (
                                                         <>
                                                             <ListItem disablePadding sx={{marginBottom: "-20px"}}>
@@ -169,11 +284,13 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
                             </Grid>
                         </Grid>
                     </CardContent>
-                        <Box sx={{position: "absolute", maxWidth: 200, right:-20, bottom:0}} align={"right"}>
-                                <TextField multiline sx={{width: 300, position:"relative", bottom:0}} rows={rowsValue()}
-                                           onkeydown={sendOnCtrlEnter}></TextField>
-                                {/**<Button >Send Message</Button>*/}
-                        </Box>
+                    <CardActions>
+
+                    <Container sx={{minHeight:90}}>
+                                <TextField multiline sx={{width: 300, position:"absolute",bottom:2, left:60}} id="lol" rows={rowsValue()}
+                                           onkeydown={sendOnCtrlEnter} autoFocus></TextField>
+                    </Container>
+                    </CardActions>
                 </Card>
             </Show>
         </ThemeProvider>

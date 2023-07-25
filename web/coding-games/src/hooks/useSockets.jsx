@@ -13,8 +13,13 @@ export default function useSockets() {
 
     const [msg, setMsg] = createSignal({list:[]});
     onMount(() => {
-        const ws = createWS(`ws://localhost:7589/ws?token=${UserStore.get().token}`);
-        console.log(ws)
+        let ws;
+        if(sessionStorage.getItem("token")){
+            ws = createWS(`ws://localhost:7589/ws?token=${sessionStorage.getItem("token")}`);
+
+        } else {
+          ws = createWS(`ws://localhost:7589/ws?token=${UserStore.get().token}`);
+        }
         setSocket("websockets",ws)
         sendMessage("Hello")
         ws.addEventListener("message", (ev) => {
@@ -35,7 +40,6 @@ export default function useSockets() {
     const handleMessages = (jsonSocketMessage) => {
         if(jsonSocketMessage.Message){
             setConvo([...convo(),jsonSocketMessage.Message ])
-            console.log(convo())
             return jsonSocketMessage.Message;
 
         }else if(jsonSocketMessage.Emote){

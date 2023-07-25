@@ -27,11 +27,10 @@ export default function NavBar({setOpen}){
                                 <Link href={"#"}  underline={"none"} color="white"  onclick={() => nav("/ranking")}> Leaderboard</Link>
                                 <Link href={"#"}  underline={"none"} color="white"  onclick={() => nav("/code-editor")}> Code Editor</Link>
                                 <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/search-user")}> Search Users</Link>
-                                <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/meeting")}> Meeting</Link>
                                 <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/chat")}> Chat</Link>
 
                         <div>
-                            <Show when={!UserStore.get().token}>
+                            <Show when={!UserStore.get().token && !sessionStorage.getItem("token")}>
 
                                 <div color="inherit" onClick={handleOpen} sx={{justifyContent:"flex-start"}} >Login</div>
                             </Show>

@@ -142,7 +142,8 @@ const UnloggedScreen = (
                                         setUserSignIn(user)
                                     } }
                                     />
-                                    <Button size="large" onclick={signIn}>Login</Button>
+                                        <Button size="large" onclick={signIn}>Login</Button>
+
                                 </Stack>
                             </Match>
                             <Match when={screen() === 'signUp'}>

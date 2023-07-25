@@ -66,10 +66,8 @@ export default function Lobby(){
         setGameList(data)
     })
     function test(val){
-        console.log(val)
     }
 
-    console.log(convo())
     const msgList = createMemo((previous) => {
 
         return test(messages);
@@ -144,11 +142,9 @@ export default function Lobby(){
     }
 
     const handleInvitesChange = (e) => {
-        console.log(e)
     }
 
     const Item = styled(Paper)(({ theme }) => {
-            console.log(theme)
         return ({
             ...theme.typography.body2,
             padding: theme.spacing(1),
