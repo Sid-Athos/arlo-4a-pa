@@ -47,6 +47,7 @@ impl GameService {
 
         let body_str = serde_json::to_string(&create_image_request).unwrap();
         //println!("body_str: {}", body_str);
+        println!("test wsh");
 
         let client = Client::new();
         let req = Request::builder()
