@@ -21,6 +21,7 @@ async def head():
 
 @router.post("/", status_code=200)
 async def build_image(image_build_model: ImageBuildModel):
+    print("Got the request")
     tag = docker_image_service.build_image(language=image_build_model.language, tag=image_build_model.tag,
                                            game_file_name=image_build_model.game_file_name)
     if tag != "":
