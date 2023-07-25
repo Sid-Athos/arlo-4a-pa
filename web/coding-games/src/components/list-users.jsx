@@ -1,11 +1,26 @@
-import {createSignal, For, onMount, Show} from "solid-js";
+import {createMemo, createSignal, For, onMount, Show} from "solid-js";
 import {UserService} from "../utils/services/user-service";
-import {Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from "@suid/material";
+import {
+    Box, Button, createTheme,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Paper, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, ThemeProvider
+} from "@suid/material";
 import SearchComponent from "./search-bar.jsx"
 import createSvgIcon from "@suid/material/utils/createSvgIcon";
+import {UserStore} from "../utils/user-store";
+import {Add} from "@suid/icons-material";
+import {useNavigate} from "@solidjs/router";
 
 
 export default function ListUsers() {
+    const nav = useNavigate();
+    console.log(UserStore.get().pseudo)
     const PlusIcon = createSvgIcon(
         // credit: plus icon from https://heroicons.com/
         <svg
@@ -21,40 +36,82 @@ export default function ListUsers() {
     );
     const [userList, setUserList] = createSignal([])
 
+    const users = createMemo(()=> {
+        console.log(userList())
+        console.log(UserStore.get().username)
+        console.log(userList().filter(user => user.pseudo !== UserStore.get().username))
+        if(UserStore.get().username){
+        return userList().filter(user => user.pseudo !== UserStore.get().username)
+
+        } else if (sessionStorage.getItem("username")){
+             return userList().filter(user => user.pseudo !== sessionStorage.getItem("username"))
+
+        } else {
+            nav("/")
+        }
+    })
+    console.log(users())
+
     const addFriend = async (recipientId) => {
 
         await UserService.addFriend({recipient_id: recipientId})
     }
+
+    function renderManagementOptions(userId) {
+        return (
+            <>
+                <IconButton aria-label="delete" onClick={() => addFriend(userId)}>
+                    <Add />
+                </IconButton>
+
+            </>);
+    }
+    const darkTheme = createTheme({
+        palette: {
+            mode: 'dark',
+        },
+    });
     return (
         <>
             <Box sx={{flexGrow: 1, m: 8}}>
                 <SearchComponent setUserList={setUserList}></SearchComponent>
                 <Show when={userList().length > 0}>
-                    <List sx={{color:"white",ml:40}}>
-                        <ListItem >
-                                <ListItemText primary={"Pseudo"} sx={{maxWidth:'250px'}}/>
-                                <ListItemText primary={"Experience"} sx={{maxWidth:'250px'}}/>
-                                <ListItemText primary={"Level"} sx={{maxWidth:'250px'}}/>
-                                <ListItemText primary={"Action"} sx={{maxWidth:'250px'}}/>
-                            </ListItem>
+                    <ThemeProvider theme={darkTheme}>
+                    <TableContainer component={Paper}>
+                        <Table sx={{maxWidth: 650}} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Username</TableCell>
+                                    <TableCell align="right">Experience</TableCell>
+                                    <TableCell align="right">Level</TableCell>
+                                    <TableCell align="right">Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                        { users().map(user => {
+                            return (    <><TableRow>
+            <TableCell>
+                {user.pseudo}
+            </TableCell>
+                                    <TableCell align="right">
+                                        {user.experience}
+                                    </TableCell>
 
-                    </List>
-                    <List sx={{color:"white",ml:40}}>
-                        <For each={userList()}>{(user) =>
-                            <><ListItem>
-                                <ListItemText primary={user.pseudo} sx={{maxWidth:'250px'}}/>
-                                <ListItemText primary={user.experience} sx={{maxWidth:'250px'}}/>
-                                <ListItemText primary={user.level} sx={{maxWidth:'250px'}}/>
-                                <ListItemIcon onclick={() => addFriend(user.id)}>
-                                    <PlusIcon sx={{color:"white"}}/>
+                                    <TableCell align="right">
+                                        {user.level}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        {renderManagementOptions}
+                                    </TableCell>
 
-                                </ListItemIcon>
-                            </ListItem></>
-                        }
+                                </TableRow></>
+                        )
+                        })}
 
-                        </For>
-                    </List>
-
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    </ThemeProvider>
                 </Show>
             </Box>
         </>

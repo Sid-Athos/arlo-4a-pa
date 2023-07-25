@@ -30,7 +30,7 @@ export default function NavBar({setOpen}){
                                 <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/chat")}> Chat</Link>
 
                         <div>
-                            <Show when={!UserStore.get().token && !sessionStorage.getItem("token")}>
+                            <Show when={(!UserStore.get().token && !sessionStorage.getItem("token")) || !sessionStorage.getItem("username")}>
 
                                 <div color="inherit" onClick={handleOpen} sx={{justifyContent:"flex-start"}} >Login</div>
                             </Show>

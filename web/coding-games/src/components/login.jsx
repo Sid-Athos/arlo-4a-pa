@@ -54,6 +54,7 @@ export default function LoginComponent ({open,setOpen})  {
         GameManagerInstance.updateAuthorizationHeader(userInfo.token);
         UserStore.save({token: response.data.token, username: userInfo.nickname, mail: userInfo.email})
         sessionStorage.setItem("token", response.data.token)
+        sessionStorage.setItem("username", userInfo.nickname)
     }
 
 

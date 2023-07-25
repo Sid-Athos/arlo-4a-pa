@@ -64,7 +64,7 @@ render(
                             <Route path={"/search-user"} component={ListUsersComponent}></Route>
                             <Route path={"/chat"} component={Chat}></Route>
                             <Route path={"/meeting"} component={HomeMeeting}></Route>
-                            <Route path="/:meetCode" element={<Meeting/>}/>
+                            <Route path="/meeting/:meetCode" element={<Meeting/>}/>
                         </Routes>
                     </Router>
             </Box>
