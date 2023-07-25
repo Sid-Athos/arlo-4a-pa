@@ -104,6 +104,9 @@ impl GameActionRequest {
         } else {
             if !GameActionRequest::as_actions(&docker_manager_response) {
                 docker_manager_response.game_state.game_over = true;
+                for lobby_member in &lobby_members {
+                    lobby_service.exit_lobby(lobby_member.user_id).await.map_err(status_code_to_string)?;
+                }
             }
         }
 
