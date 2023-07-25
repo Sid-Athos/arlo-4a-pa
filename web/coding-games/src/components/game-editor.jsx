@@ -222,7 +222,7 @@ export default function Editor() {
                                         label="Language"
                                         sx={{color: "white", justifyContent: "center"}}
                                     >
-                                        <MenuItem value={'python'}>python</MenuItem>
+                                        <MenuItem value={'python3'}>python</MenuItem>
                                         <MenuItem value={'java'}>java</MenuItem>
                                     </Select>
                                 </FormControl>
