@@ -38,7 +38,7 @@ impl GameService {
     pub async fn create_game(&self, name: String, max_players: i32, min_players: i32, description: Option<String>, language: String, code: String, user_id: i32) -> Result<Game, StatusCode> {
         let tag = Uuid::new_v4().to_string();
         let game = self.game_repository.create(name, min_players, max_players, description, language, user_id, code.clone(), tag).await.map_err(database_error_to_status_code)?;
-        print!("{:?}", game);
+        //print!("{:?}", game);
         let mut f = File::create(format!("resources/games/{}.{}", game.id, game.language)).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
         let code_literal = format!(r#"{:?}"#, code);
         f.write_all(code.as_bytes()).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -46,7 +46,7 @@ impl GameService {
         let create_image_request = CreateImageRequest::new(game.language.clone(), game.tag.clone(), format!("{}.{}", game.id, game.language));
 
         let body_str = serde_json::to_string(&create_image_request).unwrap();
-        println!("body_str: {}", body_str);
+        //println!("body_str: {}", body_str);
 
         let client = Client::new();
         let req = Request::builder()
