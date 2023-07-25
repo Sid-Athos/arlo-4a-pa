@@ -22,12 +22,13 @@ export default function NavBar({setOpen}){
                                 spacing={3}
                                 sx={{fontSize:20}}
                             >
-                                <Link href="#"  underline={"none"} color="white" onclick={() => nav("/game-lobby")}
+                                <Link href="#"  underline={"none"} color="white" onclick={() => nav("/lobby")}
                                 > Games</Link>
                                 <Link href={"#"}  underline={"none"} color="white"  onclick={() => nav("/ranking")}> Leaderboard</Link>
                                 <Link href={"#"}  underline={"none"} color="white"  onclick={() => nav("/code-editor")}> Code Editor</Link>
                                 <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/search-user")}> Search Users</Link>
                                 <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/meeting")}> Meeting</Link>
+                                <Link href={"#"} underline={"none"} color="white"  onclick={() => nav("/chat")}> Chat</Link>
 
                         <div>
                             <Show when={!UserStore.get().token}>

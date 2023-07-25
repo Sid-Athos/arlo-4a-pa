@@ -1,15 +1,15 @@
 import {createSignal} from "solid-js";
 
-export default function game(){
-    const [svg,setSvg] = createSignal("")
+export default function game() {
+    const [svg, setSvg] = createSignal("")
 
-    function jsonToSvg(svgFields){
-        if(!svgFields.width || !svgFields.height || !svgFields.content || !svgFields.content[0].content){
+    function jsonToSvg(svgFields) {
+        if (!svgFields.width || !svgFields.height || !svgFields.content || !svgFields.content[0].content) {
             return alert("Cannot generate SVG");
         }
         let svg = `<svg width=${svgFields.width} height=${svgFields.height} onClick=test(event)>`;
         svgFields.content.forEach(item => {
-            switch (item.tag){
+            switch (item.tag) {
                 case "style":
                     svg += `<style>
                                 ${item.content}
@@ -35,8 +35,8 @@ export default function game(){
     }
 
     return (
-      <>
-          {svg}
-      </>
+        <>
+            {svg}
+        </>
     );
 }

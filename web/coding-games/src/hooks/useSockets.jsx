@@ -1,135 +1,141 @@
-import {onCleanup} from "solid-js";
+import {createSignal, onMount} from "solid-js";
 import {createStore} from "solid-js/store";
 import {UserStore} from "../utils/user-store";
-
+import {createWS} from "@solid-primitives/websocket";
+import { createEventSignal } from "@solid-primitives/event-listener";
 export default function useSockets() {
 
-    const [store, setStore] = createStore({
-        socket: null,
-    });
+    const [socket, setSocket] = createStore({
+        websockets:null,
+        messageEvent:null
+    })
+    const [messages, setMessages] = createStore([]);
+
+    const [msg, setMsg] = createSignal({list:[]});
+    onMount(() => {
+        const ws = createWS(`ws://localhost:7589/ws?token=${UserStore.get().token}`);
+        console.log(ws)
+        setSocket("websockets",ws)
+        sendMessage("Hello")
+        ws.addEventListener("message", (ev) => {
+                handleMessages(JSON.parse(ev.data))
+
+        });
+    })
+
+    const [convo, setConvo] = createSignal([]);
 
 
-    const setUpSockets = ()=> {
-        const socket = new WebSocket(`ws://localhost:7589/ws?token=${UserStore.get().token}`);
-
-        setStore("socket", socket);
-
-        socket.onopen = async function () {
-            //await GamesService.rtcMeeting()
-        };
-    }
 
     const sendMessage = (jsonToSend) => {
-        store.socket.send(JSON.stringify(jsonToSend))
+        socket.websockets?.send(JSON.stringify(jsonToSend))
     }
-    onCleanup(() => {
-        store.socket?.close;
-    });
 
-    store.socket.add
 
     const handleMessages = (jsonSocketMessage) => {
         if(jsonSocketMessage.Message){
+            setConvo([...convo(),jsonSocketMessage.Message ])
+            console.log(convo())
             return jsonSocketMessage.Message;
 
         }else if(jsonSocketMessage.Emote){
             return jsonSocketMessage.Emote;
 
         } else if(jsonSocketMessage.UserInvited){
-            console.log(jsonSocketMessage.UserInvited)
+            return jsonSocketMessage.UserInvited
 
         }else if(jsonSocketMessage.InviteLobbyCancelled){
-            console.log(jsonSocketMessage.InviteLobbyCancelled)
+            return jsonSocketMessage.InviteLobbyCancelled
 
         }else if(jsonSocketMessage.InviteLobbyAccepted){
-            console.log(jsonSocketMessage.InviteLobbyAccepted)
+            return jsonSocketMessage.InviteLobbyAccepted
 
         }else if(jsonSocketMessage.InviteLobbyDeclined){
-            console.log(jsonSocketMessage.InviteLobbyDeclined)
+            return jsonSocketMessage.InviteLobbyDeclined
 
         }else if(jsonSocketMessage.InviteReceived){
-            console.log(jsonSocketMessage.InviteReceived)
+            return jsonSocketMessage.InviteReceived
 
         }else if(jsonSocketMessage.GameDisplay){
-            console.log(jsonSocketMessage.GameDisplay)
+            return jsonSocketMessage.GameDisplay
 
         }else if(jsonSocketMessage.GameAction){
-            console.log(jsonSocketMessage.GameAction)
+            return jsonSocketMessage.GameAction
 
         }else if(jsonSocketMessage.GameStarted){
-            console.log(jsonSocketMessage.GameStarted)
+            return jsonSocketMessage.GameStarted
 
         }else if(jsonSocketMessage.ICECandidate){
-            console.log(jsonSocketMessage.ICECandidate)
+            return jsonSocketMessage.ICECandidate
 
         } else if(jsonSocketMessage.SDPAnswer){
-            console.log(jsonSocketMessage.SDPAnswer)
+            return jsonSocketMessage.SDPAnswer
 
         } else if(jsonSocketMessage.SDPOffer){
-            console.log(jsonSocketMessage.SDPOffer)
+            return jsonSocketMessage.SDPOffer
 
         } else if(jsonSocketMessage.Lobby){
-            console.log(jsonSocketMessage.Lobby)
+            return jsonSocketMessage.Lobby
 
         } else if(jsonSocketMessage.UserLeftRtcSession){
-            console.log(jsonSocketMessage.UserLeftRtcSession)
+            return jsonSocketMessage.UserLeftRtcSession
         } else if(jsonSocketMessage.Error){
-            console.log(jsonSocketMessage.Error)
+            return jsonSocketMessage.Error
         }else {
             switch(jsonSocketMessage){
                 case "Hello":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "Pong":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "Bye":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "LobbyCreated":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "LobbyJoined":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "LobbyExited":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "LobbyHostGiven":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "LobbyHostTaken":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "UserJoined":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "UserKicked":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "Kicked":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "UserInvited":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "StartedGame":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "CannotStartGame":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "BadMessage":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "GameStopped":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "GameWin":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 case "GameLose":
-                    console.log("here")
+                    return jsonSocketMessage
                     break;
                 default:
                     alert("Unrecognized message")
@@ -138,9 +144,12 @@ export default function useSockets() {
     }
 
     return {
-        store,
-        setUpSockets,
+        socket,
         sendMessage,
-        handleMessages
+        handleMessages,
+        msg,
+        messages,
+        convo,
+        setConvo
     };
 }

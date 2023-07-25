@@ -13,9 +13,9 @@ export default function SearchBar({setUserList}){
         setSearch(e.target.value)
     }
     return (<>
-            <Box >
+            <Box sx={{ml:80}}>
                 <SearchIcon sx={{color:"white"}}/>
-                <TextField id="input-with-sx" variant="standard" onKeyDown={test} inputProps={{ style: { color: "white", justifyContent:"center", borderColor:"white" } }}/>
+                <TextField id="input-with-sx" variant="standard" onKeyDown={test} inputProps={{ style: { color: "white", justifyContent:"center", borderColor:"white" ,ml:50} }}/>
             </Box>
         </>
     )

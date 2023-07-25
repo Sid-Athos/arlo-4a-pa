@@ -2,9 +2,8 @@
 import {render} from 'solid-js/web';
 // @ts-ignore
 import './index.css';
-import {Router, Route, Routes, useNavigate} from "@solidjs/router";
-import {AppBar, Box, Button, Divider, IconButton, Link, Stack, TextField, Toolbar, Typography} from "@suid/material";
-import MenuIcon from "@suid/icons-material/Menu";
+import {Route, Router, Routes} from "@solidjs/router";
+import {Box} from "@suid/material";
 import {createSignal} from "solid-js";
 // @ts-ignore
 import LoginComponent from "./components/login.jsx";
@@ -42,31 +41,31 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
     );
 }
 
-import { A } from "@solidjs/router";
-
 
 // @ts-ignore
 render(
     () => (
-        <Box sx={{backgroundColor: '#282c34', minHeight: '100vh'}}>
-            <Box sx={{flexGrow: 1}}>
-        <Router>
-            <NavBarComponent setOpen={setOpen} open={open}>
-            </NavBarComponent>
-                    <Routes>
-                        {/* @ts_ignore */}
-                        <Route path={"/"}
-                               component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
-                        <Route path={"/lobby"} component={LobbyComponent}></Route>
-                        <Route path={"/code-editor"} component={GameEditorComponent}></Route>
-                        <Route path={"/ranking"} component={RankingComponent}></Route>
-                        <Route path={"/game-lobbies"} component={GameLobbyComponent}></Route>
-                        <Route path={"/search-user"} component={ListUsersComponent}></Route>
-                        <Route path={"/chat"} component={Chat}></Route>
-                        <Route path={"/meeting"} component={HomeMeeting}></Route>
-                        <Route path="/:meetCode" element={<Meeting/>} />
-                    </Routes>
-                </Router>
-                    </Box>
+            <Box sx={{backgroundColor: '#282c34', minHeight: '100vh'}}>
+                <Box sx={{flexGrow: 1}}>
                 </Box>
+                    <Router>
+                        <NavBarComponent setOpen={setOpen} open={open}>
+                        </NavBarComponent>
+
+                        <Routes>
+                            {/* @ts_ignore */}
+                            <Route path={"/"}
+                                   component={<LoginComponent open={open} setOpen={setOpen}></LoginComponent>}></Route>
+
+                            <Route path={"/lobby"} component={LobbyComponent}></Route>
+                            <Route path={"/code-editor"} component={GameEditorComponent}></Route>
+                            <Route path={"/ranking"} component={RankingComponent}></Route>
+                            <Route path={"/game-lobbies"} component={GameLobbyComponent}></Route>
+                            <Route path={"/search-user"} component={ListUsersComponent}></Route>
+                            <Route path={"/chat"} component={Chat}></Route>
+                            <Route path={"/meeting"} component={HomeMeeting}></Route>
+                            <Route path="/:meetCode" element={<Meeting/>}/>
+                        </Routes>
+                    </Router>
+            </Box>
     ), root!);

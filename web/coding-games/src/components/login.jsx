@@ -13,6 +13,7 @@ import {GameManagerInstance} from "../utils/services/game-manager-instance";
 import {UserService} from "../utils/services/user-service";
 import {useNavigate} from "@solidjs/router";
 import {UserStore} from "../utils/user-store";
+import useSockets from "../hooks/useSockets";
 
 export default function LoginComponent ({open,setOpen})  {
     const [user, setUser] = createStore({nickname:"", email:"", token: null});
@@ -52,6 +53,7 @@ export default function LoginComponent ({open,setOpen})  {
         ApiInstance.updateAuthorizationHeader(userInfo.token );
         GameManagerInstance.updateAuthorizationHeader(userInfo.token);
         UserStore.save({token: response.data.token, username: userInfo.nickname, mail: userInfo.email})
+
     }
 
 

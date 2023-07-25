@@ -40,10 +40,8 @@ export default function Notifications() {
 
     onMount(() => {
         setInterval(async () => {
-            console.log(UserStore.get().username)
             if (UserStore.get().token) {
                 await UserService.friendRequests().then(res => {
-                    console.log(res)
                     setNotifications(res.data.filter(friendRequest => friendRequest.applicant.pseudo !== UserStore.get().username))
                 })
 

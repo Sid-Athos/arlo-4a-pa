@@ -30,8 +30,8 @@ export default function ListUsers() {
             <Box sx={{flexGrow: 1, m: 8}}>
                 <SearchComponent setUserList={setUserList}></SearchComponent>
                 <Show when={userList().length > 0}>
-                    <List sx={{color:"white"}}>
-                        <ListItem disablePadding >
+                    <List sx={{color:"white",ml:40}}>
+                        <ListItem >
                                 <ListItemText primary={"Pseudo"} sx={{maxWidth:'250px'}}/>
                                 <ListItemText primary={"Experience"} sx={{maxWidth:'250px'}}/>
                                 <ListItemText primary={"Level"} sx={{maxWidth:'250px'}}/>
@@ -39,15 +39,16 @@ export default function ListUsers() {
                             </ListItem>
 
                     </List>
-                    <List sx={{color:"white"}}>
+                    <List sx={{color:"white",ml:40}}>
                         <For each={userList()}>{(user) =>
-                            <><ListItem disablePadding>
+                            <><ListItem>
                                 <ListItemText primary={user.pseudo} sx={{maxWidth:'250px'}}/>
                                 <ListItemText primary={user.experience} sx={{maxWidth:'250px'}}/>
                                 <ListItemText primary={user.level} sx={{maxWidth:'250px'}}/>
-                                <ListItemButton onClick={() => addFriend(user.id)} sx={{maxWidth:'250px'}}>
-                                    <PlusIcon/>
-                                </ListItemButton>
+                                <ListItemIcon onclick={() => addFriend(user.id)}>
+                                    <PlusIcon sx={{color:"white"}}/>
+
+                                </ListItemIcon>
                             </ListItem></>
                         }
 
