@@ -20,7 +20,7 @@ services:
     volumes:
       - "./game-manager/.env:/.env"
       - "./game-manager/logs:/logs"
-      - "./game-manager/resources/games:/resources"
+      - "./game-manager/resources/games:/resources/games"
   dockermanager:
     container_name: "dockermanager"
     image: dixennaxos/pa-4al2-gr5:docker-manager-${ENV}-latest
