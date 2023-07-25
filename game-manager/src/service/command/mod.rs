@@ -1,2 +1,3 @@
 pub mod create_lobby_command;
 pub mod update_game_command;
+pub mod create_lobby_command_with_game_history_move_id;

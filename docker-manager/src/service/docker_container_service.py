@@ -10,7 +10,7 @@ from .docker_image_service import pull_image
 import subprocess
 
 languages_commands = {"python3": ["python3", "main.py"], "c": ["./game"], "rust": ["./game"],
-                      "java": ["java", "game"]}
+                      "java": ["java", "-jar", "game.jar"]}
 
 
 def run_container(tag: str) -> str:

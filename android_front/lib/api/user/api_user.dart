@@ -130,7 +130,7 @@ class ApiUser {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.get('$baseURL/friend_list');
+      final response = await dio.get('$baseURL/friend-list');
       final data = response.data as List<dynamic>;
       return data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
     } catch (e) {
@@ -144,7 +144,7 @@ class ApiUser {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.delete('$baseURL/friend_list/$user_id');
+      final response = await dio.delete('$baseURL/friend-list/$user_id');
       return FriendListResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
@@ -155,7 +155,7 @@ class ApiUser {
   static Future<FriendList?> sendFriendRequest(SendFriendRequestRequest sendFriendRequestRequest) async {
     try {
       dio.options.headers["api-key"] = "coding_games";
-      final response = await dio.post('$baseURL/friend_list', data: sendFriendRequestRequest.toJson());
+      final response = await dio.post('$baseURL/friend-list', data: sendFriendRequestRequest.toJson());
       return FriendListResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());
@@ -168,7 +168,7 @@ class ApiUser {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.get('$baseURL/friend_list/requests');
+      final response = await dio.get('$baseURL/friend-list/requests');
       final data = response.data as List<dynamic>;
       List<FriendList> friendsRequest =  data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
       List<FriendList> friendsRequestFiltered = [];
@@ -189,7 +189,7 @@ class ApiUser {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.get('$baseURL/friend_list/requests');
+      final response = await dio.get('$baseURL/friend-list/requests');
       final data = response.data as List<dynamic>;
       List<FriendList> friendsRequest =  data.map((json) => FriendListResponseMapper.fromJson(json)).toList();
       List<FriendList> friendsRequestFiltered = [];
@@ -210,7 +210,7 @@ class ApiUser {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       dio.options.headers["api-key"] = "coding_games";
       dio.options.headers["Authorization"] = "Bearer ${prefs.getString('login_token')}";
-      final response = await dio.put('$baseURL/friend_list/$requestId');
+      final response = await dio.put('$baseURL/friend-list/$requestId');
       return UserResponseMapper.fromJson(response.data);
     } catch (e) {
       developer.log(e.toString());

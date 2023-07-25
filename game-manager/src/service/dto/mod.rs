@@ -1,1 +1,2 @@
-pub mod game_dto;
+pub mod response;
+pub mod request;

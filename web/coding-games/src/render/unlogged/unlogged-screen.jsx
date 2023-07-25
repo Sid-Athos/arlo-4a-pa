@@ -52,7 +52,7 @@ const UnloggedScreen = (
             aria-describedby="modal-modal-description"
         >
             <Card
-                className="signCard"
+                className="signCard" sx={{m:3}}
             >
                 <CardContent>
                     <Stack spacing={2}>
@@ -142,7 +142,8 @@ const UnloggedScreen = (
                                         setUserSignIn(user)
                                     } }
                                     />
-                                    <Button size="large" onclick={signIn}>Login</Button>
+                                        <Button size="large" onclick={signIn}>Login</Button>
+
                                 </Stack>
                             </Match>
                             <Match when={screen() === 'signUp'}>

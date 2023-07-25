@@ -5,11 +5,11 @@ use crate::database::init::ConnectionPool;
 use crate::domain::error::status_code_to_string;
 use crate::domain::model::user::User;
 use crate::entrypoint::websocket::connections::Connections;
-use crate::entrypoint::websocket::response::lobby_response::LobbyResponse;
+
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
 use crate::entrypoint::websocket::response::sdp_offer_response::SDPOfferResponse;
 use crate::entrypoint::websocket::response::user_response::UserResponse;
-use crate::service::lobby_service::LobbyService;
+
 use crate::service::ws_session_service::WsSessionService;
 
 #[derive(Deserialize, Debug)]

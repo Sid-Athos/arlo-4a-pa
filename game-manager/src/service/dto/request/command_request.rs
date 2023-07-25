@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-pub struct GameDto {
+pub struct CommandRequest {
     pub language: String,
     pub commands: Vec<String>,
 }
 
-impl GameDto {
+impl CommandRequest {
     pub fn new(language: String, commands: Vec<String>) -> Self {
-        GameDto {
+        CommandRequest {
             language,
             commands
         }

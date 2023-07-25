@@ -32,6 +32,23 @@ impl GameRepository {
         Ok(GameEntityMapper::entity_to_domain(result))
     }
 
+    pub async fn get_my_games(&self, id: i32) -> Result<Vec<Game>, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+        tracing::info!("Init db get all");
+        let rows = conn
+            .query("SELECT id,name,min_players,max_players,description,language,code,user_id, tag FROM coding_games.game WHERE user_id = $1", &[&id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let mut result = Vec::new();
+
+        for row in rows {
+            result.push(GameEntityMapper::entity_to_domain(GameEntity::new(row)));
+        }
+
+        Ok(result)
+    }
+
     pub async fn get_all(&self) -> Result<Vec<Game>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
         tracing::info!("Init db get all");
@@ -62,12 +79,12 @@ impl GameRepository {
         Ok(GameEntityMapper::entity_to_domain(result))
     }
 
-    pub async fn create(&self, name : String, min_players: i32, max_players : i32, description : Option<String> , language : String, user_id : i32, code : String) -> Result<Game, DatabaseError> {
+    pub async fn create(&self, name : String, min_players: i32, max_players : i32, description : Option<String> , language : String, user_id : i32, code : String, tag : String) -> Result<Game, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
 
-        let uuid = Uuid::new_v4();
+
         let row = conn
-            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &uuid.to_string()])
+            .query_one("INSERT INTO coding_games.game (name, min_players, max_players, description, language, user_id, code, tag) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *", &[&name, &min_players, &max_players, &description, &language, &user_id, &code, &tag])
             .await
             .map_err(database_error_not_found)?;
 

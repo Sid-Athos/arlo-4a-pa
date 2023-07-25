@@ -38,18 +38,18 @@ class _ChatViewState extends State<ChatView> {
   User user;
   bool emoteDisplayed = false;
   List<String> emote = [
-    "assets/img/emote/Clean_Emote.webp",
-    "assets/img/emote/Despair_Emote.webp",
-    "assets/img/emote/Dislike_Emote.webp",
-    "assets/img/emote/Everything_is_Okay_Emote.webp",
-    "assets/img/emote/Fired_Up_Emote.webp",
-    "assets/img/emote/Gonna_Be_A_Blast_Emote.webp",
-    "assets/img/emote/Goodbye_Friend_Emote.webp",
-    "assets/img/emote/Let_s_Do_This_Emote.webp",
-    "assets/img/emote/Scout-Approved_Emote.webp",
-    "assets/img/emote/Star_Guardian_Towa_Emote.webp",
-    "assets/img/emote/Unbenched_Emote.webp",
-    "assets/img/emote/Was_that_Me_Emote.webp"
+    "Clean_Emote.webp",
+    "Despair_Emote.webp",
+    "Dislike_Emote.webp",
+    "Everything_is_Okay_Emote.webp",
+    "Fired_Up_Emote.webp",
+    "Gonna_Be_A_Blast_Emote.webp",
+    "Goodbye_Friend_Emote.webp",
+    "Let_s_Do_This_Emote.webp",
+    "Scout-Approved_Emote.webp",
+    "Star_Guardian_Towa_Emote.webp",
+    "Unbenched_Emote.webp",
+    "Was_that_Me_Emote.webp"
   ];
 
   final ScrollController _scrollController = ScrollController();
@@ -132,7 +132,7 @@ class _ChatViewState extends State<ChatView> {
                             emoteDisplayed = false;
                           });
                         },
-                        child: Image.asset(emote[index]),
+                        child: Image.asset("assets/img/emote/${emote[index]}"),
                       );
                     }),
                   ))
@@ -177,7 +177,7 @@ class _ChatViewState extends State<ChatView> {
                       style: const TextStyle(color: Colors.white38),
                     ),
                     subtitle: messages[index].isEmote
-                        ? Image.asset(messages[index].message, width: 100, height: 100)
+                        ? Image.asset("assets/img/emote/${messages[index].message}", width: 100, height: 100)
                         : Text(
                             messages[index].message,
                             style: const TextStyle(color: Colors.white),

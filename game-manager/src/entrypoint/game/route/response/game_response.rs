@@ -7,6 +7,7 @@ pub struct GameResponse {
     pub id: i32,
     pub name: String,
     pub description: Option<String>,
+    pub language: String,
     pub min_players: i32,
     pub max_players: i32,
     pub code : Option<String>
@@ -21,6 +22,7 @@ impl GameResponse {
             description: game.description,
             min_players: game.min_players,
             max_players: game.max_players,
+            language:game.language,
             code : game.code
         }
     }

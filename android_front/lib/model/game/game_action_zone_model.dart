@@ -12,8 +12,8 @@ class GameActionZone {
     required this.height
   });
 
-  bool isInZone(double x, double y) {
-    if (x >= this.x && x < this.x + width && y >= this.y && y < this.y + height) {
+  bool isInZone(int x, int y) {
+    if (x > this.x && x < this.x + width && y > this.y && y < this.y + height) {
       return true;
     }
     return false;

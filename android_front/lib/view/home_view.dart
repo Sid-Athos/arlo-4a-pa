@@ -13,6 +13,8 @@ import 'package:miku/mapper/game/game_svg_info_response_mapper.dart';
 import 'package:miku/mapper/user/user_response_mapper.dart';
 import 'package:miku/view/friends/friend_list_view.dart';
 import 'package:miku/view/game/game_left_dialog.dart';
+import 'package:miku/view/game/game_lose_dialog.dart';
+import 'package:miku/view/game/game_win_dialog.dart';
 
 import 'package:miku/view/lobby/game_list_view.dart';
 import 'package:miku/view/game/game_view.dart';
@@ -69,10 +71,6 @@ class _HomeState extends State<HomeView> {
   GameProvider gameProvider =
       GameProvider(messages: [], isShowChat: false, channel: null);
 
-  String tmpSvgDisplayData =
-      '{"width": "300","height": "300","content": [{"tag": "style","content": "line{stroke:black;stroke-width:4;}"},{"tag": "line","x1": "0","y1": "100","x2": "300","y2": "100"},{"tag": "line","x1": "100","y1": "0","x2": "100","y2": "300"},{"tag": "line","x1": "0","y1": "200","x2": "300","y2": "200"},{"tag": "line","x1": "200","y1": "0","x2": "200","y2": "300"},{"tag": "circle","cx": "50","cy": "50","r": "33","fill": "blue"}],"player": 2}';
-  String tmpActionData =
-      '{"type": "CLICK","zones": [{"x": 0,"y": 100,"width": 100,"height": 100},{"x": 0,"y": 200,"width": 100,"height": 100},{"x": 100,"y": 0,"width": 100,"height": 100},{"x": 100,"y": 100,"width": 100,"height": 100},{"x": 100,"y": 200,"width": 100,"height": 100},{"x": 200,"y": 0,"width": 100,"height": 100},{"x": 200,"y": 100,"width": 100,"height": 100},{"x": 200,"y": 200,"width": 100,"height": 100}]}';
 
   @override
   void initState() {
@@ -128,6 +126,12 @@ class _HomeState extends State<HomeView> {
         case "\"CannotStartGame\"":
           developer.log("CannotStartGame");
           return;
+        case "\"GameWin\"":
+          showGameWinDialog();
+          return;
+        case "\"GameLose\"":
+          showGameLoseDialog();
+          return;
         case "\"GameStopped\"":
           showGameLeftDialog();
           return;
@@ -137,15 +141,17 @@ class _HomeState extends State<HomeView> {
       for (var key in json.keys) {
         switch (key) {
           case "Message":
-            gameProvider.setSvgDisplay(GameSvgInfoResponseMapper.fromJson(
-                jsonDecode(tmpSvgDisplayData)));
-            gameProvider.setAction(
-                GameActionResponseMapper.fromJson(jsonDecode(tmpActionData)));
             gameProvider
                 .addMessage(MessageResponseWS.fromJson(json["Message"]));
             break;
           case "Emote":
             gameProvider.addEmote(EmoteResponseWS.fromJson(json["Emote"]));
+            break;
+          case "GameDisplay":
+            gameProvider.setSvgDisplay(GameSvgInfoResponseMapper.fromJson(json["GameDisplay"]));
+            break;
+          case "GameAction":
+            gameProvider.setAction(GameActionResponseMapper.fromJson(json["GameAction"]));
             break;
           case "Lobby":
             lobby.update(json["Lobby"]);
@@ -199,6 +205,26 @@ class _HomeState extends State<HomeView> {
         }
       }
     });
+  }
+
+  showGameLoseDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: navigatorKeys[1].currentContext!,
+      builder: (BuildContext context) {
+        return GameLoseDialog();
+      },
+    ).then((value) => {navigatorKeys[1].currentState!.pop()});
+  }
+
+  showGameWinDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: navigatorKeys[1].currentContext!,
+      builder: (BuildContext context) {
+        return GameWinDialog();
+      },
+    ).then((value) => {navigatorKeys[1].currentState!.pop()});
   }
 
   showGameLeftDialog() {
@@ -297,12 +323,13 @@ class _HomeState extends State<HomeView> {
     return Offstage(
       offstage: currentTab != 2,
       child: Navigator(
-          key: navigatorKeys[2],
-          onGenerateRoute: (settings) {
-            return MaterialPageRoute(
-              builder: (context) => ProfileView(user: user),
-            );
-          }),
+        key: navigatorKeys[2],
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => ProfileView(user: user),
+          );
+        }
+      ),
     );
   }
 

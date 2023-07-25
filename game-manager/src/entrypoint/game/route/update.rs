@@ -10,7 +10,7 @@ use crate::service::game_service::GameService;
 
 #[utoipa::path(
 put,
-path = "/game/{game_id}",
+path = "/games/{game_id}",
 responses(
 (status = 200, description = "game found", body = UserResponse),
 (status = 401, description = "Invalid token",),

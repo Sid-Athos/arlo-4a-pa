@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use axum::extract::ws::{Message, WebSocket};
-use futures_util::SinkExt;
+use futures_util::{AsyncWriteExt, SinkExt};
 use futures_util::stream::SplitSink;
 use tokio::sync::Mutex;
 use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
@@ -9,13 +9,32 @@ use crate::entrypoint::websocket::response::response_enum::ResponseEnum;
 #[derive(Debug, Clone)]
 pub struct Connections {
     clients: Arc<Mutex<HashMap<i32, SplitSink<WebSocket, Message>>>>,
+    lobbies_actions: Arc<Mutex<HashMap<i32, String>>>
 }
 
 impl Connections {
     pub(crate) fn new() -> Self {
         Self {
             clients: Arc::new(Mutex::new(HashMap::new())),
+            lobbies_actions: Arc::new(Mutex::new(HashMap::new())),
         }
+    }
+
+    pub async fn get_from_game_move_history_id(&self, game_move_history_id: i32) -> String {
+        for (i, val) in self.lobbies_actions.lock().await.iter_mut() {
+            if *i == game_move_history_id {
+                return val.clone();
+            }
+        }
+
+        return String::new();
+    }
+
+    pub async fn set_to_game_move_history_id(&self, game_move_history_id: i32, actions: String) {
+        if self.lobbies_actions.lock().await.contains_key(&game_move_history_id) {
+            self.lobbies_actions.lock().await.remove(&game_move_history_id);
+        }
+        self.lobbies_actions.lock().await.insert(game_move_history_id, actions);
     }
 
     pub async fn get_list_connected(&self) -> Vec<i32> {

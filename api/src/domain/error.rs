@@ -9,7 +9,7 @@ pub fn database_error_to_status_code(err: DatabaseError) -> StatusCode {
     match err {
         DatabaseError::NotFound => StatusCode::NOT_FOUND,
         DatabaseError::DuplicateKey => StatusCode::CONFLICT,
-        //DatabaseError::InvalidInput => StatusCode::BAD_REQUEST,
+        DatabaseError::InvalidInput => StatusCode::BAD_REQUEST,
         DatabaseError::CannotGetConnectionToDatabase => StatusCode::SERVICE_UNAVAILABLE,
     }
 }

@@ -22,6 +22,20 @@ impl GameMoveHistoryRepository {
         }
     }
 
+    pub async fn get_last_by_game_history_id(&self, game_history_id: i32) -> Result<GameMoveHistory, DatabaseError> {
+
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.game_move_history WHERE game_history_id = $1 ORDER BY action_number DESC LIMIT 1", &[&game_history_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = GameMoveHistoryEntity::new(row);
+
+        Ok(GameMoveHistoryEntityMapper::entity_to_domain(result))
+    }
+
     pub async fn get_all_by_game_history_id(&self, game_history_id: i32) -> Result<Vec<GameMoveHistory>, DatabaseError> {
         let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
         tracing::info!("Init db get all");
@@ -50,6 +64,46 @@ impl GameMoveHistoryRepository {
             VALUES \
             ($1,$2,$3,(COALESCE( (SELECT MAX(action_number) \
             FROM coding_games.game_move_history WHERE game_history_id = $4), 0))+1, $4) RETURNING *", &[&player, &game_state, &action, &game_history_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = GameMoveHistoryEntity::new(row);
+
+        Ok(GameMoveHistoryEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn get_game_id_from_game_move_history_id(&self, game_move_history_id : i32)-> Result<i32, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT gh.game_id FROM coding_games.game_history gh \
+            INNER JOIN coding_games.game_move_history gmh \
+            ON gh.id = gmh.game_history_id \
+            WHERE gmh.id = $1", &[&game_move_history_id])
+            .await
+            .map_err(database_error_not_found)?;
+        let result = row.get("game_id");
+        return Ok(result);
+    }
+
+    pub async fn get_by_id(&self, game_move_history_id : i32) -> Result<GameMoveHistory, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.game_move_history WHERE id = $1", &[&game_move_history_id])
+            .await
+            .map_err(database_error_not_found)?;
+
+        let result = GameMoveHistoryEntity::new(row);
+
+        Ok(GameMoveHistoryEntityMapper::entity_to_domain(result))
+    }
+
+    pub async fn get_by_position_and_game_history_id(&self, action_number : i32, game_history_id : i32) -> Result<GameMoveHistory, DatabaseError> {
+        let conn = self.connection.get().await.map_err(database_error_cannot_get_connection_to_database)?;
+
+        let row = conn
+            .query_one("SELECT * FROM coding_games.game_move_history WHERE action_number = $1 AND game_history_id = $2", &[&action_number,&game_history_id])
             .await
             .map_err(database_error_not_found)?;
 
