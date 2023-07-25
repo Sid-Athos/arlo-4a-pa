@@ -169,15 +169,11 @@ export default function Chat({socket, sendMessage, conversation, setConvo}) {
                             </Grid>
                         </Grid>
                     </CardContent>
-                    <CardActions>
-                        <Box sx={{position: "relative", maxWidth: 200, right: -40}} align={"right"}>
-                            <FormGroup>
-                                <TextField multiline sx={{width: 300}} rows={rowsValue()}
+                        <Box sx={{position: "absolute", maxWidth: 200, right:-20, bottom:0}} align={"right"}>
+                                <TextField multiline sx={{width: 300, position:"relative", bottom:0}} rows={rowsValue()}
                                            onkeydown={sendOnCtrlEnter}></TextField>
                                 {/**<Button >Send Message</Button>*/}
-                            </FormGroup>
                         </Box>
-                    </CardActions>
                 </Card>
             </Show>
         </ThemeProvider>

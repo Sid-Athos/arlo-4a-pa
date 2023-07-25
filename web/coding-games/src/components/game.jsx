@@ -1,7 +1,10 @@
-import {createSignal} from "solid-js";
+import {createMemo, createSignal} from "solid-js";
 
-export default function game() {
-    const [svg, setSvg] = createSignal("")
+export default function game({svgData}) {
+    /**
+    const svgContent = createMemo(()=> {
+        return svgData()?.content;
+    })*/
 
     function jsonToSvg(svgFields) {
         if (!svgFields.width || !svgFields.height || !svgFields.content || !svgFields.content[0].content) {
@@ -31,12 +34,11 @@ export default function game() {
             }
         })
         svg += `</svg>`
-        setSvg(svg)
     }
 
     return (
         <>
-            {svg}
+            svg
         </>
     );
 }

@@ -2,7 +2,7 @@ import {createSignal, onMount} from "solid-js";
 import {createStore} from "solid-js/store";
 import {UserStore} from "../utils/user-store";
 import {createWS} from "@solid-primitives/websocket";
-import { createEventSignal } from "@solid-primitives/event-listener";
+
 export default function useSockets() {
 
     const [socket, setSocket] = createStore({
