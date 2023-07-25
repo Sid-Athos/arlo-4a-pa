@@ -102,7 +102,7 @@ impl GameActionRequest {
             docker_manager_service.update_ranking(lobby_members[winner_index-1].user_id,lobby.game_id,losers_id,false,loser_rankings/nb_losers).await.map_err(status_code_to_string)?;
 
         } else {
-            if !GameActionRequest::as_actions(docker_manager_response) {
+            if !GameActionRequest::as_actions(&docker_manager_response) {
                 docker_manager_response.game_state.game_over = true;
             }
         }
@@ -112,7 +112,7 @@ impl GameActionRequest {
         return Ok(());
     }
 
-    pub fn as_actions(docker_manager_response: DockerManagerResponse) -> bool {
+    pub fn as_actions(docker_manager_response: &DockerManagerResponse) -> bool {
 
         for i in 0..docker_manager_response.requested_actions.len() {
             if docker_manager_response.requested_actions[i].zones.len() > 0 {
