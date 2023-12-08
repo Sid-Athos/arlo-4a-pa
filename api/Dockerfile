@@ -9,6 +9,9 @@ RUN cargo build --release
 
 RUN rm src/*.rs
 COPY ./src ./src
+COPY .env .env
+MKDIR logs
+EXPOSE 7980
 
 RUN rm ./target/release/deps/api*
 RUN cargo build --release
